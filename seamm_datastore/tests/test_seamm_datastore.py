@@ -8,5 +8,5 @@ import pytest
 import sys
 
 def test_import(): 
-    assert seamm_datastore in sys.modules
+    assert "seamm_datastore" in sys.modules
 
