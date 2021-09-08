@@ -5,26 +5,25 @@ Table models for SEAMM datastore SQLAlchemy database.
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Table, Text, JSON
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Table, Text, JSON, Float
 from sqlalchemy.orm import relationship
 
 from sqlalchemy.ext.declarative import declarative_base
 
 # Patched flask authorize
-from .flask_authorize_patch import (
+from seamm_datastore.flask_authorize_patch import (
     AccessControlPermissionsMixin,
     generate_association_table,
 )
 
 try:
-    from .db_util import fake_app
-
+    from seamm_datastore.connect import fake_app
     # Create declarative base
     Base = declarative_base()
 except ImportError:
     # Assume we're being used with flask_sqlalchemy in the seamm dashboard
+    # TODO - need to handle if user just isn't using connect class or the seamm dashboard
     from seamm_dashboard import db
-
     Base = db.Model
 
 
@@ -125,13 +124,16 @@ class Role(Base):
 class Flowchart(Base, AccessControlPermissionsMixin):
     __tablename__ = "flowcharts"
 
-    id = Column(String(32), nullable=False, primary_key=True)
-    title = Column(String(100), nullable=True)
+    id = Column(String(100), nullable=False, primary_key=True)
+    sha256 = Column(String(75), nullable=True)
+    sha256_strict = Column(String(75), nullable=True, unique=True)
+    flowchart_version = Column(Float, nullable=True, unique=False)
+    name = Column(String(100), nullable=True)
     description = Column(Text, nullable=True)
     path = Column(String, unique=True)
-    text = Column(Text, nullable=False)
     json = Column(JSON, nullable=False)
     created = Column(DateTime, nullable=False, default=datetime.utcnow)
+    text = Column(String(300), nullable=True)
 
     jobs = relationship("Job", back_populates="flowchart", lazy=True)
     projects = relationship(

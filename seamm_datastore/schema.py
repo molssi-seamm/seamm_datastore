@@ -3,8 +3,9 @@ Marshmallow models for serialization and deserialization.
 
 """
 
-
+from marshmallow import fields
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+import marshmallow_sqlalchemy
 from marshmallow_sqlalchemy.fields import Related, Nested
 
 from .models import Flowchart, Project, Job, User, Group, Role
@@ -23,11 +24,12 @@ class FlowchartSchema(SQLAlchemyAutoSchema):
         model = Flowchart
         exclude = (
             "json",
-            "text",
             "owner_permissions",
             "group_permissions",
             "other_permissions",
+            "sha256"
         )
+    name = fields.String(data_key="title")
 
     owner = Related("username")
     group = Related("name")

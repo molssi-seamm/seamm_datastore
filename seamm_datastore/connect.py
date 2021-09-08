@@ -38,7 +38,7 @@ class SEAMMDatastore:
         project = Project.query.filter_by(name=project_name).one_or_none()
 
         if not project:
-            raise ValueError(
+            raise NameError(
                 f"Project {project_name} not found in database, please check your project name."
             )
 
@@ -127,15 +127,15 @@ class SEAMMDatastore:
 
     def __init__(
         self,
-        database_uri: str,
-        initialize: bool = False,
-        permissions={
+        database_uri: str="sqlite:///memory:",
+        initialize: bool= False,
+        permissions: dict={
             "owner": ["read", "update", "delete"],
             "group": ["read", "update"],
             "world": [],
         },
-        username=None,
-        password=None,
+        username: str=None,
+        password: str=None,
     ):
 
         self.engine = create_engine(database_uri)

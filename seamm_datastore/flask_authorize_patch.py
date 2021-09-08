@@ -26,7 +26,7 @@ from flask_authorize.plugin import (
 from flask import current_app
 
 try:
-    from .db_util import fake_app
+    from .connect import fake_app
     from flask_authorize import mixins
 
     mixins.current_app = fake_app
