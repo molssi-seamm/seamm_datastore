@@ -2,6 +2,8 @@
 Class and functions for connection to database.
 """
 
+import os
+
 from functools import wraps
 
 from sqlalchemy import create_engine
@@ -16,8 +18,9 @@ def manage_session(method):
     @wraps(method)
     def _manage_session(self, *args, **kwargs):
         self.session = self.Session()
-        method(self, *args, **kwargs)
+        ret = method(self, *args, **kwargs)
         self.session.close()
+        return ret
 
     return _manage_session
 
@@ -31,16 +34,36 @@ class current_app:
 
 
 class SEAMMDatastore:
+
+    @staticmethod
+    def _add_resource(resource_info, resource_type):
+        resource = resource_type.query.filter_by()
+
     @manage_session
-    def add_job(self, job_name, job_description, path, project_name):
+    def add_flowchart(self, flowchart_info):
+        from .models import Flowchart
+
+        new_flowchart = Flowchart(**flowchart_info)
+
+        self.session.add(new_flowchart)
+        self.session.commit()
+
+    @manage_session
+    def add_job(self, job_data):
         from seamm_datastore.models import Job, Project
 
-        project = Project.query.filter_by(name=project_name).one_or_none()
+        try:
+            project_name = job_data["project_name"]
+            project = Project.query.filter_by(name=project_name).one_or_none()
 
-        if not project:
-            raise NameError(
-                f"Project {project_name} not found in database, please check your project name."
-            )
+            if not project:
+                raise NameError(
+                    f"Project {project_name} not found in database, please check your project name."
+                )
+
+        # If no project name, add to default project
+        except KeyError:
+            project = Project.query.filter_by(name="default").one()
 
         # The other permissions method in flask-authorize is harder to fake,
         # but this one works.
@@ -67,7 +90,7 @@ class SEAMMDatastore:
     def get_projects(self, as_json=False):
         from .models import Project
 
-        projects = Project.query.filter(Project.authorized("read")).all()
+        projects = Project.query.filter().all()
 
         if as_json:
             from .schema import ProjectSchema
@@ -78,21 +101,23 @@ class SEAMMDatastore:
 
     @manage_session
     def add_user(
-        self,
-        username,
-        password,
-        first_name=None,
-        last_name=None,
-        email=None,
-        roles=["user"],
+            self,
+            username,
+            password,
+            first_name=None,
+            last_name=None,
+            email=None,
+            roles=None,
     ):
-        print("Adding a user")
+
+        if roles is None:
+            roles = ["user"]
 
         # Verify username and password
         # Check if user exists
         from seamm_datastore.models import User
 
-        user = User.query.filter_by("username" == username).one_or_none()
+        user = User.query.filter_by(username=username).one_or_none()
 
         if user:
             raise ValueError(f"User {user} already found in the database")
@@ -103,7 +128,6 @@ class SEAMMDatastore:
             first_name=first_name,
             last_name=last_name,
             email=email,
-            roles=roles,
         )
 
         self.session.add(new_user)
@@ -119,24 +143,39 @@ class SEAMMDatastore:
 
         self._user = username
 
+    # Seems like a good place for @property, but can't use because flask authorize
+    # requires this to be callable.
     def current_user(self):
         from .models import User
 
-        user = User.query.filter_by(username=self._user).one()
+        if self._user:
+            user = User.query.filter_by(username=self._user).one_or_none()
+        else:
+            user = None
         return user
 
     def __init__(
-        self,
-        database_uri: str="sqlite:///memory:",
-        initialize: bool= False,
-        permissions: dict={
-            "owner": ["read", "update", "delete"],
-            "group": ["read", "update"],
-            "world": [],
-        },
-        username: str=None,
-        password: str=None,
+            self,
+            database_uri: str = "sqlite:///memory:",
+            initialize: bool = False,
+            permissions: dict = None,
+            username: str = None,
+            password: str = None,
+            datastore_location: str = None,
+            default_project: str = "default",
     ):
+
+        if permissions is None:
+            permissions = {
+                "owner": ["read", "update", "delete"],
+                "group": ["read", "update"],
+                "world": [],
+            }
+
+        if datastore_location is None:
+            self.datastore_location = os.getcwd()
+        else:
+            self.datastore_location = datastore_location
 
         self.engine = create_engine(database_uri)
         self.Session = scoped_session(
@@ -145,6 +184,8 @@ class SEAMMDatastore:
 
         global fake_app
 
+        # Flask authorize relies on this data to be bound with the flask app
+        # we'll just create a fake app and bind the data flaks authorize wants.
         fake_app = current_app(
             config={
                 "AUTHORIZE_DEFAULT_PERMISSIONS": permissions,
@@ -153,7 +194,7 @@ class SEAMMDatastore:
             }
         )
 
-        from .models import Base, User
+        from .models import Base, Project
 
         if initialize:
             Base.metadata.drop_all(self.engine)
@@ -166,14 +207,22 @@ class SEAMMDatastore:
                 raise ValueError(
                     "User and password must be given if database is being initialized."
                 )
-
-            user = User(username=username, password=password)
-            self.Session.add(user)
-            self.Session.commit()
+            self.add_user(username, password)
 
         if username:
             self.login(username, password)
         else:
             self._user = None
 
+        # Current user has to be bound before we can add anything else to be database.
         self.authorize = Authorize(current_user=self.current_user)
+
+        # Now handle the project
+        if initialize:
+            self.add_project({"name": default_project, "owner": self.current_user()})
+        else:
+            project = Project.query.filter_by(name=default_project).one_or_none()
+            if not project:
+                raise ValueError("Invalid project name given for default.")
+
+        self.default_project = default_project

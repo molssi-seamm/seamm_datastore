@@ -29,6 +29,9 @@ class FlowchartSchema(SQLAlchemyAutoSchema):
             "other_permissions",
             "sha256"
         )
+    # we store "name" to correspond to what is
+    # in the flowchart metadata, but
+    # we want to access it as title
     name = fields.String(data_key="title")
 
     owner = Related("username")
