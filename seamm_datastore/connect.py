@@ -11,6 +11,8 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 from flask_authorize import Authorize
 
+from .util import LoginRequiredError
+
 
 def manage_session(method):
     """Decorator for closing sqlalchemy sessions."""
@@ -35,22 +37,27 @@ class current_app:
 
 class SEAMMDatastore:
 
-    @staticmethod
-    def _add_resource(resource_info, resource_type):
-        resource = resource_type.query.filter_by()
-
     @manage_session
     def add_flowchart(self, flowchart_info):
         from .models import Flowchart
 
         new_flowchart = Flowchart(**flowchart_info)
 
+
         self.session.add(new_flowchart)
         self.session.commit()
 
     @manage_session
     def add_job(self, job_data):
+        """Add a job to the datastore.
+
+        This method requires a user to be logged in and to have appropriate permissions
+        for the project.
+        """
         from seamm_datastore.models import Job, Project
+
+        if not self.current_user():
+            raise LoginRequiredError
 
         try:
             project_name = job_data["project_name"]
@@ -71,7 +78,10 @@ class SEAMMDatastore:
             raise RuntimeError("You are not authorized to add jobs to this project.")
 
         new_job = Job(
-            title=job_name, description=job_description, path=path, projects=[project]
+            title=job_data["name"],
+            description=job_data["description"],
+            path=job_data["path"],
+            projects=job_data["projects"],
         )
 
         self.session.add(new_job)
@@ -101,13 +111,13 @@ class SEAMMDatastore:
 
     @manage_session
     def add_user(
-            self,
-            username,
-            password,
-            first_name=None,
-            last_name=None,
-            email=None,
-            roles=None,
+        self,
+        username,
+        password,
+        first_name=None,
+        last_name=None,
+        email=None,
+        roles=None,
     ):
 
         if roles is None:
@@ -143,6 +153,9 @@ class SEAMMDatastore:
 
         self._user = username
 
+    def logout(self):
+        self._user = None
+
     # Seems like a good place for @property, but can't use because flask authorize
     # requires this to be callable.
     def current_user(self):
@@ -155,14 +168,14 @@ class SEAMMDatastore:
         return user
 
     def __init__(
-            self,
-            database_uri: str = "sqlite:///memory:",
-            initialize: bool = False,
-            permissions: dict = None,
-            username: str = None,
-            password: str = None,
-            datastore_location: str = None,
-            default_project: str = "default",
+        self,
+        database_uri: str = "sqlite:///:memory:",
+        initialize: bool = False,
+        permissions: dict = None,
+        username: str = None,
+        password: str = None,
+        datastore_location: str = None,
+        default_project: str = "default",
     ):
 
         if permissions is None:

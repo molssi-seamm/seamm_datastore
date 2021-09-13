@@ -4,14 +4,14 @@ Tests for build module
 
 import os
 
-import seamm_datastore.build
+import seamm_datastore.util
 
 
 def test_parse_flowchart_v2():
     this_file = os.path.dirname(os.path.abspath(__file__))
     filepath = os.path.join(this_file, "..", "data", "sample_flowchart_v2.flow")
 
-    metadata, text = seamm_datastore.build.parse_flowchart(filepath)
+    metadata, text = seamm_datastore.util.parse_flowchart(filepath)
 
     assert metadata["flowchart_version"] == 2.0
     assert (

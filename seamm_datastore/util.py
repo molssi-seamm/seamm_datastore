@@ -1,5 +1,5 @@
 """
-Functions for building the datastore
+Util Functions and classes
 """
 
 import re
@@ -49,3 +49,10 @@ def parse_flowchart(path):
     flowchart = flowchart_pattern.findall(text)[0]
 
     return metadata, flowchart
+
+
+class LoginRequiredError(Exception):
+    def __init__(self, message=None):
+        if not message:
+            self.message = "This action requires a user to be logged in."
+        super().__init__(self.message)

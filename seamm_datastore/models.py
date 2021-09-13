@@ -5,7 +5,17 @@ Table models for SEAMM datastore SQLAlchemy database.
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Table, Text, JSON, Float
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    DateTime,
+    ForeignKey,
+    Table,
+    Text,
+    JSON,
+    Float,
+)
 from sqlalchemy.orm import relationship
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -18,12 +28,14 @@ from seamm_datastore.flask_authorize_patch import (
 
 try:
     from seamm_datastore.connect import fake_app
+
     # Create declarative base
     Base = declarative_base()
 except ImportError:
     # Assume we're being used with flask_sqlalchemy in the seamm dashboard
     # TODO - need to handle if user just isn't using connect class or the seamm dashboard
     from seamm_dashboard import db
+
     Base = db.Model
 
 
