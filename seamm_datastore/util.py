@@ -5,6 +5,31 @@ Util Functions and classes
 import re
 import json
 
+def _build_initial(session):
+    """Build the initial database"""
+
+    from seamm_datastore.database.models import Role, Group, User
+
+    # Create roles
+    role_names = ["user", "group manager", "admin"]
+    for role_name in role_names:
+        role = Role(name=role_name)
+        session.add(role)
+        session.commit()
+
+    # Create default admin group
+    group = Group(name="admin")
+    session.add(group)
+    session.commit()
+
+    # Create default admin user.
+    admin_role = session.query(Role).filter_by(name="admin").one()
+    user = User(username="admin", password="admin", roles=[admin_role])
+    user.groups.append(group)
+    session.add(user)
+    session.add(admin_role)
+    session.add(group)
+    session.commit()
 
 def parse_flowchart(path):
     """
