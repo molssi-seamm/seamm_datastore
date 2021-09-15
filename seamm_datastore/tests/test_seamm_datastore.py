@@ -27,7 +27,7 @@ def test_add_job_error(connection):
     from seamm_datastore.util import LoginRequiredError
     connection.logout()
     with pytest.raises(LoginRequiredError):
-        connection.add_job("fake job")
+        connection.add_job({"title":"fake job"})
 
 def test_add_job(connection):
     from seamm_datastore.database.models import Project
@@ -50,7 +50,7 @@ def test_add_job(connection):
         "projects": [project],
         "owner_id": 3,
         "status": "finished",
-        "name": "test job",
+        "title": "test job",
         "description": "",
     }
     connection.add_job(job1_data)

@@ -27,13 +27,15 @@ from seamm_datastore.flask_authorize_patch import (
 )
 
 try:
-    from seamm_datastore.connect import Session
+    from seamm_datastore.connect import fake_app
     # Create declarative base
     Base = declarative_base()
+
 except ImportError:
     # Assume we're being used with flask_sqlalchemy in the seamm dashboard
     from seamm_dashboard import db
     Base = db.Model
+
 
 
 #############################
