@@ -5,6 +5,7 @@ Util Functions and classes
 import re
 import json
 
+
 def _build_initial(session):
     """Build the initial database"""
 

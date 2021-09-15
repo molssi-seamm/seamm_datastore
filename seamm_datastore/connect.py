@@ -5,11 +5,13 @@ Class and functions for connection to database.
 import os
 
 from functools import wraps
+from contextlib import contextmanager
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 from flask_authorize import Authorize
+
 
 from .util import LoginRequiredError, _build_initial
 
@@ -19,17 +21,30 @@ def manage_session(method):
 
     @wraps(method)
     def _manage_session(self, *args, **kwargs):
-        self.session = self.Session()
+        session = Session()
         try:
             ret = method(self, *args, **kwargs)
         except:
-            self.session.rollback()
+            session.rollback()
             raise
         finally:
-            self.session.close()
+            session.close()
         return ret
 
     return _manage_session
+
+@contextmanager
+def session_scope():
+    """Provide a transactional scope around a series of operations."""
+    session = Session()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
 
 def login_required(method):
@@ -57,7 +72,6 @@ class current_app:
 
 class SEAMMDatastore:
 
-    @manage_session
     def add_flowchart(self, flowchart_info):
 
         from seamm_datastore.database.models import Flowchart
@@ -218,23 +232,17 @@ class SEAMMDatastore:
         else:
             self.datastore_location = datastore_location
 
+
         # Create engine and session
         self.engine = create_engine(database_uri)
-        self.Session = scoped_session(
+
+        # SQLAlchemy recommends a global session. We only want one if we're not
+        # using flask. We'll make the restriction that when using SQLAlchemy only,
+        # we should always use this object (this will hold datastore location and
+        # the logged in user.
+        global Session
+        Session = scoped_session(
             sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
-        )
-
-        # A fake flask app for use outside of flask.
-        global fake_app
-
-        # Flask authorize relies on this data to be bound with the flask app
-        # we'll just create a fake app and bind the data flaks authorize wants.
-        fake_app = current_app(
-            config={
-                "AUTHORIZE_DEFAULT_PERMISSIONS": permissions,
-                "AUTHORIZE_MODEL_PARSER": "table",
-                "AUTHORIZE_IGNORE_PROPERTY": "__check_access__",
-            }
         )
 
         from seamm_datastore.database.models import Base, Project
