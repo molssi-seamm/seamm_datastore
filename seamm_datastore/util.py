@@ -36,8 +36,14 @@ def _build_initial(session, default_project):
     session.add(group)
 
     # Create a user with the same username as user running
-    item = Path.home()
-    username = item.owner()
+    try:
+        item = Path.home()
+        username = item.owner()
+    except NotImplementedError:
+        # This will occur on Windows
+        import pwd, os
+        username = pwd.getpwuid(os.getuid())[0]
+
     password = "default"
     user = User(username=username, password=password, roles=[admin_role])
     user.groups.append(group)
