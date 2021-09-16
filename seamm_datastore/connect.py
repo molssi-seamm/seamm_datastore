@@ -26,12 +26,11 @@ def manage_session(function):
         return _manage_session
     return _wrap_method
 
-sessions = []
+
 @contextmanager
 def session_scope(session):
     """Provide a transactional scope around a series of operations."""
     session = session()
-    sessions.append(session)
     try:
         yield session
         session.commit()

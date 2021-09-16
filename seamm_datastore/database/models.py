@@ -26,17 +26,16 @@ from seamm_datastore.flask_authorize_patch import (
     generate_association_table,
 )
 
+# The default is sqlalchemy unless we have
+# the dashboard installed and a db with
+# a bound engine.
 try:
-    from seamm_datastore.connect import fake_app
-    # Create declarative base
-    Base = declarative_base()
-
-except ImportError:
-    # Assume we're being used with flask_sqlalchemy in the seamm dashboard
     from seamm_dashboard import db
+    if "engine=None" in str(db):
+        raise ImportError
     Base = db.Model
-
-
+except ImportError:
+    Base = declarative_base()
 
 #############################
 #
