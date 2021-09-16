@@ -30,11 +30,11 @@ from seamm_datastore.flask_authorize_patch import (
 # the dashboard installed and a db with
 # a bound engine.
 try:
+    import sys
+    assert "seamm_dashboard" in sys.modules
     from seamm_dashboard import db
-    if "engine=None" in str(db):
-        raise ImportError
     Base = db.Model
-except ImportError:
+except AssertionError:
     Base = declarative_base()
 
 #############################

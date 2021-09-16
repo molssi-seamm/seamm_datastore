@@ -6,6 +6,7 @@ import os
 
 from functools import wraps
 from contextlib import contextmanager
+from pathlib import Path
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -21,6 +22,7 @@ def manage_session(function):
     def _wrap_method(method):
         def _manage_session(self, *args, **kwargs):
             with session_scope(self.Session) as session:
+                print(f"Calling {function}")
                 ret = function(session, *args, **kwargs)
             return ret
         return _manage_session
@@ -31,6 +33,7 @@ def manage_session(function):
 def session_scope(session):
     """Provide a transactional scope around a series of operations."""
     session = session()
+    print("Session Opened.")
     try:
         yield session
         session.commit()
@@ -39,6 +42,7 @@ def session_scope(session):
         raise
     finally:
         session.close()
+        print("Session Closed.")
 
 
 def login_required(method):
@@ -75,7 +79,6 @@ class SEAMMDatastore:
             datastore_location: str = None,
             default_project: str = "default",
     ):
-
 
         # Default permissions
         if permissions is None:
@@ -116,7 +119,7 @@ class SEAMMDatastore:
 
         # Set up the database.
         if initialize:
-            _build_initial(self.Session())
+            _build_initial(self.Session(), default_project)
 
             from seamm_datastore.database.models import Group, Role
             group = Group.query.one()
@@ -137,19 +140,15 @@ class SEAMMDatastore:
         self.authorize = Authorize(current_user=self.current_user)
 
         # Now handle the project
-        if initialize:
-            self.add_project({"name": default_project, "owner": self.current_user(), "group": group})
-        else:
-            project = Project.query.filter_by(name=default_project).one_or_none()
-            if not project:
-                raise ValueError("Invalid project name given for default.")
+        project = Project.query.filter_by(name=default_project).one_or_none()
+        if not project:
+            raise ValueError("Invalid project name given for default.")
 
         self.default_project = default_project
 
     def login(self, username, password):
         from seamm_datastore.database.models import User
 
-        #breakpoint()
         user = User.query.filter_by(username=username).one()
 
         if not user.verify_password(password):

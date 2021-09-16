@@ -5,11 +5,15 @@ Util Functions and classes
 import re
 import json
 
+from pathlib import Path
 
-def _build_initial(session):
+from seamm_datastore import api
+
+
+def _build_initial(session, default_project):
     """Build the initial database"""
 
-    from seamm_datastore.database.models import Role, Group, User
+    from seamm_datastore.database.models import Role, Group, User, Project
 
     # Create roles
     role_names = ["user", "group manager", "admin"]
@@ -30,6 +34,18 @@ def _build_initial(session):
     session.add(user)
     session.add(admin_role)
     session.add(group)
+
+    # Create a user with the same username as user running
+    item = Path.home()
+    username = item.owner()
+    password = "default"
+    user = User(username=username, password=password, roles=[admin_role])
+    user.groups.append(group)
+    session.add(user)
+
+    # Create a default project
+    project = Project(name=default_project, owner=user, group = group)
+    session.add(project)
     session.commit()
 
 def parse_flowchart(path):
