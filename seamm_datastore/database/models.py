@@ -134,16 +134,14 @@ class Role(Base):
 class Flowchart(Base, AccessControlPermissionsMixin):
     __tablename__ = "flowcharts"
 
-    id = Column(String(100), nullable=False, primary_key=True)
+    id = Column(Integer, nullable=False, primary_key=True)
     sha256 = Column(String(75), nullable=True)
-    sha256_strict = Column(String(75), nullable=True, unique=True)
+    sha256_strict = Column(String(75), nullable=True)
     flowchart_version = Column(Float, nullable=True, unique=False)
     name = Column(String(100), nullable=True)
     description = Column(Text, nullable=True)
     path = Column(String, unique=True)
     json = Column(JSON, nullable=False)
-    created = Column(DateTime, nullable=False, default=datetime.utcnow)
-    text = Column(String(300), nullable=True)
 
     jobs = relationship("Job", back_populates="flowchart", lazy=True)
     projects = relationship(
