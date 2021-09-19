@@ -23,11 +23,13 @@ def test_connection_logout(connection):
     connection.logout()
     assert connection.current_user() is None
 
+
 def test_add_job_error(connection):
     from seamm_datastore.util import LoginRequiredError
     connection.logout()
     with pytest.raises(LoginRequiredError):
-        connection.add_job({"title":"fake job"})
+        connection.add_job({"title": "fake job"})
+
 
 def test_add_job(connection):
     from seamm_datastore.database.models import Project
@@ -55,4 +57,5 @@ def test_add_job(connection):
     }
     connection.add_job(job1_data)
 
-
+    # Retrieve job
+    assert len(connection.get_jobs()) == 1

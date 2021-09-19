@@ -6,7 +6,6 @@ import os
 
 from functools import wraps
 from contextlib import contextmanager
-from pathlib import Path
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -18,11 +17,10 @@ from .util import LoginRequiredError, _build_initial
 
 
 def manage_session(function):
-    """Decorator for closing sqlalchemy sessions."""
+    """Decorator for closing sqlalchemy sessions when attached to SEAMMDatastore class"""
     def _wrap_method(method):
         def _manage_session(self, *args, **kwargs):
             with session_scope(self.Session) as session:
-                print(f"Calling {function}")
                 ret = function(session, *args, **kwargs)
             return ret
         return _manage_session
@@ -175,16 +173,22 @@ class SEAMMDatastore:
     def add_job(self, *args, **kwargs):
         pass
 
+    @login_required
     @manage_session(api.add_project)
     def add_project(self, *args, **kwargs):
         pass
 
+    @login_required
     @manage_session(api.add_user)
     def add_user(self, *args, **kwargs):
         pass
 
     @manage_session(api.get_projects)
     def get_projects(self, *args, **kwargs):
+        pass
+
+    @manage_session(api.get_jobs)
+    def get_jobs(self, *args, **kwargs):
         pass
 
 

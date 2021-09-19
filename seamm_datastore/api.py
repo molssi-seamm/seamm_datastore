@@ -31,9 +31,9 @@ def add_project(session, project_data):
     project = Project.query.filter_by(name=project_data["name"]).one_or_none()
 
     if project:
-        raise ValueError(f"User {user} already found in the database")
+        raise ValueError(f"Project {project} already found in the database")
 
-    new_project = Project(name=project_data["name"])
+    new_project = Project(name=project_data)
 
     session.add(new_project)
     session.commit()
@@ -85,6 +85,14 @@ def add_user(
 def add_flowchart(session, flowchart_info):
     from seamm_datastore.database.models import Flowchart
 
+    try:
+        flowhcart = Flowchart.query.filter_by(flowchart_info["id"]).one_or_none()
+    except KeyError:
+        flowchart = None
+
+    if flowhcart:
+        raise ValueError(f"Flowchart with ID {flowchart.id} already in datastore.")
+
     new_flowchart = Flowchart(**flowchart_info)
 
     session.add(new_flowchart)
@@ -118,9 +126,46 @@ def add_job(session, job_data):
     if project not in Project.query.filter(Project.authorized("update")).all():
         raise RuntimeError("You are not authorized to add jobs to this project.")
 
+    try:
+        job = Job.query.filter_by(id=job_data["id"]).one_or_none()
+    except KeyError:
+        job = None
+
+    if job:
+        raise ValueError(f"Job with ID {job.id} already found in the database")
+
     new_job = Job(**job_data)
 
     session.add(new_job)
     session.commit()
 
     return new_job
+
+
+def get_jobs(session, as_json=False):
+    from seamm_datastore.database.models import Job
+
+    jobs = Job.query.filter(Job.authorized("read")).all()
+
+    if as_json:
+        from seamm_datastore.database.schema import JobSchema
+
+        jobs = JobSchema(many=True).dump(jobs)
+
+    return jobs
+
+
+def get_groups(session, as_json=False):
+    from seamm_datastore.database.models import Group
+
+    groups = Group.query.all()
+
+    if as_json:
+        from seamm_datastore.database.schema import GroupSchema
+
+        groups = GroupSchema(many=True).dump(groups)
+
+    return groups
+
+
+
