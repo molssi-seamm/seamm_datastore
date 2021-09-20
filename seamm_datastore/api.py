@@ -16,7 +16,7 @@ def get_projects(session, as_json=False):
     return projects
 
 
-def add_project(session, project_data):
+def add_project(session, project_data, as_json=False):
     """
     Add a project to the database.
 
@@ -24,19 +24,33 @@ def add_project(session, project_data):
     ----------
     session : sqlalchemy session
     project_data : dict
-    owner : User model
+    as_json : bool
     """
-    from seamm_datastore.database.models import Project
+    from seamm_datastore.database.models import Project, User, Group
+    from seamm_datastore.database.schema import ProjectSchema
 
     project = Project.query.filter_by(name=project_data["name"]).one_or_none()
 
     if project:
         raise ValueError(f"Project {project} already found in the database")
 
-    new_project = Project(name=project_data)
+    if isinstance(project_data["owner"], str):
+        user = User.query.filter_by(username=project_data["owner"]).one()
+        project_data["owner"] = user
+
+    if isinstance(project_data["group"], str):
+        group = Group.query.filter_by(name=project_data["group"]).one()
+        project_data["group"] = group
+
+    print(f"Owner is {user.username}")
+    new_project = Project(**project_data)
 
     session.add(new_project)
     session.commit()
+
+    if as_json:
+        project_schema = ProjectSchema()
+        new_project = project_schema.dump(new_project)
 
     return new_project
 
@@ -50,6 +64,7 @@ def add_user(
         email=None,
         roles=None,
         groups=None,
+        as_json=False
 ):
     if roles is None:
         roles = ["user"]
@@ -60,6 +75,7 @@ def add_user(
     # Verify username and password
     # Check if user exists
     from seamm_datastore.database.models import User
+    from seamm_datastore.database.schema import UserSchema
 
     user = User.query.filter_by(username=username).one_or_none()
 
@@ -78,6 +94,9 @@ def add_user(
 
     session.add(new_user)
     session.commit()
+
+    if as_json:
+        new_user = UserSchema().dump(new_user)
 
     return new_user
 
@@ -101,13 +120,14 @@ def add_flowchart(session, flowchart_info):
     return new_flowchart
 
 
-def add_job(session, job_data):
+def add_job(session, job_data, as_json=False):
     """Add a job to the datastore.
 
     This method requires a user to be logged in and to have appropriate permissions
     for the project.
     """
     from seamm_datastore.database.models import Job, Project
+    from seamm_datastore.database.schema import JobSchema
 
     try:
         project_name = job_data["project_name"]
@@ -139,6 +159,9 @@ def add_job(session, job_data):
     session.add(new_job)
     session.commit()
 
+    if as_json:
+        new_job = JobSchema().dump(new_job)
+
     return new_job
 
 
@@ -166,6 +189,18 @@ def get_groups(session, as_json=False):
         groups = GroupSchema(many=True).dump(groups)
 
     return groups
+
+def get_users(session, as_json=False):
+    from seamm_datastore.database.models import User
+
+    users = User.query.all()
+
+    if as_json:
+        from seamm_datastore.database.schema import UserSchema
+
+        users = UserSchema(many=True).dump(users)
+
+    return users
 
 
 

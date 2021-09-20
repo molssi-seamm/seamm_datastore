@@ -22,6 +22,7 @@ def session():
 @pytest.fixture(scope="function")
 def connection():
     db = seamm_datastore.connect(
-        initialize=True, username="test_user", password="password"
+        initialize=True
     )
+    db.login(username="admin", password="admin")
     return db

@@ -12,6 +12,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 from flask_authorize import Authorize
 
+import seamm_datastore.database.build
 from seamm_datastore import api
 from .util import LoginRequiredError, _build_initial
 
@@ -21,7 +22,7 @@ def manage_session(function):
     def _wrap_method(method):
         def _manage_session(self, *args, **kwargs):
             with session_scope(self.Session) as session:
-                ret = function(session, *args, **kwargs)
+                ret = function(session, as_json=True, *args, **kwargs)
             return ret
         return _manage_session
     return _wrap_method
@@ -31,7 +32,6 @@ def manage_session(function):
 def session_scope(session):
     """Provide a transactional scope around a series of operations."""
     session = session()
-    print("Session Opened.")
     try:
         yield session
         session.commit()
@@ -40,7 +40,6 @@ def session_scope(session):
         raise
     finally:
         session.close()
-        print("Session Closed.")
 
 
 def login_required(method):
@@ -120,7 +119,7 @@ class SEAMMDatastore:
             _build_initial(self.Session(), default_project)
 
             from seamm_datastore.database.models import Group, Role
-            group = Group.query.one()
+            group = Group.query.filter_by(name="admin").one()
             admin_role = Role.query.filter_by(name="admin").one()
 
             # Log in the admin user and create specified user
@@ -189,6 +188,14 @@ class SEAMMDatastore:
 
     @manage_session(api.get_jobs)
     def get_jobs(self, *args, **kwargs):
+        pass
+
+    @manage_session(api.get_users)
+    def get_users(self, *args, **kwargs):
+        pass
+
+    @manage_session(seamm_datastore.database.build.import_datastore)
+    def import_datastore(self, *args, **kwargs):
         pass
 
 
