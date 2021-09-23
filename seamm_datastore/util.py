@@ -23,30 +23,39 @@ def _build_initial(session, default_project):
         session.commit()
 
     # Create default admin group
-    group = Group(name="admin")
-    session.add(group)
+    admin_group = Group(name="admin")
+    session.add(admin_group)
     session.commit()
 
     # Create default admin user.
     admin_role = session.query(Role).filter_by(name="admin").one()
-    user = User(username="admin", password="admin", roles=[admin_role])
-    user.groups.append(group)
-    session.add(user)
-    session.add(admin_role)
-    session.add(group)
+    admin_user = User(username="admin", password="admin", roles=[admin_role])
+    admin_user.groups.append(admin_group)
 
-    # Create a user with the same username as user running
+    # Create a user and group with the same information as user running
     try:
         item = Path.home()
         username = item.owner()
+        group_name = item.group()
     except NotImplementedError:
         # This will occur on Windows
-        import pwd, os
+        import pwd, os, grp
         username = pwd.getpwuid(os.getuid())[0]
+        group_name = grp.getgrgid(os.getgid()[0])
+
+    group = Group(name=group_name)
 
     password = "default"
     user = User(username=username, password=password, roles=[admin_role])
     user.groups.append(group)
+
+    # Admin user needs to be part of all groups.
+    admin_user.groups.append(group)
+
+    session.add(admin_user)
+    session.add(admin_role)
+    session.add(admin_group)
+
     session.add(user)
 
     # Create a default project

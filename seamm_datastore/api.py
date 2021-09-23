@@ -3,7 +3,7 @@ Functions which take a session and add or retrieve data to the db
 """
 
 
-def get_projects(session, as_json=False):
+def get_projects(_=None, as_json=False):
     from seamm_datastore.database.models import Project
 
     projects = Project.query.filter(Project.authorized("read")).all()
@@ -130,21 +130,24 @@ def add_job(session, job_data, as_json=False):
     from seamm_datastore.database.schema import JobSchema
 
     try:
-        project_name = job_data["project_name"]
+        project_names = job_data["project_names"]
     except KeyError:
-        project_name = "default"
+        job_data["project_names"] = ["default"]
+        project_names = ["default"]
 
-    project = Project.query.filter_by(name=project_name).one_or_none()
+    projects = [ Project.query.filter_by(name=x).one_or_none() for x in project_names ]
+    projects = [ project for project in projects if project ]
 
-    if not project:
+    if not projects:
         raise NameError(
-            f"Project {project_name} not found in database, please check your project name."
+            f"Projects listed for this job not found in database, please check your project names."
         )
 
     # The other permissions method in flask-authorize is harder to fake,
     # but this one works.
-    if project not in Project.query.filter(Project.authorized("update")).all():
-        raise RuntimeError("You are not authorized to add jobs to this project.")
+    for project in projects:
+        if project not in Project.query.filter(Project.authorized("update")).all():
+            raise RuntimeError(f"You are not authorized to add jobs to {project} project.")
 
     try:
         job = Job.query.filter_by(id=job_data["id"]).one_or_none()
@@ -153,6 +156,9 @@ def add_job(session, job_data, as_json=False):
 
     if job:
         raise ValueError(f"Job with ID {job.id} already found in the database")
+
+    job_data["projects"] = projects
+    del job_data["project_names"]
 
     new_job = Job(**job_data)
 
@@ -165,7 +171,7 @@ def add_job(session, job_data, as_json=False):
     return new_job
 
 
-def get_jobs(session, as_json=False):
+def get_jobs(_=None, as_json=False):
     from seamm_datastore.database.models import Job
 
     jobs = Job.query.filter(Job.authorized("read")).all()
@@ -178,7 +184,7 @@ def get_jobs(session, as_json=False):
     return jobs
 
 
-def get_groups(session, as_json=False):
+def get_groups(_=None, as_json=False):
     from seamm_datastore.database.models import Group
 
     groups = Group.query.all()
@@ -190,7 +196,8 @@ def get_groups(session, as_json=False):
 
     return groups
 
-def get_users(session, as_json=False):
+
+def get_users(_=None, as_json=False):
     from seamm_datastore.database.models import User
 
     users = User.query.all()
