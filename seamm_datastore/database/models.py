@@ -140,7 +140,6 @@ class Flowchart(Base, AccessControlPermissionsMixin):
     flowchart_version = Column(Float, nullable=True, unique=False)
     name = Column(String(100), nullable=True)
     description = Column(Text, nullable=True)
-    path = Column(String, unique=True)
     json = Column(JSON, nullable=False)
 
     jobs = relationship("Job", back_populates="flowchart", lazy=True)

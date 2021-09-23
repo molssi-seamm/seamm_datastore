@@ -26,6 +26,7 @@ def test_connection_logout(connection):
 
 def test_add_job_error(connection):
     from seamm_datastore.util import LoginRequiredError
+
     connection.logout()
     with pytest.raises(LoginRequiredError):
         connection.add_job({"title": "fake job"})
@@ -47,7 +48,7 @@ def test_add_job(connection):
     job1_data = {
         "flowchart_id": "ABCD",
         "id": 1,
-        "path": "a/path",
+        "path": f"{os.path.abspath(os.path.join(os.path.split(os.path.abspath(__file__))[1], '..', 'seamm_datastore', 'data', 'Projects', 'sample_project1', 'Job_00001'))}",
         "submitted": parser.parse("2016-08-29T09:12:33.001000+00:00"),
         "projects": [project],
         "owner_id": 3,
@@ -58,4 +59,4 @@ def test_add_job(connection):
     connection.add_job(job1_data)
 
     # Retrieve job
-    #assert len(connection.get_jobs()) == 1
+    # assert len(connection.get_jobs()) == 1

@@ -190,6 +190,10 @@ class SEAMMDatastore:
     def get_jobs(self, *args, **kwargs):
         pass
 
+    @manage_session(api.get_flowcharts)
+    def get_flowcharts(self, *args, **kwargs):
+        pass
+
     @manage_session(api.get_users)
     def get_users(self, *args, **kwargs):
         pass

@@ -3,14 +3,11 @@ Automatic import of projects and jobs from directories.
 """
 
 import os
-import json
 from pathlib import Path
-
-from datetime import datetime
 
 from seamm_datastore import api
 
-time_format = "%Y-%m-%d %H:%M:%S %Z"
+from seamm_datastore.util import parse_job_data
 
 
 def import_datastore(session, location, as_json=True):
@@ -68,29 +65,7 @@ def import_datastore(session, location, as_json=True):
                     check_path = os.path.join(potential_job, "job_data.json")
 
                     if os.path.exists(check_path):
-                        with open(check_path) as f:
-                            job_data_json = json.load(f)
-                        job_data = {
-                            "path": potential_job,
-                            "title": str(
-                                job_data_json["title"]
-                                if job_data_json["title"]
-                                else job_name
-                            ),
-                            "project_names": job_data_json["projects"],
-                            "status": job_data_json["state"],
-                        }
-
-                        if "end time" in job_data_json:
-                            job_data["finished"] = datetime.strptime(
-                                job_data_json["end time"], time_format
-                            )
-
-                        if "start time" in job_data_json:
-
-                            job_data["started"] = datetime.strptime(
-                                job_data_json["start time"], time_format
-                            )
+                        job_data = parse_job_data(check_path)
 
                         try:
                             job = api.add_job(
@@ -99,7 +74,6 @@ def import_datastore(session, location, as_json=True):
                             jobs.append(job)
                         except ValueError:
                             # Job has already been added.
-                            # Continue here - go to next job
-                            continue
+                            pass
 
-        return jobs, projects
+    return jobs, projects

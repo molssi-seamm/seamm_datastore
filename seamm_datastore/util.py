@@ -3,11 +3,15 @@ Util Functions and classes
 """
 
 import re
+import os
 import json
 
 from pathlib import Path
 
 from seamm_datastore import api
+
+from datetime import datetime
+time_format = "%Y-%m-%d %H:%M:%S %Z"
 
 
 def _build_initial(session, default_project):
@@ -106,6 +110,38 @@ def parse_flowchart(path):
     flowchart = flowchart_pattern.findall(text)[0]
 
     return metadata, flowchart
+
+
+def parse_job_data(path):
+    """Parse job_data.json at path"""
+
+    directory = os.path.dirname(path)
+
+    with open(path) as f:
+        job_data_json = json.load(f)
+    job_data = {
+        "path": directory,
+        "title": str(
+            job_data_json["title"]
+            if job_data_json["title"]
+            else os.path.basename(os.path.dirname(path))
+        ),
+        "project_names": job_data_json["projects"],
+        "status": job_data_json["state"],
+        "id": job_data_json["job id"],
+    }
+
+    if "end time" in job_data_json:
+        job_data["finished"] = datetime.strptime(
+            job_data_json["end time"], time_format
+        )
+
+    if "start time" in job_data_json:
+        job_data["started"] = datetime.strptime(
+            job_data_json["start time"], time_format
+        )
+
+    return job_data
 
 
 class LoginRequiredError(Exception):

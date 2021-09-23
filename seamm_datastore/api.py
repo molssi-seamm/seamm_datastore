@@ -1,6 +1,10 @@
 """
 Functions which take a session and add or retrieve data to the db
 """
+import os
+import glob
+
+from seamm_datastore.util import parse_flowchart
 
 
 def get_projects(_=None, as_json=False):
@@ -105,12 +109,15 @@ def add_flowchart(session, flowchart_info):
     from seamm_datastore.database.models import Flowchart
 
     try:
-        flowhcart = Flowchart.query.filter_by(flowchart_info["id"]).one_or_none()
+        flowchart = Flowchart.query.filter_by(sha256_strict=flowchart_info["sha256_strict"]).one_or_none()
     except KeyError:
-        flowchart = None
+        try:
+            flowchart = Flowchart.query.filter_by(id=flowchart_info["id"]).one_or_none()
+        except KeyError:
+            flowchart = None
 
-    if flowhcart:
-        raise ValueError(f"Flowchart with ID {flowchart.id} already in datastore.")
+    if flowchart:
+        raise ValueError(f"Flowchart already in datastore. ID: {flowchart.id}")
 
     new_flowchart = Flowchart(**flowchart_info)
 
@@ -157,7 +164,22 @@ def add_job(session, job_data, as_json=False):
     if job:
         raise ValueError(f"Job with ID {job.id} already found in the database")
 
+    # Handle the flowchart - we'll only want to add it if we're adding the job.
+    flowchart_filename = glob.glob(os.path.join(job_data["path"], "*.flow"))
+    if len(flowchart_filename) != 1:
+        raise ValueError(f"Invalid number of flowcharts found for a project: {len(flowchart_filename)}. There should be one flowchart per job.")
+    fl_data, fl = parse_flowchart(flowchart_filename[0])
+    fl_data["json"] = fl
+
+    try:
+        flowchart = add_flowchart(session, fl_data)
+    except ValueError as e:
+        from seamm_datastore.database.models import Flowchart
+        id = int(e.args[0].split(":")[1])
+        flowchart = Flowchart.query.filter_by(id=id).one()
+
     job_data["projects"] = projects
+    job_data["flowchart"] = flowchart
     del job_data["project_names"]
 
     new_job = Job(**job_data)
@@ -182,6 +204,19 @@ def get_jobs(_=None, as_json=False):
         jobs = JobSchema(many=True).dump(jobs)
 
     return jobs
+
+
+def get_flowcharts(_=None, as_json=False):
+    from seamm_datastore.database.models import Flowchart
+
+    flowcharts = Flowchart.query.filter(Flowchart.authorized("read")).all()
+
+    if as_json:
+        from seamm_datastore.database.schema import FlowchartSchema
+
+        flowcharts = FlowchartSchema(many=True).dump(flowcharts)
+
+    return flowcharts
 
 
 def get_groups(_=None, as_json=False):
