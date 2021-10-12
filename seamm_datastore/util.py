@@ -40,9 +40,11 @@ def _build_initial(session, default_project):
         group_name = item.group()
     except NotImplementedError:
         # This will occur on Windows
-        import os, grp
+        import os
+
         username = os.environ["USERNAME"]
-        group_name = grp.getgrgid(os.getgid()[0])
+        # Just a default group name.
+        group_name = "staff"
 
     group = Group(name=group_name)
 
@@ -60,9 +62,10 @@ def _build_initial(session, default_project):
     session.add(user)
 
     # Create a default project
-    project = Project(name=default_project, owner=user, group = group)
+    project = Project(name=default_project, owner=user, group=group)
     session.add(project)
     session.commit()
+
 
 def parse_flowchart(path):
     """
@@ -129,9 +132,7 @@ def parse_job_data(path):
     }
 
     if "end time" in job_data_json:
-        job_data["finished"] = datetime.strptime(
-            job_data_json["end time"], time_format
-        )
+        job_data["finished"] = datetime.strptime(job_data_json["end time"], time_format)
 
     if "start time" in job_data_json:
         job_data["started"] = datetime.strptime(
