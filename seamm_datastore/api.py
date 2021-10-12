@@ -7,10 +7,25 @@ import glob
 from seamm_datastore.util import parse_flowchart
 
 
-def get_projects(_=None, as_json=False):
+def _build_query(filter, obj):
+    q = []
+    for key, value in filter.items():
+        q.append(getattr(obj, key).in_(value))
+    return q
+
+
+def get_projects(_=None, as_json=False, filter=None):
     from seamm_datastore.database.models import Project
 
-    projects = Project.query.filter(Project.authorized("read")).all()
+    if not filter:
+        projects = Project.query.filter(Project.authorized("read")).all()
+    else:
+        # Build a query
+        b = _build_query(filter, Project)
+        # Pass the query. Use unpacking operator to unpack generator.
+        projects = Project.query.filter(
+            Project.authorized("read"), *(a for a in b)
+        ).all()
 
     if as_json:
         from seamm_datastore.database.schema import ProjectSchema
@@ -60,15 +75,15 @@ def add_project(session, project_data, as_json=False):
 
 
 def add_user(
-        session,
-        username,
-        password,
-        first_name=None,
-        last_name=None,
-        email=None,
-        roles=None,
-        groups=None,
-        as_json=False
+    session,
+    username,
+    password,
+    first_name=None,
+    last_name=None,
+    email=None,
+    roles=None,
+    groups=None,
+    as_json=False,
 ):
     if roles is None:
         roles = ["user"]
@@ -109,7 +124,9 @@ def add_flowchart(session, flowchart_info):
     from seamm_datastore.database.models import Flowchart
 
     try:
-        flowchart = Flowchart.query.filter_by(sha256_strict=flowchart_info["sha256_strict"]).one_or_none()
+        flowchart = Flowchart.query.filter_by(
+            sha256_strict=flowchart_info["sha256_strict"]
+        ).one_or_none()
     except KeyError:
         try:
             flowchart = Flowchart.query.filter_by(id=flowchart_info["id"]).one_or_none()
@@ -142,8 +159,8 @@ def add_job(session, job_data, as_json=False):
         job_data["project_names"] = ["default"]
         project_names = ["default"]
 
-    projects = [ Project.query.filter_by(name=x).one_or_none() for x in project_names ]
-    projects = [ project for project in projects if project ]
+    projects = [Project.query.filter_by(name=x).one_or_none() for x in project_names]
+    projects = [project for project in projects if project]
 
     if not projects:
         raise NameError(
@@ -154,7 +171,9 @@ def add_job(session, job_data, as_json=False):
     # but this one works.
     for project in projects:
         if project not in Project.query.filter(Project.authorized("update")).all():
-            raise RuntimeError(f"You are not authorized to add jobs to {project} project.")
+            raise RuntimeError(
+                f"You are not authorized to add jobs to {project} project."
+            )
 
     try:
         job = Job.query.filter_by(id=job_data["id"]).one_or_none()
@@ -167,7 +186,9 @@ def add_job(session, job_data, as_json=False):
     # Handle the flowchart - we'll only want to add it if we're adding the job.
     flowchart_filename = glob.glob(os.path.join(job_data["path"], "*.flow"))
     if len(flowchart_filename) != 1:
-        raise ValueError(f"Invalid number of flowcharts found for a project: {len(flowchart_filename)}. There should be one flowchart per job.")
+        raise ValueError(
+            f"Invalid number of flowcharts found for a project: {len(flowchart_filename)}. There should be one flowchart per job."
+        )
     fl_data, fl = parse_flowchart(flowchart_filename[0])
     fl_data["json"] = fl
 
@@ -175,6 +196,7 @@ def add_job(session, job_data, as_json=False):
         flowchart = add_flowchart(session, fl_data)
     except ValueError as e:
         from seamm_datastore.database.models import Flowchart
+
         id = int(e.args[0].split(":")[1])
         flowchart = Flowchart.query.filter_by(id=id).one()
 
@@ -243,6 +265,3 @@ def get_users(_=None, as_json=False):
         users = UserSchema(many=True).dump(users)
 
     return users
-
-
-

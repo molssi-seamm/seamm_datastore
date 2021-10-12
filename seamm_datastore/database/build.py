@@ -26,7 +26,7 @@ def import_datastore(session, location, as_json=True):
     """
 
     jobs = []
-    projects = []
+    project_names = []
 
     # Get directory contents of file path
     for folder in os.listdir(location):
@@ -48,8 +48,8 @@ def import_datastore(session, location, as_json=True):
             }
 
             try:
-                project = api.add_project(session, project_data, as_json=as_json)
-                projects.append(project)
+                api.add_project(session, project_data, as_json=as_json)
+                project_names.append(project_data["name"])
             except ValueError:
                 # Project exists, we don't need to add it.
                 # Pass here because we should still try importing jobs.
@@ -59,7 +59,6 @@ def import_datastore(session, location, as_json=True):
                 potential_job = os.path.join(potential_project, potential_job)
 
                 if os.path.isdir(potential_job):
-                    job_name = os.path.basename(potential_job)
 
                     # Check for job_data.json - has to have this to be job
                     check_path = os.path.join(potential_job, "job_data.json")
@@ -75,5 +74,8 @@ def import_datastore(session, location, as_json=True):
                         except ValueError:
                             # Job has already been added.
                             pass
+
+    # retrieve projects now that all the jobs have been added.
+    projects = api.get_projects(session, as_json=True, filter={"name": project_names})
 
     return jobs, projects
