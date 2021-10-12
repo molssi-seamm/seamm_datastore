@@ -2,15 +2,12 @@
 Util Functions and classes
 """
 
-import re
-import os
 import json
-
+import os
+import re
+from datetime import datetime
 from pathlib import Path
 
-from seamm_datastore import api
-
-from datetime import datetime
 time_format = "%Y-%m-%d %H:%M:%S %Z"
 
 
@@ -43,8 +40,8 @@ def _build_initial(session, default_project):
         group_name = item.group()
     except NotImplementedError:
         # This will occur on Windows
-        import pwd, os, grp
-        username = pwd.getpwuid(os.getuid())[0]
+        import os, grp
+        username = os.environ["USERNAME"]
         group_name = grp.getgrgid(os.getgid()[0])
 
     group = Group(name=group_name)
