@@ -10,6 +10,7 @@ dependencies:
   - pip:
     - flask
     - flask-authorize
+    - python-dateutil
     - sqlalchemy
     - marshmallow_sqlalchemy
     # For testing:
