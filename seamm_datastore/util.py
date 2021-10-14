@@ -8,7 +8,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-time_format = "%Y-%m-%d %H:%M:%S %Z"
+time_format = "%Y-%m-%d"
 
 
 def _build_initial(session, default_project):

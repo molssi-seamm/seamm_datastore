@@ -13,7 +13,7 @@
    "cpuinfo_version_string": "8.0.0",
    "datastore": "/Users/jessica/SEAMM/Jobs",
    "elapsed time": 2.6068530082702637,
-   "end time": "2019-12-10 17:09:53 EST",
+   "end time": "2019-12-10",
    "family": 6,
    "flags": [
       "1gbpage",
@@ -140,7 +140,7 @@
       "sample_project1"
    ],
    "python_version": "3.9.4.final.0 (64 bit)",
-   "start time": "2021-06-16 13:31:25 EDT",
+   "start time": "2021-06-16",
    "state": "finished",
    "stepping": 9,
    "title": "Tutorial 1 - Second Session",

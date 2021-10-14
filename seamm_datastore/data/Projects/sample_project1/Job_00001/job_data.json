@@ -14,7 +14,7 @@
    ],
    "datastore": "/Users/jessica/SEAMM",
    "elapsed time": 87.64521288871765,
-   "end time": "2019-12-10 17:09:53 EST",
+   "end time": "2019-12-10",
    "extended_model": 9,
    "family": 6,
    "flags": [
@@ -143,7 +143,7 @@
    ],
    "python_version": "3.7.0.final.0 (64 bit)",
    "raw_arch_string": "x86_64",
-   "start time": "2019-12-10 17:08:25 EST",
+   "start time": "2019-12-10",
    "state": "finished",
    "stepping": 9,
    "title": "",
