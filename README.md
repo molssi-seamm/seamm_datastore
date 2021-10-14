@@ -23,7 +23,7 @@ The `SEAMMDatastore` class has associated functions which can be used to add to 
 To retrieve all the users and dump the info to JSON:
 
 ```python
-from seamm_datastore.schema import JobSchema
+from seamm_datastore.database.schema import JobSchema
 
 # Create user schema
 users = JobSchema(many=True)

@@ -1,0 +1,353 @@
+#!/usr/bin/env run_flowchart
+!MolSSI flowchart 2.0
+#metadata
+{
+    "sha256": "c21c44d3da02d37aa1a3945a43ca3c98c9d2cd3589768b697976d4ba33e5f094",
+    "sha256_strict": "79d580b78559fe137872bcffe24aa7455e6c66fe260cf63e5edd3b3a1464e9c6",
+    "name": "",
+    "description": ""
+}
+#flowchart
+{
+    "item": "object",
+    "module": "seamm.flowchart",
+    "class": "Flowchart",
+    "extension": null,
+    "nodes": [
+        {
+            "item": "object",
+            "module": "seamm.start_node",
+            "class": "StartNode",
+            "version": "2021.8.3.3",
+            "extension": null,
+            "attributes": {
+                "_uuid": 1,
+                "_title": "Start",
+                "extension": null,
+                "parameters": null,
+                "x": 150.0,
+                "y": 35.0,
+                "w": 200,
+                "h": 50
+            }
+        },
+        {
+            "item": "object",
+            "module": "from_smiles_step.from_smiles",
+            "class": "FromSMILES",
+            "version": "2021.8.4.1",
+            "extension": "FromSMILESStep",
+            "attributes": {
+                "_uuid": 7357056185187301996987527554198914681,
+                "_title": "from SMILES",
+                "extension": "FromSMILESStep",
+                "parameters": {
+                    "__class__": "FromSMILESParameters",
+                    "__module__": "from_smiles_step.from_smiles_parameters",
+                    "smiles string": {
+                        "value": "CCS",
+                        "units": null
+                    },
+                    "structure handling": {
+                        "value": "Overwrite the current configuration",
+                        "units": null
+                    },
+                    "subsequent structure handling": {
+                        "value": "Create a new system and configuration",
+                        "units": null
+                    },
+                    "system name": {
+                        "value": "from file",
+                        "units": null
+                    },
+                    "configuration name": {
+                        "value": "use Canonical SMILES string",
+                        "units": null
+                    }
+                },
+                "x": 150.0,
+                "y": 105.0,
+                "w": 200,
+                "h": 50
+            }
+        },
+        {
+            "item": "object",
+            "module": "dftbplus_step.dftbplus",
+            "class": "Dftbplus",
+            "version": "2021.6.5",
+            "extension": "DFTB+",
+            "attributes": {
+                "_uuid": 257617583036816434829983166226248557668,
+                "_title": "DFTB+",
+                "extension": "DFTB+",
+                "parameters": {
+                    "__class__": "DftbplusParameters",
+                    "__module__": "dftbplus_step.dftbplus_parameters",
+                    "calculation": {
+                        "value": "geometry optimization",
+                        "units": null
+                    }
+                },
+                "x": 150.0,
+                "y": 175.0,
+                "w": 200,
+                "h": 50
+            },
+            "subflowchart": {
+                "item": "object",
+                "module": "seamm.flowchart",
+                "class": "Flowchart",
+                "extension": null,
+                "nodes": [
+                    {
+                        "item": "object",
+                        "module": "seamm.start_node",
+                        "class": "StartNode",
+                        "version": "2021.8.3.3",
+                        "extension": null,
+                        "attributes": {
+                            "_uuid": 1,
+                            "_title": "Start",
+                            "extension": null,
+                            "parameters": null,
+                            "x": 150.0,
+                            "y": 35.0,
+                            "w": 200,
+                            "h": 50
+                        }
+                    },
+                    {
+                        "item": "object",
+                        "module": "dftbplus_step.choose_parameters",
+                        "class": "ChooseParameters",
+                        "version": "2021.6.5",
+                        "extension": "ChooseParameters",
+                        "attributes": {
+                            "_uuid": 38587696192145787045181857031441863072,
+                            "_title": "Choose Parameters",
+                            "extension": "ChooseParameters",
+                            "parameters": {
+                                "__class__": "ChooseParametersParameters",
+                                "__module__": "dftbplus_step.choose_parameters_parameters",
+                                "elements": {
+                                    "value": [],
+                                    "units": null
+                                },
+                                "dataset": {
+                                    "value": "3ob",
+                                    "units": null
+                                },
+                                "subset": {
+                                    "value": "none",
+                                    "units": null
+                                }
+                            },
+                            "x": 150.0,
+                            "y": 105.0,
+                            "w": 200,
+                            "h": 50
+                        }
+                    },
+                    {
+                        "item": "object",
+                        "module": "dftbplus_step.optimization",
+                        "class": "Optimization",
+                        "version": "2021.6.5",
+                        "extension": "Optimization",
+                        "attributes": {
+                            "_uuid": 195793145940249943172033200554592208519,
+                            "_title": "Optimization",
+                            "extension": "Optimization",
+                            "parameters": {
+                                "__class__": "OptimizationParameters",
+                                "__module__": "dftbplus_step.optimization_parameters",
+                                "SCC": {
+                                    "value": "Yes",
+                                    "units": null
+                                },
+                                "SCCTolerance": {
+                                    "value": 1e-05,
+                                    "units": null
+                                },
+                                "MaxSCCIterations": {
+                                    "value": 100,
+                                    "units": null
+                                },
+                                "ThirdOrder": {
+                                    "value": "Default for parameters",
+                                    "units": null
+                                },
+                                "HCorrection": {
+                                    "value": "Default for parameters",
+                                    "units": null
+                                },
+                                "Damping Exponent": {
+                                    "value": 4.0,
+                                    "units": null
+                                },
+                                "results": {
+                                    "value": {},
+                                    "units": null
+                                },
+                                "create tables": {
+                                    "value": "yes",
+                                    "units": null
+                                },
+                                "optimization method": {
+                                    "value": "Direct inversion of iterative subspace (gDIIS)",
+                                    "units": null
+                                },
+                                "MaxForceComponent": {
+                                    "value": 0.0001,
+                                    "units": "hartree/bohr"
+                                },
+                                "MaxSteps": {
+                                    "value": 200,
+                                    "units": null
+                                },
+                                "LatticeOpt": {
+                                    "value": "Yes",
+                                    "units": null
+                                },
+                                "constrain_cell": {
+                                    "value": "No",
+                                    "units": null
+                                },
+                                "fix_a": {
+                                    "value": "No",
+                                    "units": null
+                                },
+                                "fix_b": {
+                                    "value": "No",
+                                    "units": null
+                                },
+                                "fix_c": {
+                                    "value": "No",
+                                    "units": null
+                                },
+                                "pressure": {
+                                    "value": 0.0,
+                                    "units": null
+                                },
+                                "MaxAtomStep": {
+                                    "value": 0.2,
+                                    "units": null
+                                },
+                                "MaxLatticeStep": {
+                                    "value": 0.2,
+                                    "units": null
+                                },
+                                "stop_if_scc_fails": {
+                                    "value": "Yes",
+                                    "units": null
+                                },
+                                "StepSize": {
+                                    "value": 100.0,
+                                    "units": "a_u_time"
+                                },
+                                "Alpha": {
+                                    "value": 0.1,
+                                    "units": null
+                                },
+                                "Generations": {
+                                    "value": 8,
+                                    "units": null
+                                },
+                                "Memory": {
+                                    "value": 20,
+                                    "units": null
+                                },
+                                "LineSearch": {
+                                    "value": "No",
+                                    "units": null
+                                }
+                            },
+                            "x": 150.0,
+                            "y": 175.0,
+                            "w": 200,
+                            "h": 50
+                        }
+                    }
+                ],
+                "edges": [
+                    {
+                        "item": "edge",
+                        "node1": 1,
+                        "node2": 38587696192145787045181857031441863072,
+                        "edge_type": "execution",
+                        "edge_subtype": "next",
+                        "attributes": {
+                            "anchor1": "s",
+                            "anchor2": "n",
+                            "coords": [
+                                150,
+                                60,
+                                150,
+                                80
+                            ],
+                            "arrow_id": 52
+                        }
+                    },
+                    {
+                        "item": "edge",
+                        "node1": 38587696192145787045181857031441863072,
+                        "node2": 195793145940249943172033200554592208519,
+                        "edge_type": "execution",
+                        "edge_subtype": "next",
+                        "attributes": {
+                            "anchor1": "s",
+                            "anchor2": "n",
+                            "coords": [
+                                150,
+                                130,
+                                150,
+                                150
+                            ],
+                            "arrow_id": 53
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "edges": [
+        {
+            "item": "edge",
+            "node1": 1,
+            "node2": 7357056185187301996987527554198914681,
+            "edge_type": "execution",
+            "edge_subtype": "next",
+            "attributes": {
+                "anchor1": "s",
+                "anchor2": "n",
+                "coords": [
+                    150,
+                    60,
+                    150,
+                    80
+                ],
+                "arrow_id": 37
+            }
+        },
+        {
+            "item": "edge",
+            "node1": 7357056185187301996987527554198914681,
+            "node2": 257617583036816434829983166226248557668,
+            "edge_type": "execution",
+            "edge_subtype": "next",
+            "attributes": {
+                "anchor1": "s",
+                "anchor2": "n",
+                "coords": [
+                    150,
+                    130,
+                    150,
+                    150
+                ],
+                "arrow_id": 58
+            }
+        }
+    ]
+}
+#end

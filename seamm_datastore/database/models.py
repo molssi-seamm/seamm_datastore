@@ -5,28 +5,37 @@ Table models for SEAMM datastore SQLAlchemy database.
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Table, Text, JSON
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    DateTime,
+    ForeignKey,
+    Table,
+    Text,
+    JSON,
+    Float,
+)
 from sqlalchemy.orm import relationship
 
 from sqlalchemy.ext.declarative import declarative_base
 
 # Patched flask authorize
-from .flask_authorize_patch import (
+from seamm_datastore.flask_authorize_patch import (
     AccessControlPermissionsMixin,
     generate_association_table,
 )
 
+# The default is sqlalchemy unless we have
+# the dashboard installed and a db with
+# a bound engine.
 try:
-    from .db_util import fake_app
-
-    # Create declarative base
-    Base = declarative_base()
-except ImportError:
-    # Assume we're being used with flask_sqlalchemy in the seamm dashboard
+    import sys
+    assert "seamm_dashboard" in sys.modules
     from seamm_dashboard import db
-
     Base = db.Model
-
+except AssertionError:
+    Base = declarative_base()
 
 #############################
 #
@@ -125,13 +134,13 @@ class Role(Base):
 class Flowchart(Base, AccessControlPermissionsMixin):
     __tablename__ = "flowcharts"
 
-    id = Column(String(32), nullable=False, primary_key=True)
-    title = Column(String(100), nullable=True)
+    id = Column(Integer, nullable=False, primary_key=True)
+    sha256 = Column(String(75), nullable=True)
+    sha256_strict = Column(String(75), nullable=True)
+    flowchart_version = Column(Float, nullable=True, unique=False)
+    name = Column(String(100), nullable=True)
     description = Column(Text, nullable=True)
-    path = Column(String, unique=True)
-    text = Column(Text, nullable=False)
     json = Column(JSON, nullable=False)
-    created = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     jobs = relationship("Job", back_populates="flowchart", lazy=True)
     projects = relationship(
@@ -150,7 +159,7 @@ class Job(Base, AccessControlPermissionsMixin):
     title = Column(String, nullable=True)
     description = Column(Text, nullable=True)
     path = Column(String, unique=True)
-    submitted = Column(DateTime, nullable=False, default=datetime.utcnow)
+    submitted = Column(DateTime, nullable=True)
     started = Column(DateTime)
     finished = Column(DateTime, nullable=True)
     status = Column(String, nullable=False, default="imported")

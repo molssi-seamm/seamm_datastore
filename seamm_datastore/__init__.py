@@ -3,11 +3,9 @@ seamm_datastore
 The database models for the seamm datastore
 """
 
-# Add imports here
-import flask
-from .db_util import SEAMMDatastore
-
-__all__ = ["SEAMMDatastore"]
+# Imports - alias class to "connect".
+from .connect import SEAMMDatastore as connect
+__all__ = ["connect"]
 
 # Handle versioneer
 from ._version import get_versions
