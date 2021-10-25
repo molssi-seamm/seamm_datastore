@@ -14,17 +14,20 @@ from flask_authorize import Authorize
 
 import seamm_datastore.database.build
 from seamm_datastore import api
-from .util import LoginRequiredError, _build_initial
+from .util import LoginRequiredError
 
 
 def manage_session(function):
     """Decorator for closing sqlalchemy sessions when attached to SEAMMDatastore class"""
+
     def _wrap_method(method):
         def _manage_session(self, *args, **kwargs):
             with session_scope(self.Session) as session:
                 ret = function(session, as_json=True, *args, **kwargs)
             return ret
+
         return _manage_session
+
     return _wrap_method
 
 
@@ -67,14 +70,14 @@ class current_app:
 
 class SEAMMDatastore:
     def __init__(
-            self,
-            database_uri: str = "sqlite:///:memory:",
-            initialize: bool = False,
-            permissions: dict = None,
-            username: str = None,
-            password: str = None,
-            datastore_location: str = None,
-            default_project: str = "default",
+        self,
+        database_uri: str = "sqlite:///:memory:",
+        initialize: bool = False,
+        permissions: dict = None,
+        username: str = None,
+        password: str = None,
+        datastore_location: str = None,
+        default_project: str = "default",
     ):
 
         # Default permissions
@@ -116,9 +119,12 @@ class SEAMMDatastore:
 
         # Set up the database.
         if initialize:
-            _build_initial(self.Session(), default_project)
+            seamm_datastore.database.build._build_initial(
+                self.Session(), default_project
+            )
 
             from seamm_datastore.database.models import Group, Role
+
             group = Group.query.filter_by(name="admin").one()
             admin_role = Role.query.filter_by(name="admin").one()
 
@@ -201,6 +207,3 @@ class SEAMMDatastore:
     @manage_session(seamm_datastore.database.build.import_datastore)
     def import_datastore(self, *args, **kwargs):
         pass
-
-
-

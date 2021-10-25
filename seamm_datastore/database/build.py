@@ -10,6 +10,62 @@ from seamm_datastore import api
 from seamm_datastore.util import parse_job_data
 
 
+def _build_initial(session, default_project):
+    """Build the initial database"""
+
+    from seamm_datastore.database.models import Role, Group, User, Project
+
+    # Create roles
+    role_names = ["user", "group manager", "admin"]
+    for role_name in role_names:
+        role = Role(name=role_name)
+        session.add(role)
+        session.commit()
+
+    # Create default admin group
+    admin_group = Group(name="admin")
+    session.add(admin_group)
+    session.commit()
+
+    # Create default admin user.
+    admin_role = session.query(Role).filter_by(name="admin").one()
+    admin_user = User(username="admin", password="admin", roles=[admin_role])
+    admin_user.groups.append(admin_group)
+
+    # Create a user and group with the same information as user running
+    try:
+        item = Path.home()
+        username = item.owner()
+        group_name = item.group()
+    except NotImplementedError:
+        # This will occur on Windows
+        import os
+
+        username = os.environ["USERNAME"]
+        # Just a default group name.
+        group_name = "staff"
+
+    group = Group(name=group_name)
+
+    password = "default"
+    user = User(username=username, password=password, roles=[admin_role])
+    user.groups.append(group)
+
+    # Admin user needs to be part of all groups.
+    admin_user.groups.append(group)
+
+    session.add(admin_user)
+    session.add(admin_role)
+    session.add(admin_group)
+
+    session.add(user)
+
+    # Create a default project
+    project = Project(name=default_project, owner=user, group=group)
+    session.add(project)
+    session.commit()
+
+
 def import_datastore(session, location, as_json=True):
     """Import all the projects and jobs at <location>.
 
