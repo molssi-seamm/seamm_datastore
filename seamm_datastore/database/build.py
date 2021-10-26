@@ -27,7 +27,7 @@ def _build_initial(session, default_project):
     session.add(admin_group)
     session.commit()
 
-    # Create default admin user.
+    # Create default admin user.s
     admin_role = session.query(Role).filter_by(name="admin").one()
     admin_user = User(username="admin", password="admin", roles=[admin_role])
     admin_user.groups.append(admin_group)
@@ -81,6 +81,8 @@ def import_datastore(session, location, as_json=True):
         The number of projects and jobs added to the database.
     """
 
+    from seamm_datastore.database.models import Project
+
     jobs = []
     project_names = []
 
@@ -124,14 +126,13 @@ def import_datastore(session, location, as_json=True):
 
                         try:
                             job = api.add_job(
-                                session, job_data=job_data, as_json=as_json
-                            )
+                                session, job_data=job_data, as_json=as_json)
                             jobs.append(job)
                         except ValueError:
                             # Job has already been added.
                             pass
 
     # retrieve projects now that all the jobs have been added.
-    projects = api.get_projects(session, as_json=True, filter={"name": project_names})
+    projects = Project.query.filter(Project.name.in_(project_names)).all()
 
     return jobs, projects
