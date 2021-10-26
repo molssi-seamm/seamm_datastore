@@ -2,6 +2,7 @@
 Automatic import of projects and jobs from directories.
 """
 
+import json
 import os
 from pathlib import Path
 
@@ -122,7 +123,15 @@ def import_datastore(session, location, as_json=True):
                     check_path = os.path.join(potential_job, "job_data.json")
 
                     if os.path.exists(check_path):
-                        job_data = parse_job_data(check_path)
+                        with open(check_path, 'r') as fd:
+                            lines = fd.read().splitlines()
+                        # Old files may not have a header line
+                        if lines[0][0] == "{":
+                            text = "\n".join(lines)
+                        else:
+                            text = "\n".join(lines[1:])                            
+                        job_data_json = json.loads(text)
+                        job_data = parse_job_data(job_data_json)
 
                         try:
                             job = api.add_job(
