@@ -233,13 +233,13 @@ def get_jobs(_=None, as_json=False, limit=None):
                     # We can exit the loop if we have found one
                     # project which grants read permission
                     break
-        if limit and len(authorized_jobs) >= limit:
-            continue
 
     if as_json:
         from seamm_datastore.database.schema import JobSchema
 
         jobs = JobSchema(many=True).dump(jobs)
+    if limit:
+        jobs = jobs[:limit]
 
     return jobs
 
