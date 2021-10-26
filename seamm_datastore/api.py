@@ -237,7 +237,7 @@ def get_jobs(_=None, as_json=False, limit=None):
     if as_json:
         from seamm_datastore.database.schema import JobSchema
 
-        jobs = JobSchema(many=True).dump(jobs)
+        jobs = JobSchema(many=True).dump(authorized_jobs)
     if limit:
         jobs = jobs[:limit]
 
