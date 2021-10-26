@@ -6,7 +6,6 @@ import json
 import os
 import re
 from datetime import datetime
-from pathlib import Path
 
 time_format = "%Y-%m-%d %H:%M:%S %Z"
 
@@ -56,19 +55,15 @@ def parse_flowchart(path):
     return metadata, flowchart
 
 
-def parse_job_data(path):
+def parse_job_data(job_data_json):
     """Parse job_data.json at path"""
-
-    directory = os.path.dirname(path)
-
-    with open(path) as f:
-        job_data_json = json.load(f)
+    directory = job_data_json["working directory"]
     job_data = {
         "path": directory,
         "title": str(
             job_data_json["title"]
             if job_data_json["title"]
-            else os.path.basename(os.path.dirname(path))
+            else os.path.basename(directory)
         ),
         "project_names": job_data_json["projects"],
         "status": job_data_json["state"],
