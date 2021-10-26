@@ -216,14 +216,25 @@ def add_job(session, job_data, as_json=False):
 
 
 def get_jobs(_=None, as_json=False, limit=None):
-    from seamm_datastore.database.models import Job
+    from seamm_datastore.database.models import Job, Project
 
-    jobs = Job.query.filter(Job.authorized("read"))
+    jobs = Job.query.all()
 
-    if limit:
-        jobs = jobs.limit(limit)
-    else:
-        jobs = jobs.all()
+    # After we get the jobs, we need to know which jobs belong to projects which the user
+    # can read. This might be a performance issue on a larger DB, but I think we can do this
+    # check here.
+    authorized_jobs = Job.query.filter(Job.authorized("read")).all()
+    auth_projects = Project.query.filter(Project.authorized("read")).all()
+    for job in jobs:
+        if job not in authorized_jobs:
+            for project in job.projects:
+                if project in auth_projects:
+                    authorized_jobs.append(job)
+                    # We can exit the loop if we have found one
+                    # project which grants read permission
+                    break
+        if limit and len(authorized_jobs) >= limit:
+            continue
 
     if as_json:
         from seamm_datastore.database.schema import JobSchema
