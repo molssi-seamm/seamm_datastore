@@ -137,6 +137,7 @@ class Flowchart(Base, AccessControlPermissionsMixin):
     id = Column(Integer, nullable=False, primary_key=True)
     sha256 = Column(String(75), nullable=True)
     sha256_strict = Column(String(75), nullable=True)
+    path = Column(String, nullable=True)
     flowchart_version = Column(Float, nullable=True, unique=False)
     name = Column(String(100), nullable=True)
     description = Column(Text, nullable=True)

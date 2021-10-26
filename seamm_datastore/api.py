@@ -164,7 +164,7 @@ def add_job(session, job_data, as_json=False):
 
     if not projects:
         raise NameError(
-            f"Projects listed for this job not found in database, please check your project names."
+            "Projects listed for this job not found in database, please check your project names."
         )
 
     # The other permissions method in flask-authorize is harder to fake,
@@ -215,10 +215,15 @@ def add_job(session, job_data, as_json=False):
     return new_job
 
 
-def get_jobs(_=None, as_json=False):
+def get_jobs(_=None, as_json=False, limit=None):
     from seamm_datastore.database.models import Job
 
-    jobs = Job.query.filter(Job.authorized("read")).all()
+    jobs = Job.query.filter(Job.authorized("read"))
+
+    if limit:
+        jobs = jobs.limit(limit)
+    else:
+        jobs = jobs.all()
 
     if as_json:
         from seamm_datastore.database.schema import JobSchema
