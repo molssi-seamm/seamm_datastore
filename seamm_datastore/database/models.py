@@ -139,8 +139,11 @@ class Flowchart(Base, AccessControlPermissionsMixin):
     sha256_strict = Column(String(75), nullable=True)
     path = Column(String, nullable=True)
     flowchart_version = Column(Float, nullable=True, unique=False)
-    name = Column(String(100), nullable=True)
+    doi = Column(Text, nullable=True)
+    title = Column(String(100), nullable=True)
     description = Column(Text, nullable=True)
+    creators = Column(JSON, nullable=True)
+    keywords = Column(JSON, nullable=True)
     json = Column(JSON, nullable=False)
 
     jobs = relationship("Job", back_populates="flowchart", lazy=True)
