@@ -109,10 +109,10 @@ def import_datastore(session, location, as_json=True):
             try:
                 api.add_project(session, project_data, as_json=as_json)
                 project_names.append(project_data["name"])
-            except ValueError:
+            except Exception:
                 # Project exists, we don't need to add it.
                 # Pass here because we should still try importing jobs.
-                pass
+                session.rollback()
 
             for potential_job in os.listdir(potential_project):
                 potential_job = os.path.join(potential_project, potential_job)
@@ -137,9 +137,9 @@ def import_datastore(session, location, as_json=True):
                             job = api.add_job(
                                 session, job_data=job_data, as_json=as_json)
                             jobs.append(job)
-                        except ValueError:
+                        except Exception:
                             # Job has already been added.
-                            pass
+                            session.rollback()
 
     # retrieve projects now that all the jobs have been added.
     projects = Project.query.filter(Project.name.in_(project_names)).all()
