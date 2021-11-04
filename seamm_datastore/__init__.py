@@ -4,6 +4,7 @@ The database models for the seamm datastore
 """
 
 # Imports - alias class to "connect".
+import seamm_datastore.api  # noqa: F401
 from .connect import SEAMMDatastore as connect
 __all__ = ["connect"]
 
