@@ -1,6 +1,7 @@
 """
 Functions which take a session and add or retrieve data to the db
 """
+import datetime
 import os
 import glob
 
@@ -281,3 +282,116 @@ def get_users(_=None, as_json=False):
         users = UserSchema(many=True).dump(users)
 
     return users
+
+
+def finish_job(session, job_id, finish_time, status="finished", as_json=False):
+    """Set the status and time that the job finished.
+
+    Parameters
+    ----------
+    session : session object
+        The SQLAlchemy session
+    job_id : int
+        The ID of the job, eg. 209
+    finish_time : datetime.datetime
+        The time when the job finished.
+    status : str
+        The status, such as "error" or the default, "finished"
+
+    Returns
+    -------
+    bool
+        True if the finish time was successfully set, False otherwise.
+    """
+    from seamm_datastore.database.models import Job
+
+    job = Job.query.filter_by(id=job_id).one_or_none()
+    if job is None:
+        return False
+    else:
+        job.finished = finish_time
+        job.status = status
+        session.commit()
+        return True
+
+
+def submit_job(
+    session,
+    job_id,
+    flowchart_filename,
+    project_names=["default"],
+    path=None,
+    title="",
+    description="",
+    submitted=datetime.datetime.now(),
+    started=None,
+    status="submitted",
+    as_json=False,
+):
+    """Submit a job to the datastore.
+
+    This method requires a user to be logged in and to have appropriate permissions
+    for the project.
+    """
+    from seamm_datastore.database.models import Job, Project
+    from seamm_datastore.database.schema import JobSchema
+
+    # Check if this job already exists
+    try:
+        job = Job.query.filter_by(id=job_id).one_or_none()
+    except KeyError:
+        job = None
+
+    if job:
+        raise ValueError(f"Job with ID {job_id} already found in the database")
+
+    # Get the ids for the projects
+    projects = [Project.query.filter_by(name=x).one_or_none() for x in project_names]
+    projects = [project for project in projects if project]
+
+    if not projects:
+        tmp = "', '".join(project_names)
+        raise NameError(
+            "Projects listed for this job not found in database."
+            f"\nPlease check your project names: '{tmp}'"
+        )
+
+    # Check the permissions of the projects to see if we can add a job to them
+    allowed_projects = Project.query.filter(Project.authorized("update")).all()
+    for project in projects:
+        # if project not in Project.query.filter(Project.authorized("update")).all():
+        if project not in allowed_projects:
+            raise RuntimeError(
+                f"You are not authorized to add jobs to {project} project."
+            )
+
+    # Handle the flowchart - we'll only want to add it if we're adding the job.
+    fl_data, fl = parse_flowchart(flowchart_filename)
+    fl_data["json"] = fl
+
+    try:
+        flowchart = add_flowchart(session, fl_data)
+    except ValueError as e:
+        from seamm_datastore.database.models import Flowchart
+
+        id = int(e.args[0].split(":")[1])
+        flowchart = Flowchart.query.filter_by(id=id).one()
+
+    new_job = Job(
+        title=title,
+        description=description,
+        path=path,
+        flowchart=flowchart,
+        projects=projects,
+        status=status,
+        submitted=submitted,
+        started=started,
+    )
+
+    session.add(new_job)
+    session.commit()
+
+    if as_json:
+        new_job = JobSchema().dump(new_job)
+
+    return new_job
