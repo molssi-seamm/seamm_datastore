@@ -71,6 +71,9 @@ class JobSchema(SQLAlchemyAutoSchema):
             many=True,
         )
     )
+    started = fields.DateTime(format="%Y-%m-%d %H:%M")
+    finished = fields.DateTime(format="%Y-%m-%d %H:%M")
+    submitted = fields.DateTime(format="%Y-%m-%d %H:%M")
 
 
 class UserSchema(SQLAlchemyAutoSchema):
