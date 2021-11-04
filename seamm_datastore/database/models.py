@@ -163,8 +163,8 @@ class Job(Base, AccessControlPermissionsMixin):
     title = Column(String, nullable=True)
     description = Column(Text, nullable=True)
     path = Column(String, unique=True)
-    submitted = Column(DateTime, nullable=True)
-    started = Column(DateTime)
+    submitted = Column(DateTime, nullable=False, default=datetime.utcnow)
+    started = Column(DateTime, nullable=True)
     finished = Column(DateTime, nullable=True)
     status = Column(String, nullable=False, default="imported")
 
