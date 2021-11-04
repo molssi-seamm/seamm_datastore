@@ -207,3 +207,13 @@ class SEAMMDatastore:
     @manage_session(seamm_datastore.database.build.import_datastore)
     def import_datastore(self, *args, **kwargs):
         pass
+
+    @login_required
+    @manage_session(api.submit_job)
+    def submit_job(self, *args, **kwargs):
+        pass
+
+    @login_required
+    @manage_session(api.finish_job)
+    def finish_job(self, *args, **kwargs):
+        pass
