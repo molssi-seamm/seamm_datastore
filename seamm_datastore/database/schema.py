@@ -3,11 +3,28 @@ Marshmallow models for serialization and deserialization.
 
 """
 
+import datetime
+
 from marshmallow import fields
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow_sqlalchemy.fields import Related, Nested
 
 from seamm_datastore.database.models import Flowchart, Project, Job, User, Group, Role
+
+#############################
+#
+# Custom Field
+#
+#############################
+
+class LocalDateTime(fields.DateTime):
+    def _serialize(self, value, attr, obj, **kwargs):
+        if value is None:
+            return None
+        data_format = self.format or self.DEFAULT_FORMAT
+        value = value.replace(tzinfo=datetime.timezone.utc)
+        value = value.astimezone()
+        return value.strftime(data_format)
 
 #############################
 #
@@ -71,6 +88,9 @@ class JobSchema(SQLAlchemyAutoSchema):
             many=True,
         )
     )
+    started = LocalDateTime(format="%Y-%m-%d %H:%M")
+    finished = LocalDateTime(format="%Y-%m-%d %H:%M")
+    submitted = LocalDateTime(format="%Y-%m-%d %H:%M")
 
 
 class UserSchema(SQLAlchemyAutoSchema):

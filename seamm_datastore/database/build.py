@@ -96,8 +96,15 @@ def import_datastore(session, location, as_json=True):
         if os.path.isdir(potential_project):
             project_name = os.path.basename(potential_project)
             item = Path(potential_project)
-            group = item.group()
-            username = item.owner()
+            try:
+                group = item.group()
+                username = item.owner()
+            except NotImplementedError:
+
+                username = os.environ["USERNAME"]
+                # Just a default group name.
+                group = "staff"
+
             project_data = {
                 "owner": username,
                 "group": group,
