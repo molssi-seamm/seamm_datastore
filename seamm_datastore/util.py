@@ -5,7 +5,8 @@ Util Functions and classes
 import json
 import os
 import re
-from datetime import datetime
+import datetime
+
 from dateutil import parser
 
 def parse_flowchart(path):
@@ -73,11 +74,10 @@ def parse_job_data(path):
     }
 
     if "end time" in job_data_json:
-        job_data["finished"] = parser.parse(job_data_json["end time"])
+        job_data["finished"] = parser.parse(job_data_json["end time"]).astimezone(datetime.timezone.utc)
 
     if "start time" in job_data_json:
-        job_data["started"] = parser.parse(job_data_json["start time"])
-
+        job_data["started"] = parser.parse(job_data_json["start time"]).astimezone(datetime.timezone.utc)
     return job_data
 
 
