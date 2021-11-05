@@ -323,7 +323,7 @@ def submit_job(
     path=None,
     title="",
     description="",
-    submitted=datetime.datetime.now(),
+    submitted=datetime.datetime.now(datetime.timezone.utc),
     started=None,
     status="submitted",
     as_json=False,
