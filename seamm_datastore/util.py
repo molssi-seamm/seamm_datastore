@@ -6,10 +6,7 @@ import json
 import os
 import re
 from datetime import datetime
-from pathlib import Path
-
-time_format = "%Y-%m-%d %H:%M:%S %Z"
-
+from dateutil import parser
 
 def parse_flowchart(path):
     """
@@ -76,12 +73,10 @@ def parse_job_data(path):
     }
 
     if "end time" in job_data_json:
-        job_data["finished"] = datetime.strptime(job_data_json["end time"], time_format)
+        job_data["finished"] = parser.parse(job_data_json["end time"])
 
     if "start time" in job_data_json:
-        job_data["started"] = datetime.strptime(
-            job_data_json["start time"], time_format
-        )
+        job_data["started"] = parser.parse(job_data_json["start time"])
 
     return job_data
 
