@@ -378,6 +378,7 @@ def submit_job(
         flowchart = Flowchart.query.filter_by(id=id).one()
 
     new_job = Job(
+        id=job_id,
         title=title,
         description=description,
         path=path,
