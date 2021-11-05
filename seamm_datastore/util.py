@@ -71,12 +71,20 @@ def parse_job_data(job_data_json):
     }
 
     if "end time" in job_data_json:
-        job_data["finished"] = datetime.strptime(job_data_json["end time"], time_format)
+        try:
+            job_data["finished"] = datetime.fromisoformat(job_data_json["end time"])
+        except Exception:
+            job_data["finished"] = datetime.strptime(
+                job_data_json["end time"], time_format
+            )
 
     if "start time" in job_data_json:
-        job_data["started"] = datetime.strptime(
-            job_data_json["start time"], time_format
-        )
+        try:
+            job_data["started"] = datetime.fromisoformat(job_data_json["start time"])
+        except Exception:
+            job_data["started"] = datetime.strptime(
+                job_data_json["start time"], time_format
+            )
 
     return job_data
 
