@@ -1,0 +1,9 @@
+Step 1: from SMILES  2021.10.13+1.g1177adb
+    Create the structure from the SMILES 'CCS', overwriting the current
+    configuration. The name of the system will be the canonical SMILES of the
+    structure. The name of the configuration will be initial.
+
+    Created a molecular structure with 9 atoms.
+           System name = CCS
+    Configuration name = initial
+

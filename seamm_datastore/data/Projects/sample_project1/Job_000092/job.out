@@ -1,0 +1,102 @@
+Running in directory '/Users/psaxe/SEAMM/Jobs/projects/dbg/Job_000092'
+
+Description of the flowchart
+----------------------------
+Step 0: Start  2021.10.25+2.g8bb303f.dirty
+
+Step 1: from SMILES  2021.10.13+1.g1177adb
+    Create the structure from the SMILES 'CCS', overwriting the current
+    configuration. The name of the system will be the canonical SMILES of the
+    structure. The name of the configuration will be initial.
+
+Step 2: DFTB+  2021.10.13+1.ge5b9c74.dirty
+
+   Step 2.1: Choose Parameters
+       Using the '3ob' set of Slater-Koster parameters.
+
+   Step 2.2: Optimization
+       Structural optimization using the Direct inversion of iterative subspace
+       (gDIIS) method with a convergence criterion of 0.0 hartree/bohr. A maximum
+       of 200 will be used.
+
+
+
+Running the flowchart
+---------------------
+Step 0: Start  2021.10.25+2.g8bb303f.dirty
+
+Step 1: from SMILES  2021.10.13+1.g1177adb
+    Create the structure from the SMILES 'CCS', overwriting the current
+    configuration. The name of the system will be the canonical SMILES of the
+    structure. The name of the configuration will be initial.
+
+    Created a molecular structure with 9 atoms.
+           System name = CCS
+    Configuration name = initial
+
+Step 2: DFTB+  2021.10.13+1.ge5b9c74.dirty
+
+    Step 2.1: Choose Parameters
+        Using the '3ob' set of Slater-Koster parameters.
+
+ 
+    Step 2.2: Optimization
+        Structural optimization using the Direct inversion of iterative subspace
+        (gDIIS) method with a convergence criterion of 0.0001 E_h/a_0. A maximum of
+        200 will be used.
+
+ 
+        The geometry optimization converged in 25 steps to a total energy of
+        -8.115700 Ha.
+
+Wrote the final structure to 'final_structure.mmcif' for viewing.
+
+Primary references:
+
+(1) Jessica Nash and Eliseo Marin-Rimoldi and Paul Saxe. SEAMM: Simulation
+    Environment for Atomistic and Molecular Modeling, version
+    2021.10.25+2.g8bb303f.dirty; The Molecular Sciences Software Institute
+    (MolSSI): Virginia Tech, Blacksburg, VA, USA,
+    https://doi.org/10.5281/zenodo.5153984, DOI: 10.5281/zenodo.5153984
+
+(2) O'Boyle, Noel M. and Banck, Michael and James, Craig A. and Morley, Chris
+    and Vandermeersch, Tim and Hutchison, Geoffrey R. Open Babel: An open
+    chemical toolbox. Journal of Cheminformatics 2011, 3, 33. DOI:
+    10.1186/1758-2946-3-33
+
+(3)  The Open Babel Package, version 3.1.0; Open Babel, http://openbabel.org
+
+(4) Hourahine, B.; Aradi, B.; Blum, V.; Bonafé, F.; Buccheri, A.; Camacho, C.;
+    Cevallos, C.; Deshaye, M. Y.; Dumitrică, T.; Dominguez, A.; Ehlert, S.;
+    Elstner, M.; van der Heide, T.; Hermann, J.; Irle, S.; Kranz, J. J.; Köhler,
+    C.; Kowalczyk, T.; Kubař, T.; Lee, I. S.; Lutsker, V.; Maurer, R. J.; Min,
+    S. K.; Mitchell, I.; Negre, C.; Niehaus, T. A.; Niklasson, A. M. N.; Page,
+    A. J.; Pecchia, A.; Penazzi, G.; Persson, M. P.; Řezáč, J.; Sánchez, C. G.;
+    Sternberg, M.; Stöhr, M.; Stuckenberg, F.; Tkatchenko, A.; Yu, V. W.-z.;
+    Frauenheim, T. DFTB+, a software package for efficient approximate density
+    functional theory based atomistic simulations. The Journal of Chemical
+    Physics 2020, 152, 124101. DOI: 10.1063/1.5143190
+
+(5) Gaus, Michael; Goez, Albrecht; Elstner, Marcus. Parametrization and
+    Benchmark of DFTB3 for Organic Molecules. Journal of Chemical Theory and
+    Computation 2013, 9, 338-354. DOI: 10.1021/ct300849w
+
+(6) Gaus, Michael; Lu, Xiya; Elstner, Marcus; Cui, Qiang. Parameterization of
+    DFTB3/3OB for Sulfur and Phosphorus for Chemical and Biological
+    Applications. Journal of Chemical Theory and Computation 2014, 10,
+    1518-1537. DOI: 10.1021/ct401002w
+
+Secondary references:
+
+(1) Paul Saxe. From Smiles plug-in for SEAMM for creating structures from
+    SMILES, version 2021.10.13+1.g1177adb; The Molecular Sciences Software
+    Institute (MolSSI): Virginia Tech, Blacksburg, VA, USA,
+    https://github.com/molssi-seamm/from_smiles_step, DOI:
+    10.5281/zenodo.5159800
+
+(2) Paul Saxe. DFTB+ plug-in for SEAMM, version 2021.10.13+1.ge5b9c74.dirty; The
+    Molecular Sciences Software Institute (MolSSI): Virginia Tech, Blacksburg,
+    VA, USA, https://github.com/molssi-seamm/dftbplus_step
+
+Process time: 0:00:00.890916 (0.891 s)
+Elapsed time: 0:00:02.059439 (2.059 s)

@@ -1,0 +1,638 @@
+|===============================================================================
+|
+|  DFTB+ release 21.1
+|
+|  Copyright (C) 2006 - 2021  DFTB+ developers group
+|
+|===============================================================================
+|
+|  When publishing results obtained with DFTB+, please cite the following
+|  reference:
+|
+|  * DFTB+, a software package for efficient approximate density functional
+|    theory based atomistic simulations, J. Chem. Phys. 152, 124101 (2020).
+|    [doi: 10.1063/1.5143190]
+|
+|  You should also cite additional publications crediting the parametrization
+|  data you use. Please consult the documentation of the SK-files for the
+|  references.
+|
+|===============================================================================
+
+Reading input file 'dftb_in.hsd'
+Parser version: 9
+
+--------------------------------------------------------------------------------
+Reading SK-files:
+Done.
+
+
+Processed input in HSD format written to 'dftb_pin.hsd'
+
+Starting initialization...
+--------------------------------------------------------------------------------
+OpenMP threads:              8
+Chosen random seed:          1991428636
+Mode:                        Modified gDIIS relaxation
+WARNING!
+-> This geometry optimisation method requires force related energies for accurate minimisation.
+Self consistent charges:     Yes
+SCC-tolerance:                 0.100000E-04
+Max. scc iterations:                    100
+Shell resolved Hubbard:      No
+Spin polarisation:           No
+Nr. of up electrons:            10.000000
+Nr. of down electrons:          10.000000
+Periodic boundaries:         No
+Electronic solver:           Relatively robust
+Mixer:                       Broyden mixer
+Mixing parameter:                  0.200000
+Maximal SCC-cycles:                     100
+Nr. of chrg. vec. in memory:              0
+Nr. of moved atoms:                       9
+Max. nr. of geometry steps:             200
+Force tolerance:               0.100000E-03
+Electronic temperature:        0.100000E-07 H      0.272114E-06 eV
+Initial charges:             Set automatically (system chrg:   0.000E+00)
+Included shells:             C:  s, p
+                             H:  s
+                             S:  s, p, d
+Full 3rd order correction    Yes
+Damped SCC                   Yes
+Damped species(s):           H                                                 
+Extra options:
+                             Mulliken analysis
+Force type                   original
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 0
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1    0.00000000E+00    0.00000000E+00    0.36960488E+00
+    2   -0.80572374E+01   -0.80572374E+01    0.26792637E+00
+    3   -0.80579046E+01   -0.66713905E-03    0.52205492E-01
+    4   -0.80585766E+01   -0.67203870E-03    0.21394965E-01
+    5   -0.80585803E+01   -0.37023437E-05    0.20111917E-02
+    6   -0.80585841E+01   -0.37531995E-05    0.15576491E-02
+    7   -0.80585843E+01   -0.21382467E-06    0.19173951E-03
+    8   -0.80585843E+01   -0.83799812E-08    0.50384106E-04
+    9   -0.80585843E+01   -0.19514346E-08    0.62787852E-04
+   10   -0.80585843E+01    0.21389113E-10    0.11206287E-05
+
+Total Energy:                       -8.1101539280 H         -220.6885 eV
+Extrapolated to 0K:                 -8.1101539280 H         -220.6885 eV
+Total Mermin free energy:           -8.1101539280 H         -220.6885 eV
+Force related energy:               -8.1101539280 H         -220.6885 eV
+
+Maximal force component:             0.219668E-01
+Averaged force norm:                 0.176018E-01
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 1
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80585843E+01    0.00000000E+00    0.11580435E-01
+    2   -0.80644726E+01   -0.58883026E-02    0.92957526E-02
+    3   -0.80644727E+01   -0.17044827E-06    0.58188633E-03
+    4   -0.80644729E+01   -0.19370258E-06    0.17713666E-03
+    5   -0.80644730E+01   -0.18809081E-07    0.10970733E-03
+    6   -0.80644730E+01   -0.27227287E-09    0.10586322E-04
+    7   -0.80644730E+01   -0.12709833E-09    0.25040457E-05
+
+Total Energy:                       -8.1064728358 H         -220.5883 eV
+Extrapolated to 0K:                 -8.1064728358 H         -220.5883 eV
+Total Mermin free energy:           -8.1064728358 H         -220.5883 eV
+Force related energy:               -8.1064728358 H         -220.5883 eV
+
+Maximal force component:             0.334749E-01
+Averaged force norm:                 0.269743E-01
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 2
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80644730E+01    0.00000000E+00    0.28911859E-01
+    2   -0.80506619E+01    0.13811024E-01    0.23283805E-01
+    3   -0.80506632E+01   -0.12421313E-05    0.16049100E-02
+    4   -0.80506646E+01   -0.14489702E-05    0.89463970E-03
+    5   -0.80506647E+01   -0.10305041E-06    0.17289291E-03
+    6   -0.80506647E+01    0.60861716E-09    0.17356165E-04
+    7   -0.80506647E+01   -0.87701579E-09    0.16236710E-04
+    8   -0.80506647E+01   -0.11210588E-10    0.73293170E-06
+
+Total Energy:                       -8.1122196645 H         -220.7447 eV
+Extrapolated to 0K:                 -8.1122196645 H         -220.7447 eV
+Total Mermin free energy:           -8.1122196645 H         -220.7447 eV
+Force related energy:               -8.1122196645 H         -220.7447 eV
+
+Maximal force component:             0.148489E-01
+Averaged force norm:                 0.996940E-02
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 3
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80506647E+01    0.00000000E+00    0.38967998E-02
+    2   -0.80444533E+01    0.62114412E-02    0.30182666E-02
+    3   -0.80444536E+01   -0.30868429E-06    0.48944217E-03
+    4   -0.80444539E+01   -0.30367043E-06    0.54559198E-04
+    5   -0.80444539E+01   -0.63462835E-08    0.35482712E-04
+    6   -0.80444539E+01   -0.15260326E-09    0.34085609E-05
+
+Total Energy:                       -8.1135787142 H         -220.7817 eV
+Extrapolated to 0K:                 -8.1135787142 H         -220.7817 eV
+Total Mermin free energy:           -8.1135787142 H         -220.7817 eV
+Force related energy:               -8.1135787142 H         -220.7817 eV
+
+Maximal force component:             0.116010E-01
+Averaged force norm:                 0.727350E-02
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 4
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80444539E+01    0.00000000E+00    0.25522392E-02
+    2   -0.80435440E+01    0.90988090E-03    0.19174771E-02
+    3   -0.80435441E+01   -0.48843447E-07    0.34219334E-03
+    4   -0.80435441E+01   -0.51901278E-07    0.36219965E-04
+    5   -0.80435441E+01   -0.20741115E-08    0.13737421E-04
+    6   -0.80435441E+01   -0.97992725E-10    0.46632654E-05
+
+Total Energy:                       -8.1137964917 H         -220.7876 eV
+Extrapolated to 0K:                 -8.1137964917 H         -220.7876 eV
+Total Mermin free energy:           -8.1137964917 H         -220.7876 eV
+Force related energy:               -8.1137964917 H         -220.7876 eV
+
+Maximal force component:             0.103508E-01
+Averaged force norm:                 0.602332E-02
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 5
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80435441E+01    0.00000000E+00    0.15388590E-01
+    2   -0.80393924E+01    0.41517613E-02    0.11398227E-01
+    3   -0.80393935E+01   -0.11571505E-05    0.13612551E-02
+    4   -0.80393947E+01   -0.11332877E-05    0.15850733E-03
+    5   -0.80393947E+01   -0.33991382E-07    0.94329631E-04
+    6   -0.80393947E+01   -0.22403412E-09    0.20135055E-04
+    7   -0.80393947E+01   -0.13251729E-08    0.27277334E-05
+
+Total Energy:                       -8.1143641356 H         -220.8031 eV
+Extrapolated to 0K:                 -8.1143641356 H         -220.8031 eV
+Total Mermin free energy:           -8.1143641356 H         -220.8031 eV
+Force related energy:               -8.1143641356 H         -220.8031 eV
+
+Maximal force component:             0.133027E-01
+Averaged force norm:                 0.691392E-02
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 6
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80393947E+01    0.00000000E+00    0.52688666E-02
+    2   -0.80412785E+01   -0.18837805E-02    0.40623403E-02
+    3   -0.80412789E+01   -0.41937110E-06    0.12655081E-02
+    4   -0.80412794E+01   -0.45651943E-06    0.11785794E-03
+    5   -0.80412794E+01   -0.17826967E-07    0.87635483E-04
+    6   -0.80412794E+01   -0.11287149E-09    0.66385276E-05
+
+Total Energy:                       -8.1149863214 H         -220.8200 eV
+Extrapolated to 0K:                 -8.1149863214 H         -220.8200 eV
+Total Mermin free energy:           -8.1149863214 H         -220.8200 eV
+Force related energy:               -8.1149863214 H         -220.8200 eV
+
+Maximal force component:             0.493003E-02
+Averaged force norm:                 0.362596E-02
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 7
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80412794E+01    0.00000000E+00    0.52277389E-03
+    2   -0.80409806E+01    0.29873881E-03    0.37611550E-03
+    3   -0.80409806E+01   -0.30890224E-08    0.93866813E-04
+    4   -0.80409806E+01   -0.31515306E-08    0.11915496E-04
+    5   -0.80409806E+01   -0.10736301E-09    0.79593735E-06
+
+Total Energy:                       -8.1150081375 H         -220.8206 eV
+Extrapolated to 0K:                 -8.1150081375 H         -220.8206 eV
+Total Mermin free energy:           -8.1150081375 H         -220.8206 eV
+Force related energy:               -8.1150081375 H         -220.8206 eV
+
+Maximal force component:             0.505305E-02
+Averaged force norm:                 0.354396E-02
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 8
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80409806E+01    0.00000000E+00    0.81526924E-03
+    2   -0.80406394E+01    0.34125410E-03    0.59889970E-03
+    3   -0.80406394E+01   -0.85452356E-08    0.99190055E-04
+    4   -0.80406394E+01   -0.96814468E-08    0.13256097E-04
+    5   -0.80406394E+01   -0.10529710E-09    0.28013526E-05
+
+Total Energy:                       -8.1149664055 H         -220.8195 eV
+Extrapolated to 0K:                 -8.1149664055 H         -220.8195 eV
+Total Mermin free energy:           -8.1149664055 H         -220.8195 eV
+Force related energy:               -8.1149664055 H         -220.8195 eV
+
+Maximal force component:             0.590292E-02
+Averaged force norm:                 0.397641E-02
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 9
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80406394E+01    0.00000000E+00    0.14634435E-02
+    2   -0.80428483E+01   -0.22088751E-02    0.10203655E-02
+    3   -0.80428483E+01   -0.72907905E-07    0.27062902E-03
+    4   -0.80428484E+01   -0.62535490E-07    0.17035410E-04
+    5   -0.80428484E+01   -0.36538594E-09    0.46638581E-05
+
+Total Energy:                       -8.1153505761 H         -220.8299 eV
+Extrapolated to 0K:                 -8.1153505761 H         -220.8299 eV
+Total Mermin free energy:           -8.1153505761 H         -220.8299 eV
+Force related energy:               -8.1153505761 H         -220.8299 eV
+
+Maximal force component:             0.384473E-02
+Averaged force norm:                 0.263506E-02
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 10
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80428484E+01    0.00000000E+00    0.15328035E-02
+    2   -0.80443663E+01   -0.15178944E-02    0.11372188E-02
+    3   -0.80443664E+01   -0.52445081E-07    0.72673084E-04
+    4   -0.80443664E+01   -0.57852493E-07    0.15031644E-04
+    5   -0.80443664E+01   -0.34295766E-09    0.71222507E-05
+
+Total Energy:                       -8.1155090000 H         -220.8342 eV
+Extrapolated to 0K:                 -8.1155090000 H         -220.8342 eV
+Total Mermin free energy:           -8.1155090000 H         -220.8342 eV
+Force related energy:               -8.1155090000 H         -220.8342 eV
+
+Maximal force component:             0.138293E-02
+Averaged force norm:                 0.139966E-02
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 11
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80443664E+01    0.00000000E+00    0.88399860E-03
+    2   -0.80445703E+01   -0.20392984E-03    0.63792072E-03
+    3   -0.80445704E+01   -0.52115237E-08    0.10321611E-03
+    4   -0.80445704E+01   -0.53753730E-08    0.52598418E-05
+
+Total Energy:                       -8.1155904025 H         -220.8365 eV
+Extrapolated to 0K:                 -8.1155904025 H         -220.8365 eV
+Total Mermin free energy:           -8.1155904025 H         -220.8365 eV
+Force related energy:               -8.1155904025 H         -220.8365 eV
+
+Maximal force component:             0.107084E-02
+Averaged force norm:                 0.100713E-02
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 12
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80445704E+01    0.00000000E+00    0.34256968E-03
+    2   -0.80444311E+01    0.13925300E-03    0.28255920E-03
+    3   -0.80444311E+01   -0.13370975E-08    0.61077487E-04
+    4   -0.80444311E+01   -0.14894539E-08    0.35950033E-05
+
+Total Energy:                       -8.1156509679 H         -220.8381 eV
+Extrapolated to 0K:                 -8.1156509679 H         -220.8381 eV
+Total Mermin free energy:           -8.1156509679 H         -220.8381 eV
+Force related energy:               -8.1156509679 H         -220.8381 eV
+
+Maximal force component:             0.768721E-03
+Averaged force norm:                 0.670560E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 13
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80444311E+01    0.00000000E+00    0.85588612E-03
+    2   -0.80441932E+01    0.23793394E-03    0.60805690E-03
+    3   -0.80441932E+01   -0.11135301E-07    0.13676092E-03
+    4   -0.80441932E+01   -0.11350680E-07    0.62438609E-05
+
+Total Energy:                       -8.1156732270 H         -220.8387 eV
+Extrapolated to 0K:                 -8.1156732270 H         -220.8387 eV
+Total Mermin free energy:           -8.1156732270 H         -220.8387 eV
+Force related energy:               -8.1156732270 H         -220.8387 eV
+
+Maximal force component:             0.694477E-03
+Averaged force norm:                 0.541669E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 14
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80441932E+01    0.00000000E+00    0.91925286E-03
+    2   -0.80445916E+01   -0.39839392E-03    0.74144086E-03
+    3   -0.80445916E+01   -0.71827397E-08    0.94158617E-04
+    4   -0.80445916E+01   -0.70409634E-08    0.13608151E-04
+    5   -0.80445916E+01   -0.59266192E-09    0.42070142E-05
+
+Total Energy:                       -8.1156819546 H         -220.8389 eV
+Extrapolated to 0K:                 -8.1156819546 H         -220.8389 eV
+Total Mermin free energy:           -8.1156819546 H         -220.8389 eV
+Force related energy:               -8.1156819546 H         -220.8389 eV
+
+Maximal force component:             0.103034E-02
+Averaged force norm:                 0.691722E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 15
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80445916E+01    0.00000000E+00    0.58158060E-03
+    2   -0.80443482E+01    0.24340249E-03    0.43887698E-03
+    3   -0.80443482E+01   -0.72399295E-08    0.14211124E-03
+    4   -0.80443482E+01   -0.61869567E-08    0.11052211E-04
+    5   -0.80443482E+01   -0.58912875E-09    0.20054566E-05
+
+Total Energy:                       -8.1156900624 H         -220.8392 eV
+Extrapolated to 0K:                 -8.1156900624 H         -220.8392 eV
+Total Mermin free energy:           -8.1156900624 H         -220.8392 eV
+Force related energy:               -8.1156900624 H         -220.8392 eV
+
+Maximal force component:             0.680777E-03
+Averaged force norm:                 0.333889E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 16
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80443482E+01    0.00000000E+00    0.30403155E-03
+    2   -0.80443785E+01   -0.30332958E-04    0.22706777E-03
+    3   -0.80443786E+01   -0.50247806E-08    0.52899168E-04
+    4   -0.80443786E+01   -0.52652496E-08    0.68535519E-05
+
+Total Energy:                       -8.1156926903 H         -220.8392 eV
+Extrapolated to 0K:                 -8.1156926903 H         -220.8392 eV
+Total Mermin free energy:           -8.1156926903 H         -220.8392 eV
+Force related energy:               -8.1156926903 H         -220.8392 eV
+
+Maximal force component:             0.441612E-03
+Averaged force norm:                 0.329401E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 17
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80443786E+01    0.00000000E+00    0.27646647E-03
+    2   -0.80443661E+01    0.12470675E-04    0.20693906E-03
+    3   -0.80443661E+01   -0.17776518E-08    0.47416305E-04
+    4   -0.80443661E+01   -0.19176678E-08    0.53743927E-05
+
+Total Energy:                       -8.1156929017 H         -220.8392 eV
+Extrapolated to 0K:                 -8.1156929017 H         -220.8392 eV
+Total Mermin free energy:           -8.1156929017 H         -220.8392 eV
+Force related energy:               -8.1156929017 H         -220.8392 eV
+
+Maximal force component:             0.286957E-03
+Averaged force norm:                 0.181964E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 18
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80443661E+01    0.00000000E+00    0.22443598E-03
+    2   -0.80444622E+01   -0.96148007E-04    0.15776541E-03
+    3   -0.80444622E+01   -0.92901509E-09    0.24493806E-04
+    4   -0.80444622E+01   -0.92354568E-09    0.28903151E-05
+
+Total Energy:                       -8.1156948027 H         -220.8393 eV
+Extrapolated to 0K:                 -8.1156948027 H         -220.8393 eV
+Total Mermin free energy:           -8.1156948027 H         -220.8393 eV
+Force related energy:               -8.1156948027 H         -220.8393 eV
+
+Maximal force component:             0.236472E-03
+Averaged force norm:                 0.141085E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 19
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80444622E+01    0.00000000E+00    0.20539933E-03
+    2   -0.80443863E+01    0.75917951E-04    0.16910336E-03
+    3   -0.80443863E+01   -0.25938363E-09    0.32591534E-04
+    4   -0.80443863E+01   -0.27323033E-09    0.18787899E-05
+
+Total Energy:                       -8.1156956767 H         -220.8393 eV
+Extrapolated to 0K:                 -8.1156956767 H         -220.8393 eV
+Total Mermin free energy:           -8.1156956767 H         -220.8393 eV
+Force related energy:               -8.1156956767 H         -220.8393 eV
+
+Maximal force component:             0.228312E-03
+Averaged force norm:                 0.176024E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 20
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80443863E+01    0.00000000E+00    0.30359279E-03
+    2   -0.80444583E+01   -0.72003832E-04    0.24151362E-03
+    3   -0.80444583E+01   -0.10208758E-08    0.51528432E-04
+    4   -0.80444583E+01   -0.94455643E-09    0.35232862E-05
+
+Total Energy:                       -8.1156970520 H         -220.8394 eV
+Extrapolated to 0K:                 -8.1156970520 H         -220.8394 eV
+Total Mermin free energy:           -8.1156970520 H         -220.8394 eV
+Force related energy:               -8.1156970520 H         -220.8394 eV
+
+Maximal force component:             0.296963E-03
+Averaged force norm:                 0.160628E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 21
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80444583E+01    0.00000000E+00    0.55893213E-03
+    2   -0.80445833E+01   -0.12497205E-03    0.40571604E-03
+    3   -0.80445833E+01   -0.24663915E-08    0.26150123E-04
+    4   -0.80445833E+01   -0.27428158E-08    0.38877617E-05
+
+Total Energy:                       -8.1156969059 H         -220.8393 eV
+Extrapolated to 0K:                 -8.1156969059 H         -220.8393 eV
+Total Mermin free energy:           -8.1156969059 H         -220.8393 eV
+Force related energy:               -8.1156969059 H         -220.8393 eV
+
+Maximal force component:             0.562331E-03
+Averaged force norm:                 0.367872E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 22
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80445833E+01    0.00000000E+00    0.46263999E-03
+    2   -0.80444822E+01    0.10108911E-03    0.33543436E-03
+    3   -0.80444822E+01   -0.23024818E-08    0.27447021E-04
+    4   -0.80444822E+01   -0.25127260E-08    0.36836147E-05
+
+Total Energy:                       -8.1156976123 H         -220.8394 eV
+Extrapolated to 0K:                 -8.1156976123 H         -220.8394 eV
+Total Mermin free energy:           -8.1156976123 H         -220.8394 eV
+Force related energy:               -8.1156976123 H         -220.8394 eV
+
+Maximal force component:             0.142146E-03
+Averaged force norm:                 0.110075E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 23
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80444822E+01    0.00000000E+00    0.12546363E-03
+    2   -0.80444722E+01    0.10023226E-04    0.93849358E-04
+    3   -0.80444722E+01   -0.34168224E-09    0.16040366E-04
+    4   -0.80444722E+01   -0.37320724E-09    0.90392475E-06
+
+Total Energy:                       -8.1156984781 H         -220.8394 eV
+Extrapolated to 0K:                 -8.1156984781 H         -220.8394 eV
+Total Mermin free energy:           -8.1156984781 H         -220.8394 eV
+Force related energy:               -8.1156984781 H         -220.8394 eV
+
+Maximal force component:             0.173857E-03
+Averaged force norm:                 0.136558E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 24
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80444722E+01    0.00000000E+00    0.15532766E-03
+    2   -0.80444918E+01   -0.19612515E-04    0.11622183E-03
+    3   -0.80444918E+01   -0.73700157E-09    0.22453003E-04
+    4   -0.80444918E+01   -0.81917584E-09    0.24593860E-05
+
+Total Energy:                       -8.1156987586 H         -220.8394 eV
+Extrapolated to 0K:                 -8.1156987586 H         -220.8394 eV
+Total Mermin free energy:           -8.1156987586 H         -220.8394 eV
+Force related energy:               -8.1156987586 H         -220.8394 eV
+
+Maximal force component:             0.356643E-03
+Averaged force norm:                 0.198061E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 25
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80444918E+01    0.00000000E+00    0.23642609E-03
+    2   -0.80445591E+01   -0.67258856E-04    0.17730383E-03
+    3   -0.80445591E+01   -0.15374457E-08    0.28282596E-04
+    4   -0.80445591E+01   -0.16226949E-08    0.36052100E-05
+
+Total Energy:                       -8.1156997795 H         -220.8394 eV
+Extrapolated to 0K:                 -8.1156997795 H         -220.8394 eV
+Total Mermin free energy:           -8.1156997795 H         -220.8394 eV
+Force related energy:               -8.1156997795 H         -220.8394 eV
+
+Maximal force component:             0.351275E-03
+Averaged force norm:                 0.230362E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 26
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80445591E+01    0.00000000E+00    0.26136577E-03
+    2   -0.80444823E+01    0.76809127E-04    0.19507316E-03
+    3   -0.80444823E+01   -0.13915429E-08    0.41915112E-04
+    4   -0.80444823E+01   -0.14467840E-08    0.56577865E-05
+
+Total Energy:                       -8.1156991996 H         -220.8394 eV
+Extrapolated to 0K:                 -8.1156991996 H         -220.8394 eV
+Total Mermin free energy:           -8.1156991996 H         -220.8394 eV
+Force related energy:               -8.1156991996 H         -220.8394 eV
+
+Maximal force component:             0.210590E-03
+Averaged force norm:                 0.137239E-03
+>> Charges saved for restart in charges.dat
+
+--------------------------------------------------------------------------------
+
+***  Geometry step: 27
+
+ iSCC Total electronic   Diff electronic      SCC error    
+    1   -0.80444823E+01    0.00000000E+00    0.10722893E-03
+    2   -0.80443936E+01    0.88691630E-04    0.77661241E-04
+    3   -0.80443936E+01   -0.39306514E-09    0.16460350E-04
+    4   -0.80443936E+01   -0.39307402E-09    0.30532350E-05
+
+Total Energy:                       -8.1157003870 H         -220.8394 eV
+Extrapolated to 0K:                 -8.1157003870 H         -220.8394 eV
+Total Mermin free energy:           -8.1157003870 H         -220.8394 eV
+Force related energy:               -8.1157003870 H         -220.8394 eV
+
+Maximal force component:             0.996562E-04
+Averaged force norm:                 0.777559E-04
+>> Charges saved for restart in charges.dat
+
+Geometry converged
+
+--------------------------------------------------------------------------------
+DFTB+ running times                          cpu [s]             wall clock [s]
+--------------------------------------------------------------------------------
+Pre-SCC initialisation                 +     0.04  (  2.2%)      0.01  (  2.5%)
+SCC                                    +     1.20  ( 72.8%)      0.18  ( 73.8%)
+Post-SCC processing                    +     0.40  ( 24.4%)      0.05  ( 22.1%)
+--------------------------------------------------------------------------------
+Missing                                +     0.01  (  0.6%)      0.00  (  1.7%)
+Total                                  =     1.65  (100.0%)      0.24  (100.0%)
+--------------------------------------------------------------------------------

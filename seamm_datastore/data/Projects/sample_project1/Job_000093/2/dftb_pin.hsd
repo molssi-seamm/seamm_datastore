@@ -1,0 +1,121 @@
+Options = {
+  WriteResultsTag = Yes
+  WriteChargesAsText = Yes
+  WriteDetailedOut = Yes
+  WriteAutotestTag = No
+  WriteDetailedXML = No
+  RandomSeed = 0
+  WriteHS = No
+  WriteRealHS = No
+  MinimiseMemoryUsage = No
+  ShowFoldedCoords = No
+  TimingVerbosity = 1
+}
+Hamiltonian = DFTB {
+  SlaterKosterFiles = {
+    C-C = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/C-C.skf
+    C-H = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/C-H.skf
+    C-S = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/C-S.skf
+    H-C = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/H-C.skf
+    H-H = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/H-H.skf
+    H-S = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/H-S.skf
+    S-C = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/S-C.skf
+    S-H = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/S-H.skf
+    S-S = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/S-S.skf
+  }
+  MaxAngularMomentum = {
+    C = p
+    H = s
+    S = d
+  }
+  HubbardDerivs = {
+    C = -0.1492
+    H = -0.1857
+    S = -0.11
+  }
+  SCC = Yes
+  SCCTolerance = 1e-05
+  MaxSCCIterations = 100
+  ThirdOrderFull = Yes
+  HCorrection = Damping {
+    Exponent = 4.0
+  }
+  PolynomialRepulsive = {}
+  ShellResolvedSCC = No
+  OldSKInterpolation = No
+  RangeSeparated = None {}
+  ReadInitialCharges = No
+  InitialCharges = {}
+  SpinPolarisation = {}
+  ElectricField = {}
+  Solver = RelativelyRobust {}
+  Charge = 0.0000000000000000
+  OnSiteCorrection = {}
+  Dispersion = {}
+  Solvation = {}
+  Electrostatics = GammaFunctional {}
+  ThirdOrder = No
+  Differentiation = FiniteDiff {
+    Delta = 1.2207031250000000E-004
+  }
+  ForceEvaluation = "Traditional"
+  Mixer = Broyden {
+    MixingParameter = 0.20000000000000001
+    InverseJacobiWeight = 1.0000000000000000E-002
+    MinimalWeight = 1.0000000000000000
+    MaximalWeight = 100000.00000000000
+    WeightFactor = 1.0000000000000000E-002
+  }
+  Filling = Fermi {
+    Temperature = 0.0000000000000000
+  }
+}
+Driver = gDIIS {
+  MaxForceComponent = 0.0001
+  MaxSteps = 200
+  OutputPrefix = geom.out
+  alpha = 0.10000000000000001
+  Generations = 8
+  LatticeOpt = No
+  MovedAtoms = "1:-1"
+  MaxAtomStep = 0.20000000000000001
+  StepSize = 100.00000000000000
+  AppendGeometries = No
+  ConvergentForcesOnly = Yes
+  Constraints = {}
+}
+Geometry = {
+  TypeNames = {
+"C" "H" "S"
+  }
+  TypesAndCoordinates = {
+ 1 1.9666756308338571 7.5173299825669563E-003 0.17243371700584958
+ 1 1.0092024950226084 1.9733652608334264 2.0350270198407565
+ 3 2.1493176476300100 5.0646546219903721 1.1167146756908291
+ 2 1.2926670624874126 0.45109460100768622 -1.6816066860047494
+ 2 1.2926765111173553 -1.8199232900127948 0.71530475037485974
+ 2 3.9886824386133051 7.5173299825669563E-003 0.17243371700584958
+ 2 -1.0128043127568396 1.9733652608334264 2.0350270198407565
+ 2 1.6832091736430641 1.5297917692602843 3.8890749817553099
+ 2 4.7193449920973460 5.0646546219903721 1.1167146756908291
+  }
+  Periodic = No
+  Helical = No
+}
+ParserOptions = {
+  ParserVersion = 9
+  WriteHSDInput = Yes
+  StopAfterParsing = No
+  IgnoreUnprocessedNodes = No
+}
+Reks = None {}
+Analysis = {
+  ProjectStates = {}
+  WriteEigenvectors = No
+  WriteBandOut = Yes
+  MullikenAnalysis = Yes
+  WriteNetCharges = No
+  AtomResolvedEnergies = No
+  CalculateForces = No
+}
+ExcitedState = {}

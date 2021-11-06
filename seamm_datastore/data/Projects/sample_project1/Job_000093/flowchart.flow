@@ -1,0 +1,385 @@
+#!/usr/bin/env run_flowchart
+!MolSSI flowchart 2.0
+#metadata
+{
+    "title": "SEAMM Tutorial 1",
+    "description": "The flowchart for the first tutorial for SEAMM, which introduces the basic use of SEAMM. The example builds the structure of ethane thiol from its SMILES representation and optimizes the structure using DFTB+ with the default '3ob' parameter set.\n",
+    "keywords": [
+        "tutorial",
+        "SEAMM",
+        "DFTB+"
+    ],
+    "creators": [
+        {
+            "name": "Saxe, Paul",
+            "orcid": "0000-0002-8641-9448",
+            "affiliation": "The Molecular Sciences Software Institute (MolSSI)"
+        }
+    ],
+    "sha256": "0007a6bf3474fddd2e8ea8974afd6eddf0f11cc6fd4a456b940716cc7aad9b17",
+    "sha256_strict": "606f2d75bcd83dbee435c7fd601f8bbb92c4d55696f09a2d81d28186dfe93fff"
+}
+#flowchart
+{
+    "item": "object",
+    "module": "seamm.flowchart",
+    "class": "Flowchart",
+    "extension": null,
+    "nodes": [
+        {
+            "item": "object",
+            "module": "seamm.start_node",
+            "class": "StartNode",
+            "version": "2021.10.25+2.g8bb303f.dirty",
+            "extension": null,
+            "attributes": {
+                "_uuid": 1,
+                "_title": "Start",
+                "extension": null,
+                "parameters": null,
+                "x": 150.0,
+                "y": 35.0,
+                "w": 200,
+                "h": 50
+            }
+        },
+        {
+            "item": "object",
+            "module": "from_smiles_step.from_smiles",
+            "class": "FromSMILES",
+            "version": "2021.10.13+1.g1177adb",
+            "extension": "FromSMILESStep",
+            "attributes": {
+                "_uuid": 44911125360813221550437313728784688578,
+                "_title": "from SMILES",
+                "extension": "FromSMILESStep",
+                "parameters": {
+                    "__class__": "FromSMILESParameters",
+                    "__module__": "from_smiles_step.from_smiles_parameters",
+                    "smiles string": {
+                        "value": "CCS",
+                        "units": null
+                    },
+                    "structure handling": {
+                        "value": "Overwrite the current configuration",
+                        "units": null
+                    },
+                    "subsequent structure handling": {
+                        "value": "Create a new system and configuration",
+                        "units": null
+                    },
+                    "system name": {
+                        "value": "use Canonical SMILES string",
+                        "units": null
+                    },
+                    "configuration name": {
+                        "value": "initial",
+                        "units": null
+                    }
+                },
+                "x": 150.0,
+                "y": 105.0,
+                "w": 200,
+                "h": 50
+            }
+        },
+        {
+            "item": "object",
+            "module": "dftbplus_step.dftbplus",
+            "class": "Dftbplus",
+            "version": "2021.10.13+1.ge5b9c74.dirty",
+            "extension": "DFTB+",
+            "attributes": {
+                "_uuid": 331215342874507599176617526801404266056,
+                "_title": "DFTB+",
+                "extension": "DFTB+",
+                "parameters": {
+                    "__class__": "DftbplusParameters",
+                    "__module__": "dftbplus_step.dftbplus_parameters",
+                    "calculation": {
+                        "value": "geometry optimization",
+                        "units": null
+                    }
+                },
+                "x": 150.0,
+                "y": 175.0,
+                "w": 200,
+                "h": 50
+            },
+            "subflowchart": {
+                "item": "object",
+                "module": "seamm.flowchart",
+                "class": "Flowchart",
+                "extension": null,
+                "nodes": [
+                    {
+                        "item": "object",
+                        "module": "seamm.start_node",
+                        "class": "StartNode",
+                        "version": "2021.10.25+2.g8bb303f.dirty",
+                        "extension": null,
+                        "attributes": {
+                            "_uuid": 1,
+                            "_title": "Start",
+                            "extension": null,
+                            "parameters": null,
+                            "x": 150.0,
+                            "y": 35.0,
+                            "w": 200,
+                            "h": 50
+                        }
+                    },
+                    {
+                        "item": "object",
+                        "module": "dftbplus_step.choose_parameters",
+                        "class": "ChooseParameters",
+                        "version": "2021.10.13+1.ge5b9c74.dirty",
+                        "extension": "ChooseParameters",
+                        "attributes": {
+                            "_uuid": 7602389354545182049714904863452660034,
+                            "_title": "Choose Parameters",
+                            "extension": "ChooseParameters",
+                            "parameters": {
+                                "__class__": "ChooseParametersParameters",
+                                "__module__": "dftbplus_step.choose_parameters_parameters",
+                                "elements": {
+                                    "value": "",
+                                    "units": null
+                                },
+                                "dataset": {
+                                    "value": "3ob",
+                                    "units": null
+                                },
+                                "subset": {
+                                    "value": "none",
+                                    "units": null
+                                }
+                            },
+                            "x": 150.0,
+                            "y": 105.0,
+                            "w": 200,
+                            "h": 50
+                        }
+                    },
+                    {
+                        "item": "object",
+                        "module": "dftbplus_step.optimization",
+                        "class": "Optimization",
+                        "version": "2021.10.13+1.ge5b9c74.dirty",
+                        "extension": "Optimization",
+                        "attributes": {
+                            "_uuid": 316545988382079727584132808704154333616,
+                            "_title": "Optimization",
+                            "extension": "Optimization",
+                            "parameters": {
+                                "__class__": "OptimizationParameters",
+                                "__module__": "dftbplus_step.optimization_parameters",
+                                "SCC": {
+                                    "value": "Yes",
+                                    "units": null
+                                },
+                                "SCCTolerance": {
+                                    "value": 1e-05,
+                                    "units": null
+                                },
+                                "MaxSCCIterations": {
+                                    "value": 100,
+                                    "units": null
+                                },
+                                "ThirdOrder": {
+                                    "value": "Default for parameters",
+                                    "units": null
+                                },
+                                "HCorrection": {
+                                    "value": "Default for parameters",
+                                    "units": null
+                                },
+                                "Damping Exponent": {
+                                    "value": 4.0,
+                                    "units": null
+                                },
+                                "results": {
+                                    "value": {},
+                                    "units": null
+                                },
+                                "create tables": {
+                                    "value": "yes",
+                                    "units": null
+                                },
+                                "k-grid method": {
+                                    "value": "grid spacing",
+                                    "units": null
+                                },
+                                "na": {
+                                    "value": 4,
+                                    "units": null
+                                },
+                                "nb": {
+                                    "value": 4,
+                                    "units": null
+                                },
+                                "nc": {
+                                    "value": 4,
+                                    "units": null
+                                },
+                                "k-spacing": {
+                                    "value": 0.2,
+                                    "units": "1/\u00c5"
+                                },
+                                "optimization method": {
+                                    "value": "Direct inversion of iterative subspace (gDIIS)",
+                                    "units": null
+                                },
+                                "MaxForceComponent": {
+                                    "value": 0.0001,
+                                    "units": "hartree/bohr"
+                                },
+                                "MaxSteps": {
+                                    "value": 200,
+                                    "units": null
+                                },
+                                "LatticeOpt": {
+                                    "value": "Yes",
+                                    "units": null
+                                },
+                                "constrain_cell": {
+                                    "value": "No",
+                                    "units": null
+                                },
+                                "fix_a": {
+                                    "value": "No",
+                                    "units": null
+                                },
+                                "fix_b": {
+                                    "value": "No",
+                                    "units": null
+                                },
+                                "fix_c": {
+                                    "value": "No",
+                                    "units": null
+                                },
+                                "pressure": {
+                                    "value": 0.0,
+                                    "units": null
+                                },
+                                "MaxAtomStep": {
+                                    "value": 0.2,
+                                    "units": null
+                                },
+                                "MaxLatticeStep": {
+                                    "value": 0.2,
+                                    "units": null
+                                },
+                                "stop_if_scc_fails": {
+                                    "value": "Yes",
+                                    "units": null
+                                },
+                                "StepSize": {
+                                    "value": 100.0,
+                                    "units": "a_u_time"
+                                },
+                                "Alpha": {
+                                    "value": 0.1,
+                                    "units": null
+                                },
+                                "Generations": {
+                                    "value": 8,
+                                    "units": null
+                                },
+                                "Memory": {
+                                    "value": 20,
+                                    "units": null
+                                },
+                                "LineSearch": {
+                                    "value": "No",
+                                    "units": null
+                                }
+                            },
+                            "x": 150.0,
+                            "y": 175.0,
+                            "w": 200,
+                            "h": 50
+                        }
+                    }
+                ],
+                "edges": [
+                    {
+                        "item": "edge",
+                        "node1": 1,
+                        "node2": 7602389354545182049714904863452660034,
+                        "edge_type": "execution",
+                        "edge_subtype": "next",
+                        "attributes": {
+                            "arrow_id": 10,
+                            "anchor1": "s",
+                            "anchor2": "n",
+                            "coords": [
+                                150,
+                                60,
+                                150,
+                                80
+                            ]
+                        }
+                    },
+                    {
+                        "item": "edge",
+                        "node1": 7602389354545182049714904863452660034,
+                        "node2": 316545988382079727584132808704154333616,
+                        "edge_type": "execution",
+                        "edge_subtype": "next",
+                        "attributes": {
+                            "arrow_id": 11,
+                            "anchor1": "s",
+                            "anchor2": "n",
+                            "coords": [
+                                150,
+                                130,
+                                150,
+                                150
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "edges": [
+        {
+            "item": "edge",
+            "node1": 1,
+            "node2": 44911125360813221550437313728784688578,
+            "edge_type": "execution",
+            "edge_subtype": "next",
+            "attributes": {
+                "arrow_id": 10,
+                "anchor1": "s",
+                "anchor2": "n",
+                "coords": [
+                    150,
+                    60,
+                    150,
+                    80
+                ]
+            }
+        },
+        {
+            "item": "edge",
+            "node1": 44911125360813221550437313728784688578,
+            "node2": 331215342874507599176617526801404266056,
+            "edge_type": "execution",
+            "edge_subtype": "next",
+            "attributes": {
+                "arrow_id": 11,
+                "anchor1": "s",
+                "anchor2": "n",
+                "coords": [
+                    150,
+                    130,
+                    150,
+                    150
+                ]
+            }
+        }
+    ]
+}
+#end
