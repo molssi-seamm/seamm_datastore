@@ -17,7 +17,7 @@
    "submitted": "2021-11-06T19:22:11.188504+00:00",
    "title": "Another test run",
    "uuid": "011ee23e55dd4afb8ddcf1916b9588f4",
-   "working directory": "/Users/psaxe/SEAMM/Jobs/projects/dbg/Job_000093",
+   "working directory": "../seamm_datastore/seamm_datastore/data/Projects/sample_project1/Job_000093",
    "~cpuinfo": {
       "arch": "X86_64",
       "arch_string_raw": "x86_64",

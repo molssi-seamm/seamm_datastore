@@ -3,6 +3,7 @@ Functions which take a session and add or retrieve data to the db
 """
 import datetime
 import os
+from pathlib import Path
 import glob
 
 from seamm_datastore.util import parse_flowchart
@@ -184,12 +185,18 @@ def add_job(session, job_data, as_json=False):
         raise ValueError(f"Job with ID {job.id} already found in the database")
 
     # Handle the flowchart - we'll only want to add it if we're adding the job.
-    flowchart_filename = glob.glob(os.path.join(job_data["path"], "*.flow"))
+    print(f"{job_data['path']=}")
+    path = Path(job_data["path"]).expanduser().resolve()
+    print(f"{path=}")
+    flowchart_filename = [str(q) for q in path.glob("*.flow")]
+    print(f"{flowchart_filename=}")
     if len(flowchart_filename) != 1:
         raise ValueError(
-            f"Invalid number of flowcharts found for a project: {len(flowchart_filename)}. There should be one flowchart per job."
+            "Invalid number of flowcharts found for a project: "
+            f"{len(flowchart_filename)}. There should be one flowchart per job."
+            f"\nDirectory = {str(path)}."
         )
-    fl_data, fl = parse_flowchart(flowchart_filename[0])
+    fl_data, fl = parse_flowchart(str(flowchart_filename[0]))
     fl_data["json"] = fl
 
     try:

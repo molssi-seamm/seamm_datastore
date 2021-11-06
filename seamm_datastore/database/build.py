@@ -129,7 +129,9 @@ def import_datastore(session, location, as_json=True):
                     # Check for job_data.json - has to have this to be job
                     check_path = os.path.join(potential_job, "job_data.json")
 
+                    print(f"{check_path=}")
                     if os.path.exists(check_path):
+                        print("    exists")
                         with open(check_path, 'r') as fd:
                             lines = fd.read().splitlines()
                         # Old files may not have a header line
@@ -144,7 +146,8 @@ def import_datastore(session, location, as_json=True):
                             job = api.add_job(
                                 session, job_data=job_data, as_json=as_json)
                             jobs.append(job)
-                        except Exception:
+                        except Exception as e:
+                            print(f"Exception --> {str(e)}")
                             # Job has already been added.
                             session.rollback()
 
