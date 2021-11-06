@@ -48,7 +48,7 @@ def test_add_job(connection):
     job1_data = {
         "flowchart_id": "ABCD",
         "id": 1,
-        "path": f"{os.path.abspath(os.path.join(os.path.split(os.path.abspath(__file__))[1], '..', 'seamm_datastore', 'data', 'Projects', 'sample_project1', 'Job_00001'))}",
+        "path": f"{os.path.abspath(os.path.join(os.path.split(os.path.abspath(__file__))[1], '..', 'seamm_datastore', 'data', 'Projects', 'sample_project1', 'Job_000093'))}",
         "submitted": parser.parse("2016-08-29T09:12:33.001000+00:00"),
         "projects": [project],
         "owner_id": 3,
