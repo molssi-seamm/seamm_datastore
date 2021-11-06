@@ -62,7 +62,6 @@ def add_project(session, project_data, as_json=False):
         group = Group.query.filter_by(name=project_data["group"]).one()
         project_data["group"] = group
 
-    print(f"Owner is {user.username}")
     new_project = Project(**project_data)
 
     session.add(new_project)
