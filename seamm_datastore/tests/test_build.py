@@ -2,9 +2,6 @@
 Tests for building/importing datastore
 """
 
-import pytest
-import seamm_datastore
-
 import os
 
 

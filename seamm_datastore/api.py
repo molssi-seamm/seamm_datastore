@@ -266,7 +266,8 @@ def qq_add_job(session, job_data, as_json=False):
 
     if not projects:
         raise NameError(
-            "Projects listed for this job not found in database, please check your project names."
+            "Projects listed for this job not found in database, please check your "
+            "project names."
         )
 
     # The other permissions method in flask-authorize is harder to fake,
@@ -328,9 +329,9 @@ def get_jobs(_=None, as_json=False, limit=None):
 
     jobs = Job.query.all()
 
-    # After we get the jobs, we need to know which jobs belong to projects which the user
-    # can read. This might be a performance issue on a larger DB, but I think we can do this
-    # check here.
+    # After we get the jobs, we need to know which jobs belong to projects which the
+    # user can read. This might be a performance issue on a larger DB, but I think we
+    # can do this check here.
     authorized_jobs = Job.query.filter(Job.authorized("read")).all()
     auth_projects = Project.query.filter(Project.authorized("read")).all()
     for job in jobs:

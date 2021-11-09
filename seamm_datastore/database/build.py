@@ -74,7 +74,8 @@ def import_datastore(session, location, as_json=True):
     ----------
     session : SQLAlchemy or flask session
     location : str or path
-        The location to check for jobs or projects. Usually the projects directory in a datastore.
+        The location to check for jobs or projects. Usually the projects directory in a
+        datastore.
 
     Returns
     -------

@@ -18,7 +18,9 @@ from .util import LoginRequiredError
 
 
 def manage_session(function):
-    """Decorator for closing sqlalchemy sessions when attached to SEAMMDatastore class"""
+    """Decorator for closing sqlalchemy sessions when attached to SEAMMDatastore
+    class.
+    """
 
     def _wrap_method(method):
         def _manage_session(self, *args, **kwargs):
@@ -38,7 +40,7 @@ def session_scope(session):
     try:
         yield session
         session.commit()
-    except:
+    except Exception:
         session.rollback()
         raise
     finally:
