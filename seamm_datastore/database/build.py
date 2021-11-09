@@ -101,7 +101,6 @@ def import_datastore(session, location, as_json=True):
                 group = item.group()
                 username = item.owner()
             except NotImplementedError:
-
                 username = os.environ["USERNAME"]
                 # Just a default group name.
                 group = "staff"
@@ -114,7 +113,14 @@ def import_datastore(session, location, as_json=True):
             }
 
             try:
-                api.add_project(session, project_data, as_json=as_json)
+                api.add_project(
+                    session,
+                    name=project_name,
+                    path=potential_project,
+                    owner=username,
+                    group=group,
+                    as_json=as_json,
+                )
                 project_names.append(project_data["name"])
             except Exception:
                 # Project exists, we don't need to add it.
@@ -129,9 +135,7 @@ def import_datastore(session, location, as_json=True):
                     # Check for job_data.json - has to have this to be job
                     check_path = os.path.join(potential_job, "job_data.json")
 
-                    print(f"{check_path=}")
                     if os.path.exists(check_path):
-                        print("    exists")
                         with open(check_path, 'r') as fd:
                             lines = fd.read().splitlines()
                         # Old files may not have a header line
@@ -144,7 +148,19 @@ def import_datastore(session, location, as_json=True):
 
                         try:
                             job = api.add_job(
-                                session, job_data=job_data, as_json=as_json)
+                                session,
+                                job_data["id"],
+                                job_data["path"] + "/flowchart.flow",
+                                project_names=job_data["project_names"],
+                                path=job_data["path"],
+                                title=job_data["title"],
+                                description=job_data.get("description", ""),
+                                submitted=job_data.get("submitted", None),
+                                started=job_data.get("started", None),
+                                finished=job_data.get("finished", None),
+                                status=job_data["status"],
+                                as_json=as_json,
+                            )
                             jobs.append(job)
                         except Exception as e:
                             print(f"Exception --> {str(e)}")
