@@ -60,7 +60,7 @@ typing: ## check typing
 	pytype seamm_datastore
 
 test: ## run tests quickly with the default Python
-	pytest seamm_datastore/tests
+	pytest -rP seamm_datastore/tests
 
 test-all: ## run tests on every Python version with tox
 	tox
