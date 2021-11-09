@@ -3,19 +3,22 @@ Unit and regression test for the seamm_datastore package.
 """
 
 # Import package, test suite, and other packages as needed
+from pathlib import Path
+import pprint
 import pytest
-import os
 
 from dateutil import parser
 
 
-def test_connected(connection):
-    assert connection.current_user().username == "admin"
-    assert connection.default_project == "default"
+def test_connected(admin_connection):
+    assert admin_connection.current_user().username == "admin"
+    assert admin_connection.default_project == "default"
 
 
 def test_get_projects(connection):
     projects = connection.get_projects()
+    if len(projects) != 1:
+        pprint.pprint(f"{projects=}")
     assert len(projects) == 1
 
 
@@ -32,31 +35,38 @@ def test_add_job_error(connection):
         connection.add_job({"title": "fake job"})
 
 
+def test_get_users(connection):
+    users = connection.get_users()
+    if len(users) != 2:
+        pprint.pprint(users)
+    assert len(users) == 2
+
+
 def test_add_job(connection):
-    from seamm_datastore.database.models import Project
+    path = (
+        Path(__file__)
+        / ".."
+        / ".."
+        / "data"
+        / "Projects"
+        / "sample_project1"
+        / "Job_000093"
+    )
+    path = path.expanduser().resolve()
 
-    # Create a sample project
-    test_project = {
-        "name": "MyProject",
-        "path": "test_project_path",
-        "owner_id": 3,
-        "id": 100,
-    }
-
-    project = Project(**test_project)
-
-    job1_data = {
-        "flowchart_id": "ABCD",
-        "id": 1,
-        "path": f"{os.path.abspath(os.path.join(os.path.split(os.path.abspath(__file__))[1], '..', 'seamm_datastore', 'data', 'Projects', 'sample_project1', 'Job_000093'))}",
-        "submitted": parser.parse("2016-08-29T09:12:33.001000+00:00"),
-        "projects": [project],
-        "owner_id": 3,
-        "status": "finished",
-        "title": "test job",
-        "description": "",
-    }
-    connection.add_job(job1_data)
+    # connection.add_job(job1_data)
+    connection.add_job(
+        1,
+        str(path / "flowchart.flow"),
+        project_names=["default"],
+        path=str(path),
+        title="test job",
+        description="description of the job",
+        submitted=parser.parse("2016-08-29T09:12:33.000000+00:00"),
+        started=parser.parse("2016-08-29T09:12:34.000000+00:00"),
+        finished=parser.parse("2016-08-29T09:13:34.000000+00:00"),
+        status="finished",
+    )
 
     # Retrieve job
-    # assert len(connection.get_jobs()) == 1
+    assert len(connection.get_jobs()) == 1
