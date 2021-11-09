@@ -122,7 +122,7 @@ class AccessControlPermissionsMixin(PermissionsMixin):
             ]
             clauses.append(cls.id.in_(overlapping_groups))
 
-        return or_(ret, or_(*clauses))
+        return or_(ret, or_(False, *clauses))
 
 
 def allowed(self, *args, **kwargs):
