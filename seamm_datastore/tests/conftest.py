@@ -24,5 +24,18 @@ def session():
 @pytest.fixture(scope="function")
 def connection():
     db = seamm_datastore.connect(initialize=True)
+    users = db.get_users()
+    for data in users:
+        if data["username"] != "admin":
+            user = data["username"]
+            break
+    
+    db.login(username=user, password="default")
+    return db
+
+
+@pytest.fixture(scope="function")
+def admin_connection():
+    db = seamm_datastore.connect(initialize=True)
     db.login(username="admin", password="admin")
     return db
