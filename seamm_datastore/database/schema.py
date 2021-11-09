@@ -17,6 +17,7 @@ from seamm_datastore.database.models import Flowchart, Project, Job, User, Group
 #
 #############################
 
+
 class LocalDateTime(fields.DateTime):
     def _serialize(self, value, attr, obj, **kwargs):
         if value is None:
@@ -25,6 +26,7 @@ class LocalDateTime(fields.DateTime):
         value = value.replace(tzinfo=datetime.timezone.utc)
         value = value.astimezone()
         return value.strftime(data_format)
+
 
 #############################
 #
@@ -43,8 +45,9 @@ class FlowchartSchema(SQLAlchemyAutoSchema):
             "owner_permissions",
             "group_permissions",
             "other_permissions",
-            "sha256"
+            "sha256",
         )
+
     # we store "name" to correspond to what is
     # in the flowchart metadata, but
     # we want to access it as title

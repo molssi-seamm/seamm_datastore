@@ -74,13 +74,17 @@ def parse_job_data(job_data_json):
         try:
             job_data["finished"] = datetime.fromisoformat(job_data_json["end time"])
         except Exception:
-            job_data["finished"] = parser.parse(job_data_json["end time"]).astimezone(timezone.utc)
+            job_data["finished"] = parser.parse(job_data_json["end time"]).astimezone(
+                timezone.utc
+            )
 
     if "start time" in job_data_json:
         try:
             job_data["started"] = datetime.fromisoformat(job_data_json["start time"])
         except Exception:
-            job_data["started"] = parser.parse(job_data_json["start time"]).astimezone(timezone.utc)
+            job_data["started"] = parser.parse(job_data_json["start time"]).astimezone(
+                timezone.utc
+            )
 
     if "submitted time" in job_data_json:
         job_data["submitted"] = datetime.fromisoformat(job_data_json["submitted time"])

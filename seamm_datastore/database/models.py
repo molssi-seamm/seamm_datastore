@@ -31,8 +31,10 @@ from seamm_datastore.flask_authorize_patch import (
 # a bound engine.
 try:
     import sys
+
     assert "seamm_dashboard" in sys.modules
     from seamm_dashboard import db
+
     Base = db.Model
 except AssertionError:
     Base = declarative_base()
