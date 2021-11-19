@@ -469,6 +469,52 @@ def get_flowcharts(_=None, as_json=False, current_user=None):
     return flowcharts
 
 
+def add_group(
+    session,
+    name,
+    as_json=False,
+    current_user=None,
+):
+    """
+    Add a project to the database.
+
+    Parameters
+    ----------
+    session : sqlalchemy.Session
+        The session used to access the database.
+    name : str
+        The name of the project, used for display and directory name.
+    as_json : bool = False
+        If True, return the json description of the project; otherwise, the project id.
+    current_user : str or User = None
+        The user currently logged in. Not used.
+
+    Returns
+    -------
+    json or Group
+        The json describing the new project, or the Group object, deoending on
+        "as_json".
+    """
+    from seamm_datastore.database.models import Group
+    from seamm_datastore.database.schema import GroupSchema
+
+    # Check that the group doesn't already exist.
+    group = Group.query.filter_by(name=name).one_or_none()
+    if group is not None:
+        raise ValueError(f"Group '{group}' already exists.")
+
+    group = Group(name=name)
+    session.add(group)
+    session.commit()
+
+    # Return the json or id as requested.
+    if as_json:
+        group_schema = GroupSchema()
+        return group_schema.dump(group)
+    else:
+        return group
+
+
 def get_groups(_=None, as_json=False, current_user=None):
     from seamm_datastore.database.models import Group
 

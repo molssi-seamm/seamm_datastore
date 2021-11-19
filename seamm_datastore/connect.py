@@ -194,6 +194,10 @@ class SEAMMDatastore:
     def get_projects(self, *args, **kwargs):
         pass
 
+    @manage_session(api.add_group)
+    def add_group(self, *args, **kwargs):
+        pass
+
     @manage_session(api.get_groups)
     def get_groups(self, *args, **kwargs):
         pass
