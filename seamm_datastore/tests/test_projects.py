@@ -15,6 +15,7 @@ def many(connection_nologin):
     conn.logout()
     conn.login("tester", "default")
     user = "tester"
+    print(f"groups = {conn.get_groups()}")
     for i in range(1, 100):
         name = f"project {i}"
         path = f"pdir_{i}"
