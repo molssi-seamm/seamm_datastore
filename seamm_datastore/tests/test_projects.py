@@ -7,20 +7,26 @@ import pytest
 
 
 @pytest.fixture(scope="function")
-def many(connection_nologin):
-    """Create a connection with many projects."""
+def tester(connection_nologin):
+    """Create a connection with user "tester"."""
     conn = connection_nologin
     conn.login("admin", "admin")
     conn.add_group("test")
-    pprint.pprint(conn.get_groups())
     conn.add_user("tester", "default", groups=["test"])
     conn.logout()
     conn.login("tester", "default")
-    user = "tester"
+
+    return conn
+
+
+@pytest.fixture(scope="function")
+def many(tester):
+    """Create a connection with many projects."""
+    conn = tester
     for i in range(1, 101):
         name = f"project {i}"
         path = f"pdir_{i}"
-        conn.add_project(name, owner=user, group="test", path=path)
+        conn.add_project(name, owner="tester", group="test", path=path)
 
     return conn
 
@@ -39,15 +45,14 @@ def test_get_nologin(connection_nologin):
     assert len(projects) == 0
 
 
-def test_add_many(connection):
-    user = connection.current_user().username
-    correct = ["default"]
-    for i in range(1, 10):
+def test_add_many(tester):
+    correct = []
+    for i in range(1, 11):
         name = f"project {i}"
         path = f"pdir_{i}"
-        connection.add_project(name, owner=user, group="staff", path=path)
+        tester.add_project(name, owner="tester", group="test", path=path)
         correct.append(name)
-    projects = connection.list_projects()
+    projects = tester.list_projects()
     if len(projects) != 10 or projects != correct:
         pprint.pprint(f"{projects=}")
     assert len(projects) == 10
