@@ -7,15 +7,20 @@ import pytest
 
 
 @pytest.fixture(scope="function")
-def many(connection):
+def many(connection_nologin):
     """Create a connection with many projects."""
-    user = connection.current_user().username
+    conn = connection_nologin
+    conn.login("admin", "admin")
+    conn.add_user("tester", "default")
+    conn.logout()
+    conn.login("tester", "default")
+    user = "tester"
     for i in range(1, 100):
         name = f"project {i}"
         path = f"pdir_{i}"
-        connection.add_project(name, owner=user, group="staff", path=path)
+        conn.add_project(name, owner=user, group="staff", path=path)
 
-    return connection
+    return conn
 
 
 def test_get_(connection):
