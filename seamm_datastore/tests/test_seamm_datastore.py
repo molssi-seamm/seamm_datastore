@@ -15,13 +15,6 @@ def test_connected(admin_connection):
     assert admin_connection.default_project == "default"
 
 
-def test_get_projects(connection):
-    projects = connection.get_projects()
-    if len(projects) != 1:
-        pprint.pprint(f"{projects=}")
-    assert len(projects) == 1
-
-
 def test_connection_logout(connection):
     connection.logout()
     assert connection.current_user() is None

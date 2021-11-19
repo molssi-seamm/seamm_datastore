@@ -39,3 +39,9 @@ def admin_connection():
     db = seamm_datastore.connect(initialize=True)
     db.login(username="admin", password="admin")
     return db
+
+
+@pytest.fixture(scope="function")
+def connection_nologin():
+    db = seamm_datastore.connect(initialize=True)
+    return db
