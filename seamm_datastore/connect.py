@@ -56,7 +56,7 @@ def login_required(method):
             raise LoginRequiredError
 
         else:
-            ret = method(self, *args, **kwargs)
+            ret = method(self, *args, **kwargs, current_user=self.current_user())
         return ret
 
     return _check_user
@@ -204,6 +204,10 @@ class SEAMMDatastore:
 
     @manage_session(api.get_users)
     def get_users(self, *args, **kwargs):
+        pass
+
+    @manage_session(api.list_projects)
+    def list_projects(self, *args, **kwargs):
         pass
 
     @manage_session(seamm_datastore.database.build.import_datastore)

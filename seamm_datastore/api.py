@@ -2,7 +2,6 @@
 Functions which take a session and add or retrieve data to the db
 """
 import datetime
-from pathlib import Path
 import pprint  # noqa: F401
 
 from seamm_datastore.util import parse_flowchart
@@ -15,25 +14,124 @@ def _build_query(filter, obj):
     return q
 
 
-def get_projects(_=None, as_json=False, filter=None):
+def list_projects(
+    _=None,
+    action="read",
+    filter=None,
+    limit=None,
+    offset=None,
+    count=False,
+    as_json=False,
+    current_user=None,
+):
+    """Get a list of projects in the datastore.
+
+    Parameters
+    ----------
+    session : Session object = None
+        The SQLAlchemy session or equivalent. Not used.
+    action : str = "read"
+        Whether to get readable ("read") of writeable ("update") projects.
+    filter : dict = None
+        A dictionary of query conditions for filtering the results.
+    limit : int = None
+        The maximum number of records to return.
+    offset : int = None
+        Return the records starting at offset (0-based). Used with limit to page through
+        records.
+    count : bool = False
+        If true, return the number of records returned by the query.
+    as_json : bool = False
+        Ignored
+    current_user : str or User = None
+        Ignored
+
+    Returns
+    -------
+    int, [str]
+        The integer count of records if "count" is True, otherwise a list of project
+        names.
+    """
+    return get_projects(
+        None,
+        action=action,
+        filter=filter,
+        limit=limit,
+        offset=offset,
+        count=count,
+        as_json=None,
+    )
+
+
+def get_projects(
+    session=None,
+    action="read",
+    filter=None,
+    limit=None,
+    offset=None,
+    count=False,
+    as_json=False,
+    current_user=None,
+):
+    """Get the projects in the datastore.
+
+    Parameters
+    ----------
+    session : Session object = None
+        The SQLAlchemy session or equivalent. Not used.
+    action : str = "read"
+        Whether to get readable ("read") of writeable ("update") projects.
+    filter : dict = None
+        A dictionary of query conditions for filtering the results.
+    limit : int = None
+        The maximum number of records to return.
+    offset : int = None
+        Return the records starting at offset (0-based). Used with limit to page through
+        records.
+    count : bool = False
+        If true, return the number of records returned by the query.
+    as_json : bool = False
+        If true return json for an array of dictionaries describing the projects.
+        If false, return just the list of project names.
+    current_user : str or User = None
+        The user currently logged in. Not used.
+
+    Returns
+    -------
+    int, [str], or json
+        The integer count of records if "count" is True.
+        A list of project names if "as_json" is False.
+        And array of dictionaries as json if "as_json" is True.
+    """
     from seamm_datastore.database.models import Project
 
-    if not filter:
-        projects = Project.query.filter(Project.authorized("read")).all()
+    if filter is None:
+        query = Project.query.filter(Project.authorized(action))
     else:
         # Build a query
         b = _build_query(filter, Project)
         # Pass the query. Use unpacking operator to unpack generator.
         projects = Project.query.filter(
-            Project.authorized("read"), *(a for a in b)
+            Project.authorized(action), *(a for a in b)
         ).all()
 
-    if as_json:
-        from seamm_datastore.database.schema import ProjectSchema
+    if limit is not None:
+        query = query.limit(limit)
+    if offset is not None:
+        query = query.offset(offset)
 
-        projects = ProjectSchema(many=True).dump(projects)
+    if count:
+        result = query.count()
+    else:
+        projects = query.all()
+        if as_json:
+            from seamm_datastore.database.schema import ProjectSchema
 
-    return projects
+            result = ProjectSchema(many=True).dump(projects)
+        else:
+            result = [p.name for p in projects]
+
+    return result
 
 
 def add_project(
@@ -44,51 +142,75 @@ def add_project(
     owner=None,
     group=None,
     as_json=False,
+    current_user=None,
 ):
     """
     Add a project to the database.
 
     Parameters
     ----------
-    session : sqlalchemy session
-    project_data : dict
-    as_json : bool
+    session : sqlalchemy.Session
+        The session used to access the database.
+    name : str
+        The name of the project, used for display and directory name.
+    description : str
+        A textual description of the project.
+    path : str = None
+        The path on disk to the project files.
+    owner : str or User = None
+        An optional user to own the project. Defaults to the currently logged in user.
+    group : str or Group = None
+        The group for the project. Defaults to user's primary group.
+    as_json : bool = False
+        If True, return the json description of the project; otherwise, the project id.
+    current_user : str or User = None
+        The user currently logged in.
+
+    Returns
+    -------
+    json or Project
+        The json describing the new project, or the Project object, deoending on
+        "as_json".
     """
     from seamm_datastore.database.models import Project, User, Group
     from seamm_datastore.database.schema import ProjectSchema, UserSchema
 
-    if owner is None:
-        raise ValueError("The owner is required for adding a project.")
-
+    # Check that the project doesn't already exist.
     project = Project.query.filter_by(name=name).one_or_none()
-
     if project is not None:
         raise ValueError(f"Project {project} already found in the database")
 
+    # Sort out the user and get as a User object.
+    if owner is None:
+        if current_user is None:
+            raise ValueError("The owner is required for adding a project.")
+        else:
+            owner = current_user
     if isinstance(owner, str):
         owner_id = User.query.filter_by(username=owner).one()
         owner = owner_id
 
+    # Get the group as a Group object. The default is the user's first group.
     if group is None:
         owner_info = UserSchema().dump(owner)
-        pprint.pprint(owner_info)
-        group = owner_info["groups"][0]
+        group = Group.query.filter_by(id=owner_info["groups"][0]).one()
     elif isinstance(group, str):
         group_id = Group.query.filter_by(name=group).one()
         group = group_id
 
+    # Create the project and sotr in the database
     project = Project(
         name=name, description=description, path=path, owner=owner, group=group
     )
-
     session.add(project)
     session.commit()
 
+    # Return the json or id as requested.
     if as_json:
         project_schema = ProjectSchema()
-        project = project_schema.dump(project)
-
-    return project
+        return project_schema.dump(project)
+    else:
+        return project
 
 
 def add_user(
@@ -98,26 +220,46 @@ def add_user(
     first_name=None,
     last_name=None,
     email=None,
-    roles=None,
-    groups=None,
+    roles=["user"],
+    groups=["staff"],
     as_json=False,
+    current_user=None,
 ):
-    if roles is None:
-        roles = ["user"]
+    """
+    Add a new user to the database.
 
-    if groups is None:
-        groups = ["staff"]
-
-    # Verify username and password
-    # Check if user exists
+    Parameters
+    ----------
+    session : sqlalchemy.Session
+        The session used to access the database.
+    username : str
+        The username that identifies the user.
+    password : str
+        The secret password for the user.
+    first_name : str = None
+        The user's first (given) name.
+    last_name : str = None
+        The user's last (family) name.
+    email : str = None
+        The user's principal email address.
+    roles : [str] = ["user"]
+        A list of roles for the user. Defaults to just "user".
+    groups : [str] = ["staff"]
+        A list of groups that the user belongs to. Defaults to "staff".
+    as_json : bool = False
+        If True, return the json description of the user; otherwise, the user id.
+    current_user : str or User = None
+        The user currently logged in. Not used.
+    """
     from seamm_datastore.database.models import User
     from seamm_datastore.database.schema import UserSchema
 
+    # Check if the user already exists.
     user = User.query.filter_by(username=username).one_or_none()
-
     if user:
         raise ValueError(f"User {user} already found in the database")
 
+    # Create the new user and store in the database
     new_user = User(
         username=username,
         password=password,
@@ -127,14 +269,14 @@ def add_user(
         roles=roles,
         groups=groups,
     )
-
     session.add(new_user)
     session.commit()
 
+    # Return the json or user, as requested.
     if as_json:
-        new_user = UserSchema().dump(new_user)
-
-    return new_user
+        return UserSchema().dump(new_user)
+    else:
+        return new_user
 
 
 def add_flowchart(session, flowchart_info):
@@ -174,11 +316,46 @@ def add_job(
     finished=None,
     status="submitted",
     as_json=False,
+    current_user=None,
 ):
     """Submit a job to the datastore.
 
     This method requires a user to be logged in and to have appropriate permissions
     for the project.
+
+    Parameters
+    ----------
+    session : sqlalchemy.Session
+        The session used to access the database.
+    job_id : int
+        The id of the job, an integer > 0.
+    flowchart_filename : str or pathlib.Path
+        The path to the file containing the flowchart.
+    project_names : [str]
+        A list of projects that the flowchart belongs to.
+    path : str
+        The directory path for the job.
+    title : str = ""
+        The title of the job, used for display.
+    description : str = ""
+        A longer, textual description of the job.
+    submitted : datetime.datetime = now()
+        When the job was submitted as a datetime object. Defaults to now in UTC.
+    started : datetime.datetime = None
+        When the job was started, if it was. Preferably in UTC.
+    finished : datetime.datetime = None
+        When the job finished, if it has. Preferably in UTC.
+    status : str = "submitted"
+        The status of the job: "submitted", "running", "finished", "error", etc.
+    as_json : bool = False
+        If true return the job data asjson, otehrwise return the Job object.
+    current_user : str or User = None
+        The user currently logged in. Not used.
+
+    Returns
+    -------
+    json or Job
+        The json of the job data, or the Job object, depending on "as_json".
     """
     from seamm_datastore.database.models import Job, Project
     from seamm_datastore.database.schema import JobSchema
@@ -188,7 +365,6 @@ def add_job(
         job = Job.query.filter_by(id=job_id).one_or_none()
     except KeyError:
         job = None
-
     if job:
         raise ValueError(f"Job with ID {job_id} already found in the database")
 
@@ -224,6 +400,7 @@ def add_job(
         id = int(e.args[0].split(":")[1])
         flowchart = Flowchart.query.filter_by(id=id).one()
 
+    # Now add the job and update the database
     new_job = Job(
         id=job_id,
         title=title,
@@ -236,95 +413,17 @@ def add_job(
         started=started,
         finished=finished,
     )
-
     session.add(new_job)
     session.commit()
 
+    # Return the job as json or an object.
     if as_json:
-        new_job = JobSchema().dump(new_job)
-
-    return new_job
-
-
-def qq_add_job(session, job_data, as_json=False):
-    """Add a job to the datastore.
-
-    This method requires a user to be logged in and to have appropriate permissions
-    for the project.
-    """
-    from seamm_datastore.database.models import Job, Project
-    from seamm_datastore.database.schema import JobSchema
-
-    try:
-        project_names = job_data["project_names"]
-    except KeyError:
-        job_data["project_names"] = ["default"]
-        project_names = ["default"]
-
-    projects = [Project.query.filter_by(name=x).one_or_none() for x in project_names]
-    projects = [project for project in projects if project]
-
-    if not projects:
-        raise NameError(
-            "Projects listed for this job not found in database, please check your "
-            "project names."
-        )
-
-    # The other permissions method in flask-authorize is harder to fake,
-    # but this one works.
-    for project in projects:
-        if project not in Project.query.filter(Project.authorized("update")).all():
-            raise RuntimeError(
-                f"You are not authorized to add jobs to {project} project."
-            )
-
-    try:
-        job = Job.query.filter_by(id=job_data["id"]).one_or_none()
-    except KeyError:
-        job = None
-
-    if job:
-        raise ValueError(f"Job with ID {job.id} already found in the database")
-
-    # Handle the flowchart - we'll only want to add it if we're adding the job.
-    print(f"{job_data['path']=}")
-    path = Path(job_data["path"]).expanduser().resolve()
-    print(f"{path=}")
-    flowchart_filename = [str(q) for q in path.glob("*.flow")]
-    print(f"{flowchart_filename=}")
-    if len(flowchart_filename) != 1:
-        raise ValueError(
-            "Invalid number of flowcharts found for a project: "
-            f"{len(flowchart_filename)}. There should be one flowchart per job."
-            f"\nDirectory = {str(path)}."
-        )
-    fl_data, fl = parse_flowchart(str(flowchart_filename[0]))
-    fl_data["json"] = fl
-
-    try:
-        flowchart = add_flowchart(session, fl_data)
-    except ValueError as e:
-        from seamm_datastore.database.models import Flowchart
-
-        id = int(e.args[0].split(":")[1])
-        flowchart = Flowchart.query.filter_by(id=id).one()
-
-    job_data["projects"] = projects
-    job_data["flowchart"] = flowchart
-    del job_data["project_names"]
-
-    new_job = Job(**job_data)
-
-    session.add(new_job)
-    session.commit()
-
-    if as_json:
-        new_job = JobSchema().dump(new_job)
-
-    return new_job
+        return JobSchema().dump(new_job)
+    else:
+        return new_job
 
 
-def get_jobs(_=None, as_json=False, limit=None):
+def get_jobs(_=None, as_json=False, current_user=None, limit=None):
     from seamm_datastore.database.models import Job, Project
 
     jobs = Job.query.all()
@@ -353,7 +452,7 @@ def get_jobs(_=None, as_json=False, limit=None):
     return jobs
 
 
-def get_flowcharts(_=None, as_json=False):
+def get_flowcharts(_=None, as_json=False, current_user=None):
     from seamm_datastore.database.models import Flowchart
 
     flowcharts = Flowchart.query.filter(Flowchart.authorized("read")).all()
@@ -366,7 +465,7 @@ def get_flowcharts(_=None, as_json=False):
     return flowcharts
 
 
-def get_groups(_=None, as_json=False):
+def get_groups(_=None, as_json=False, current_user=None):
     from seamm_datastore.database.models import Group
 
     groups = Group.query.all()
@@ -379,7 +478,7 @@ def get_groups(_=None, as_json=False):
     return groups
 
 
-def get_users(_=None, as_json=False):
+def get_users(_=None, as_json=False, current_user=None):
     from seamm_datastore.database.models import User
 
     users = User.query.all()
@@ -392,7 +491,14 @@ def get_users(_=None, as_json=False):
     return users
 
 
-def finish_job(session, job_id, finish_time, status="finished", as_json=False):
+def finish_job(
+    session,
+    job_id,
+    finish_time,
+    status="finished",
+    as_json=False,
+    current_user=None,
+):
     """Set the status and time that the job finished.
 
     Parameters
@@ -402,9 +508,13 @@ def finish_job(session, job_id, finish_time, status="finished", as_json=False):
     job_id : int
         The ID of the job, eg. 209
     finish_time : datetime.datetime
-        The time when the job finished.
+        The UTC time when the job finished.
     status : str
         The status, such as "error" or the default, "finished"
+    as_json : bool = False
+        Ignored
+    current_user : str or User = None
+        Ignored
 
     Returns
     -------
