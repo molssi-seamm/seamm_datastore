@@ -251,7 +251,7 @@ def add_user(
     current_user : str or User = None
         The user currently logged in. Not used.
     """
-    from seamm_datastore.database.models import User
+    from seamm_datastore.database.models import Group, Role, User
     from seamm_datastore.database.schema import UserSchema
 
     # Check if the user already exists.
@@ -266,9 +266,13 @@ def add_user(
         first_name=first_name,
         last_name=last_name,
         email=email,
-        roles=roles,
-        groups=groups,
     )
+    for role_name in roles:
+        role = Role.query.filter_by(name=role_name).one()
+        new_user.roles.append(role)
+    for group_name in groups:
+        group = Group.query.filter_by(name=group_name).one()
+        new_user.groups.append(group)
     session.add(new_user)
     session.commit()
 
