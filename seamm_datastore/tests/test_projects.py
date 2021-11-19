@@ -11,11 +11,11 @@ def many(connection_nologin):
     """Create a connection with many projects."""
     conn = connection_nologin
     conn.login("admin", "admin")
+    pprint.pprint(conn.get_groups())
     conn.add_user("tester", "default")
     conn.logout()
     conn.login("tester", "default")
     user = "tester"
-    print(f"groups = {conn.get_groups()}")
     for i in range(1, 100):
         name = f"project {i}"
         path = f"pdir_{i}"
