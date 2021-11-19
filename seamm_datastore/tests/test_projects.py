@@ -11,15 +11,16 @@ def many(connection_nologin):
     """Create a connection with many projects."""
     conn = connection_nologin
     conn.login("admin", "admin")
+    conn.add_group("test")
     pprint.pprint(conn.get_groups())
-    conn.add_user("tester", "default")
+    conn.add_user("tester", "default", groups=["test"])
     conn.logout()
     conn.login("tester", "default")
     user = "tester"
-    for i in range(1, 100):
+    for i in range(1, 101):
         name = f"project {i}"
         path = f"pdir_{i}"
-        conn.add_project(name, owner=user, group="staff", path=path)
+        conn.add_project(name, owner=user, group="test", path=path)
 
     return conn
 
@@ -68,7 +69,7 @@ def test_limit(many):
 
 
 def test_offset(many):
-    correct = ["project 1", "project 2", "project 3"]
+    correct = ["project 2", "project 3", "project 4"]
     projects = many.list_projects(limit=3, offset=1)
     if len(projects) != 3 or projects != correct:
         pprint.pprint(f"{projects=}")
