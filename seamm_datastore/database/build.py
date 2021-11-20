@@ -10,6 +10,62 @@ from seamm_datastore import api
 from seamm_datastore.util import parse_job_data
 
 
+def _build_initial(session, default_project):
+    """Build the initial database"""
+
+    from seamm_datastore.database.models import Role, Group, User, Project
+
+    # Create roles
+    role_names = ["user", "group manager", "admin"]
+    for role_name in role_names:
+        role = Role(name=role_name)
+        session.add(role)
+        session.commit()
+
+    # Create default admin group
+    admin_group = Group(name="admin")
+    session.add(admin_group)
+    session.commit()
+
+    # Create default admin user.s
+    admin_role = session.query(Role).filter_by(name="admin").one()
+    admin_user = User(username="admin", password="admin", roles=[admin_role])
+    admin_user.groups.append(admin_group)
+
+    # Create a user and group with the same information as user running
+    try:
+        item = Path.home()
+        username = item.owner()
+        group_name = item.group()
+    except NotImplementedError:
+        # This will occur on Windows
+        import os
+
+        username = os.environ["USERNAME"]
+        # Just a default group name.
+        group_name = "staff"
+
+    group = Group(name=group_name)
+
+    password = "default"
+    user = User(username=username, password=password, roles=[admin_role])
+    user.groups.append(group)
+
+    # Admin user needs to be part of all groups.
+    admin_user.groups.append(group)
+
+    session.add(admin_user)
+    session.add(admin_role)
+    session.add(admin_group)
+
+    session.add(user)
+
+    # Create a default project
+    project = Project(name=default_project, owner=user, group=group)
+    session.add(project)
+    session.commit()
+
+
 def import_datastore(session, location, as_json=True):
     """Import all the projects and jobs at <location>.
 
@@ -25,6 +81,8 @@ def import_datastore(session, location, as_json=True):
         The number of projects and jobs added to the database.
     """
 
+    from seamm_datastore.database.models import Project
+
     jobs = []
     project_names = []
 
@@ -38,8 +96,15 @@ def import_datastore(session, location, as_json=True):
         if os.path.isdir(potential_project):
             project_name = os.path.basename(potential_project)
             item = Path(potential_project)
-            group = item.group()
-            username = item.owner()
+            try:
+                group = item.group()
+                username = item.owner()
+            except NotImplementedError:
+
+                username = os.environ["USERNAME"]
+                # Just a default group name.
+                group = "staff"
+
             project_data = {
                 "owner": username,
                 "group": group,
@@ -68,14 +133,13 @@ def import_datastore(session, location, as_json=True):
 
                         try:
                             job = api.add_job(
-                                session, job_data=job_data, as_json=as_json
-                            )
+                                session, job_data=job_data, as_json=as_json)
                             jobs.append(job)
                         except ValueError:
                             # Job has already been added.
                             pass
 
     # retrieve projects now that all the jobs have been added.
-    projects = api.get_projects(session, as_json=True, filter={"name": project_names})
+    projects = Project.query.filter(Project.name.in_(project_names)).all()
 
     return jobs, projects

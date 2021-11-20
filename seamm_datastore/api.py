@@ -164,7 +164,7 @@ def add_job(session, job_data, as_json=False):
 
     if not projects:
         raise NameError(
-            f"Projects listed for this job not found in database, please check your project names."
+            "Projects listed for this job not found in database, please check your project names."
         )
 
     # The other permissions method in flask-authorize is harder to fake,
@@ -215,15 +215,31 @@ def add_job(session, job_data, as_json=False):
     return new_job
 
 
-def get_jobs(_=None, as_json=False):
-    from seamm_datastore.database.models import Job
+def get_jobs(_=None, as_json=False, limit=None):
+    from seamm_datastore.database.models import Job, Project
 
-    jobs = Job.query.filter(Job.authorized("read")).all()
+    jobs = Job.query.all()
+
+    # After we get the jobs, we need to know which jobs belong to projects which the user
+    # can read. This might be a performance issue on a larger DB, but I think we can do this
+    # check here.
+    authorized_jobs = Job.query.filter(Job.authorized("read")).all()
+    auth_projects = Project.query.filter(Project.authorized("read")).all()
+    for job in jobs:
+        if job not in authorized_jobs:
+            for project in job.projects:
+                if project in auth_projects:
+                    authorized_jobs.append(job)
+                    # We can exit the loop if we have found one
+                    # project which grants read permission
+                    break
 
     if as_json:
         from seamm_datastore.database.schema import JobSchema
 
-        jobs = JobSchema(many=True).dump(jobs)
+        jobs = JobSchema(many=True).dump(authorized_jobs)
+    if limit:
+        jobs = jobs[:limit]
 
     return jobs
 

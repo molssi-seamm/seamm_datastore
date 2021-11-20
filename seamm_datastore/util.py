@@ -5,6 +5,7 @@ Util Functions and classes
 import json
 import os
 import re
+
 from datetime import datetime
 from pathlib import Path
 
@@ -66,6 +67,8 @@ def _build_initial(session, default_project):
     session.add(project)
     session.commit()
 
+
+from dateutil import parser
 
 def parse_flowchart(path):
     """
@@ -132,13 +135,10 @@ def parse_job_data(path):
     }
 
     if "end time" in job_data_json:
-        job_data["finished"] = datetime.strptime(job_data_json["end time"], time_format)
+        job_data["finished"] = parser.parse(job_data_json["end time"]).astimezone(datetime.timezone.utc)
 
     if "start time" in job_data_json:
-        job_data["started"] = datetime.strptime(
-            job_data_json["start time"], time_format
-        )
-
+        job_data["started"] = parser.parse(job_data_json["start time"]).astimezone(datetime.timezone.utc)
     return job_data
 
 
