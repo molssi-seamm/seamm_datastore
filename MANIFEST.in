@@ -1,6 +1,8 @@
 include LICENSE
 include MANIFEST.in
 include CODE_OF_CONDUCT.md
+include README.md
+include requirements*
 include versioneer.py
 
 graft seamm_datastore
