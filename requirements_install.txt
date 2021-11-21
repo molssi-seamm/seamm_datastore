@@ -1,4 +1,4 @@
-dateutil
 flask
 flask_authorize
+python-dateutil
 sqlalchemy
