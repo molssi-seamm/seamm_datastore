@@ -1,0 +1,59 @@
+Options {
+    WriteResultsTag = Yes
+    WriteChargesAsText = Yes
+}
+Hamiltonian {
+    DFTB {
+        SlaterKosterFiles {
+            C-C = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/C-C.skf
+            C-H = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/C-H.skf
+            C-S = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/C-S.skf
+            H-C = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/H-C.skf
+            H-H = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/H-H.skf
+            H-S = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/H-S.skf
+            S-C = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/S-C.skf
+            S-H = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/S-H.skf
+            S-S = /Users/psaxe/SEAMM/Parameters/slako/3ob/3ob-3-1/S-S.skf
+        }
+        MaxAngularMomentum {
+            C = p
+            H = s
+            S = d
+        }
+        HubbardDerivs {
+            C = -0.1492
+            H = -0.1857
+            S = -0.11
+        }
+        SCC = Yes
+        SCCTolerance = 1e-05
+        MaxSCCIterations = 100
+        ThirdOrderFull = Yes
+        HCorrection {
+            Damping {
+                Exponent = 4.0
+            }
+        }
+    }
+}
+Driver {
+    gDIIS {
+        MaxForceComponent = 0.0001
+        MaxSteps = 200
+        OutputPrefix = geom.out
+    }
+}
+Geometry = {
+    TypeNames = {"C" "H" "S"}
+    TypesAndCoordinates [Angstrom] = {
+         1   1.040720   0.003978   0.091248
+         1   0.534047   1.044260   1.076890
+         3   1.137370   2.680100   0.590940
+         2   0.684050   0.238709  -0.889868
+         2   0.684055  -0.963062   0.378523
+         2   2.110720   0.003978   0.091248
+         2  -0.535953   1.044260   1.076890
+         2   0.890716   0.809531   2.058010
+         2   2.497370   2.680100   0.590940
+    }
+}

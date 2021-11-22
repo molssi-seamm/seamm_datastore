@@ -5,9 +5,10 @@ Util Functions and classes
 import json
 import os
 import re
-import datetime
+from datetime import datetime, timezone
 
 from dateutil import parser
+
 
 def parse_flowchart(path):
     """
@@ -54,19 +55,15 @@ def parse_flowchart(path):
     return metadata, flowchart
 
 
-def parse_job_data(path):
+def parse_job_data(job_data_json):
     """Parse job_data.json at path"""
-
-    directory = os.path.dirname(path)
-
-    with open(path) as f:
-        job_data_json = json.load(f)
+    directory = job_data_json["working directory"]
     job_data = {
         "path": directory,
         "title": str(
             job_data_json["title"]
             if job_data_json["title"]
-            else os.path.basename(os.path.dirname(path))
+            else os.path.basename(directory)
         ),
         "project_names": job_data_json["projects"],
         "status": job_data_json["state"],
@@ -74,10 +71,26 @@ def parse_job_data(path):
     }
 
     if "end time" in job_data_json:
-        job_data["finished"] = parser.parse(job_data_json["end time"]).astimezone(datetime.timezone.utc)
+        try:
+            job_data["finished"] = datetime.fromisoformat(job_data_json["end time"])
+        except Exception:
+            job_data["finished"] = parser.parse(job_data_json["end time"]).astimezone(
+                timezone.utc
+            )
 
     if "start time" in job_data_json:
-        job_data["started"] = parser.parse(job_data_json["start time"]).astimezone(datetime.timezone.utc)
+        try:
+            job_data["started"] = datetime.fromisoformat(job_data_json["start time"])
+        except Exception:
+            job_data["started"] = parser.parse(job_data_json["start time"]).astimezone(
+                timezone.utc
+            )
+
+    if "submitted time" in job_data_json:
+        job_data["submitted"] = datetime.fromisoformat(job_data_json["submitted time"])
+    elif "started" in job_data:
+        job_data["submitted"] = job_data["started"]
+
     return job_data
 
 

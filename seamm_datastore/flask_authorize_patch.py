@@ -1,7 +1,8 @@
 """
 Patch for flask_authorize.
 
-Flask authorize and the functions defined here can only be used with an application context.
+Flask authorize and the functions defined here can only be used with an application
+context.
 """
 
 import types
@@ -23,18 +24,15 @@ from flask_authorize.plugin import (
     user_in_group,
 )
 
-from flask import current_app
-
 try:
     from .connect import fake_app
     from flask_authorize import mixins
 
     mixins.current_app = fake_app
     current_app = fake_app
-
 except ImportError:
     # Assume we're being used with flask_sqlalchemy
-    pass
+    from flask import current_app
 
 __all__ = ["generate_association_table", "AccessControlPermissionsMixin"]
 
@@ -124,7 +122,7 @@ class AccessControlPermissionsMixin(PermissionsMixin):
             ]
             clauses.append(cls.id.in_(overlapping_groups))
 
-        return or_(ret, or_(*clauses))
+        return or_(ret, or_(False, *clauses))
 
 
 def allowed(self, *args, **kwargs):

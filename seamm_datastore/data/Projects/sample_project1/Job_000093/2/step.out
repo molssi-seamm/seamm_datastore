@@ -1,0 +1,12 @@
+    Step 2.1: Choose Parameters
+        Using the '3ob' set of Slater-Koster parameters.
+
+ 
+    Step 2.2: Optimization
+        Structural optimization using the Direct inversion of iterative subspace
+        (gDIIS) method with a convergence criterion of 0.0001 E_h/a_0. A maximum of
+        200 will be used.
+
+ 
+        The geometry optimization converged in 25 steps to a total energy of
+        -8.115700 Ha.

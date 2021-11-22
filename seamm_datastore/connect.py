@@ -18,7 +18,9 @@ from .util import LoginRequiredError
 
 
 def manage_session(function):
-    """Decorator for closing sqlalchemy sessions when attached to SEAMMDatastore class"""
+    """Decorator for closing sqlalchemy sessions when attached to SEAMMDatastore
+    class.
+    """
 
     def _wrap_method(method):
         def _manage_session(self, *args, **kwargs):
@@ -38,7 +40,7 @@ def session_scope(session):
     try:
         yield session
         session.commit()
-    except:
+    except Exception:
         session.rollback()
         raise
     finally:
@@ -54,7 +56,7 @@ def login_required(method):
             raise LoginRequiredError
 
         else:
-            ret = method(self, *args, **kwargs)
+            ret = method(self, *args, **kwargs, current_user=self.current_user())
         return ret
 
     return _check_user
@@ -173,6 +175,14 @@ class SEAMMDatastore:
             user = None
         return user
 
+    @manage_session(api.add_flowchart)
+    def add_flowchart(self, *args, **kwargs):
+        pass
+
+    @manage_session(api.add_group)
+    def add_group(self, *args, **kwargs):
+        pass
+
     @login_required
     @manage_session(api.add_job)
     def add_job(self, *args, **kwargs):
@@ -188,20 +198,33 @@ class SEAMMDatastore:
     def add_user(self, *args, **kwargs):
         pass
 
-    @manage_session(api.get_projects)
-    def get_projects(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.get_jobs)
-    def get_jobs(self, *args, **kwargs):
+    @login_required
+    @manage_session(api.finish_job)
+    def finish_job(self, *args, **kwargs):
         pass
 
     @manage_session(api.get_flowcharts)
     def get_flowcharts(self, *args, **kwargs):
         pass
 
+    @manage_session(api.get_groups)
+    def get_groups(self, *args, **kwargs):
+        pass
+
+    @manage_session(api.get_jobs)
+    def get_jobs(self, *args, **kwargs):
+        pass
+
+    @manage_session(api.get_projects)
+    def get_projects(self, *args, **kwargs):
+        pass
+
     @manage_session(api.get_users)
     def get_users(self, *args, **kwargs):
+        pass
+
+    @manage_session(api.list_projects)
+    def list_projects(self, *args, **kwargs):
         pass
 
     @manage_session(seamm_datastore.database.build.import_datastore)

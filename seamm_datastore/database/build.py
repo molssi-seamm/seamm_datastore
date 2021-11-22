@@ -2,6 +2,7 @@
 Automatic import of projects and jobs from directories.
 """
 
+import json
 import os
 from pathlib import Path
 
@@ -73,7 +74,8 @@ def import_datastore(session, location, as_json=True):
     ----------
     session : SQLAlchemy or flask session
     location : str or path
-        The location to check for jobs or projects. Usually the projects directory in a datastore.
+        The location to check for jobs or projects. Usually the projects directory in a
+        datastore.
 
     Returns
     -------
@@ -100,7 +102,6 @@ def import_datastore(session, location, as_json=True):
                 group = item.group()
                 username = item.owner()
             except NotImplementedError:
-
                 username = os.environ["USERNAME"]
                 # Just a default group name.
                 group = "staff"
@@ -113,12 +114,19 @@ def import_datastore(session, location, as_json=True):
             }
 
             try:
-                api.add_project(session, project_data, as_json=as_json)
+                api.add_project(
+                    session,
+                    name=project_name,
+                    path=potential_project,
+                    owner=username,
+                    group=group,
+                    as_json=as_json,
+                )
                 project_names.append(project_data["name"])
-            except ValueError:
+            except Exception:
                 # Project exists, we don't need to add it.
                 # Pass here because we should still try importing jobs.
-                pass
+                session.rollback()
 
             for potential_job in os.listdir(potential_project):
                 potential_job = os.path.join(potential_project, potential_job)
@@ -129,15 +137,36 @@ def import_datastore(session, location, as_json=True):
                     check_path = os.path.join(potential_job, "job_data.json")
 
                     if os.path.exists(check_path):
-                        job_data = parse_job_data(check_path)
+                        with open(check_path, "r") as fd:
+                            lines = fd.read().splitlines()
+                        # Old files may not have a header line
+                        if lines[0][0] == "{":
+                            text = "\n".join(lines)
+                        else:
+                            text = "\n".join(lines[1:])
+                        job_data_json = json.loads(text)
+                        job_data = parse_job_data(job_data_json)
 
                         try:
                             job = api.add_job(
-                                session, job_data=job_data, as_json=as_json)
+                                session,
+                                job_data["id"],
+                                job_data["path"] + "/flowchart.flow",
+                                project_names=job_data["project_names"],
+                                path=job_data["path"],
+                                title=job_data["title"],
+                                description=job_data.get("description", ""),
+                                submitted=job_data.get("submitted", None),
+                                started=job_data.get("started", None),
+                                finished=job_data.get("finished", None),
+                                status=job_data["status"],
+                                as_json=as_json,
+                            )
                             jobs.append(job)
-                        except ValueError:
+                        except Exception as e:
+                            print(f"Exception --> {str(e)}")
                             # Job has already been added.
-                            pass
+                            session.rollback()
 
     # retrieve projects now that all the jobs have been added.
     projects = Project.query.filter(Project.name.in_(project_names)).all()

@@ -31,8 +31,10 @@ from seamm_datastore.flask_authorize_patch import (
 # a bound engine.
 try:
     import sys
+
     assert "seamm_dashboard" in sys.modules
     from seamm_dashboard import db
+
     Base = db.Model
 except AssertionError:
     Base = declarative_base()
@@ -139,8 +141,11 @@ class Flowchart(Base, AccessControlPermissionsMixin):
     sha256_strict = Column(String(75), nullable=True)
     path = Column(String, nullable=True)
     flowchart_version = Column(Float, nullable=True, unique=False)
-    name = Column(String(100), nullable=True)
+    doi = Column(Text, nullable=True)
+    title = Column(String(100), nullable=True)
     description = Column(Text, nullable=True)
+    creators = Column(JSON, nullable=True)
+    keywords = Column(JSON, nullable=True)
     json = Column(JSON, nullable=False)
 
     jobs = relationship("Job", back_populates="flowchart", lazy=True)
@@ -160,8 +165,8 @@ class Job(Base, AccessControlPermissionsMixin):
     title = Column(String, nullable=True)
     description = Column(Text, nullable=True)
     path = Column(String, unique=True)
-    submitted = Column(DateTime, nullable=True)
-    started = Column(DateTime)
+    submitted = Column(DateTime, nullable=False, default=datetime.utcnow)
+    started = Column(DateTime, nullable=True)
     finished = Column(DateTime, nullable=True)
     status = Column(String, nullable=False, default="imported")
 
