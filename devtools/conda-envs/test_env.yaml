@@ -1,27 +1,26 @@
 name: test
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - python>=3.8
   - pip
-  - pip:
-    - flask
-    - python-dateutil
-    - flask-authorize
-    - sqlalchemy
-    - marshmallow_sqlalchemy
-    # For testing:
-    - pytest
-    - pytest-cov
-    - pytest-mock
-    # For development
-    - black
-    - flake8
-    - twine
 
+  - flask
+  - flask-authorize
+  - marshmallow
+  - marshmallow-sqlalchemy
+  - python-dateutil
+  - six
+  - sqlalchemy
+  - werkzeug
 
-    # Pip-only installs
-  #- pip:
-  #  - codecov
+  # For testing:
+  - pytest
+  - pytest-cov
+  - pytest-mock
+
+  # For development
+  - black
+  - flake8
+  - twine
 
