@@ -151,9 +151,9 @@ def import_datastore(session, location, as_json=True):
                             job = api.add_job(
                                 session,
                                 job_data["id"],
-                                job_data["path"] + "/flowchart.flow",
+                                potential_job + "/flowchart.flow",
                                 project_names=job_data["project_names"],
-                                path=job_data["path"],
+                                path=potential_job,
                                 title=job_data["title"],
                                 description=job_data.get("description", ""),
                                 submitted=job_data.get("submitted", None),
