@@ -1,4 +1,8 @@
 flask
 flask_authorize
+marshmallow
+marshmallow-sqlalchemy
 python-dateutil
+six
 sqlalchemy
+werkzeug
