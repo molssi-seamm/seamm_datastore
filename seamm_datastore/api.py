@@ -421,31 +421,44 @@ def get_groups(_=None, as_json=False, current_user=None):
     return groups
 
 
-def get_jobs(_=None, as_json=False, current_user=None, limit=None):
+def get_jobs(_=None, as_json=False, limit=None, offset=None, count=False, status=None):
+
     from seamm_datastore.database.models import Job, Project
 
-    jobs = Job.query.all()
+    # Get the jobs where the user has read permission
+    if status is None:
+        authorized_jobs = Job.query.filter(Job.authorized("read"), Job.status == status)
+    else:
+        authorized_jobs = Job.query.filter(Job.authorized("read"), Job.status == status)
 
-    # After we get the jobs, we need to know which jobs belong to projects which the
-    # user can read. This might be a performance issue on a larger DB, but I think we
-    # can do this check here.
-    authorized_jobs = Job.query.filter(Job.authorized("read")).all()
-    auth_projects = Project.query.filter(Project.authorized("read")).all()
-    for job in jobs:
-        if job not in authorized_jobs:
-            for project in job.projects:
-                if project in auth_projects:
-                    authorized_jobs.append(job)
-                    # We can exit the loop if we have found one
-                    # project which grants read permission
-                    break
+    # Get jobs from projects where user has read permission
+    if status is None:
+        project_jobs = Project.query.with_entities(Job).filter(
+            Project.authorized("read")
+        )
+    else:
+        project_jobs = Project.query.with_entities(Job).filter(
+            Project.authorized("read"), Job.status == status
+        )
 
-    if as_json:
-        from seamm_datastore.database.schema import JobSchema
+    # Find union of these queries
+    jobs = authorized_jobs.union(project_jobs)
 
-        jobs = JobSchema(many=True).dump(authorized_jobs)
-    if limit:
-        jobs = jobs[:limit]
+    # Continue building
+    if limit is not None:
+        jobs = jobs.limit(limit)
+    if offset is not None:
+        jobs = jobs.offset(offset)
+
+    if count is True:
+        jobs = jobs.count()
+    else:
+        jobs = jobs.all()
+
+        if as_json:
+            from seamm_datastore.database.schema import JobSchema
+
+            jobs = JobSchema(many=True).dump(jobs)
 
     return jobs
 
