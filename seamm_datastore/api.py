@@ -421,24 +421,50 @@ def get_groups(_=None, as_json=False, current_user=None):
     return groups
 
 
+def get_job(session, id, as_json=False):
+
+    from seamm_datastore.database.models import Job, Project
+    from .util import NotAuthorizedError
+
+    authorized_job = Job.query.filter(Job.authorized("read"), Job.id == id)
+    project_job = Project.query.with_entities(Job).filter(
+        Project.authorized("read"), Job.id == id
+    )
+
+    project_job = Job.query.filter(
+        Job.projects.any(Project.authorized("read")), Job.id == id
+    )
+
+    # Do we get the job?
+    job = authorized_job.union(project_job).one_or_none()
+
+    if job is None and Job.query.get(id):
+        raise NotAuthorizedError
+
+    if as_json:
+        from seamm_datastore.database.schema import JobSchema
+
+        job = JobSchema().dump(job)
+
+    return job
+
+
 def get_jobs(_=None, as_json=False, limit=None, offset=None, count=False, status=None):
 
     from seamm_datastore.database.models import Job, Project
 
     # Get the jobs where the user has read permission
     if status is None:
-        authorized_jobs = Job.query.filter(Job.authorized("read"), Job.status == status)
+        authorized_jobs = Job.query.filter(Job.authorized("read"))
     else:
         authorized_jobs = Job.query.filter(Job.authorized("read"), Job.status == status)
 
     # Get jobs from projects where user has read permission
     if status is None:
-        project_jobs = Project.query.with_entities(Job).filter(
-            Project.authorized("read")
-        )
+        project_jobs = Job.query.filter(Job.projects.any(Project.authorized("read")))
     else:
-        project_jobs = Project.query.with_entities(Job).filter(
-            Project.authorized("read"), Job.status == status
+        project_jobs = Job.query.filter(
+            Job.projects.any(Project.authorized("read")), Job.status == status
         )
 
     # Find union of these queries
