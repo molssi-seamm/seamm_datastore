@@ -95,7 +95,8 @@ def parse_job_data(job_data_json):
 
 
 class LoginRequiredError(Exception):
-    def __init__(self, message=None):
-        if not message:
-            self.message = "This action requires a user to be logged in."
-        super().__init__(self.message)
+    pass
+
+
+class NotAuthorizedError(Exception):
+    pass
