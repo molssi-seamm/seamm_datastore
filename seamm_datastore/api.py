@@ -449,7 +449,7 @@ def get_job(session, id, as_json=False):
     return job
 
 
-def get_jobs(_=None, as_json=False, limit=None, offset=None, count=False, status=None):
+def get_jobs(_=None, as_json=False, limit=None, offset=None, count=False, status=None, sort="asc"):
 
     from seamm_datastore.database.models import Job, Project
 
@@ -469,6 +469,10 @@ def get_jobs(_=None, as_json=False, limit=None, offset=None, count=False, status
 
     # Find union of these queries
     jobs = authorized_jobs.union(project_jobs)
+
+    # Add sorting will be asc (ascending)
+    if sort == "desc":
+        jobs = jobs.order_by(Job.id.desc())
 
     # Continue building
     if limit is not None:
