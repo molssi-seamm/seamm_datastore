@@ -169,6 +169,9 @@ class Job(Base, AccessControlPermissionsMixin):
     started = Column(DateTime, nullable=True)
     finished = Column(DateTime, nullable=True)
     status = Column(String, nullable=False, default="imported")
+    last_update = Column(
+        DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     flowchart = relationship("Flowchart", back_populates="jobs")
     projects = relationship("Project", secondary=job_project, back_populates="jobs")
