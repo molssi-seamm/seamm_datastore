@@ -89,6 +89,7 @@ class JobSchema(SQLAlchemyAutoSchema):
     started = LocalDateTime(format="%Y-%m-%d %H:%M")
     finished = LocalDateTime(format="%Y-%m-%d %H:%M")
     submitted = LocalDateTime(format="%Y-%m-%d %H:%M")
+    last_update = LocalDateTime(format="%Y-%m-%d %H:%M")
 
 
 class UserSchema(SQLAlchemyAutoSchema):
