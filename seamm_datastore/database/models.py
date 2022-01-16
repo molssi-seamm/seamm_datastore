@@ -132,6 +132,21 @@ class Role(Base):
 
     users = relationship("User", secondary=user_role, back_populates="roles")
 
+class Project(Base, AccessControlPermissionsMixin):
+    __tablename__ = "projects"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False, unique=True)
+    description = Column(String(1000), nullable=True)
+    path = Column(String, unique=True)
+
+    flowcharts = relationship(
+        "Flowchart", secondary=flowchart_project, back_populates="projects"
+    )
+    jobs = relationship("Job", secondary=job_project, back_populates="projects")
+
+    def __repr__(self):
+        return f"Project(name={self.name}, path={self.path}, description={self.description})"  # noqa: E501
 
 class Flowchart(Base, AccessControlPermissionsMixin):
     __tablename__ = "flowcharts"
@@ -156,6 +171,12 @@ class Flowchart(Base, AccessControlPermissionsMixin):
     def __repr__(self):
         return f"Flowchart(id={self.id}, description={self.description}, path={self.path})"  # noqa: E501
 
+    def permissions_query(self, permission):
+        self_read = self.query.filter(self.authorized(permission))
+        self_projects = self.query.filter(self.projects.any(Project.authorized(permission)))
+
+        return self_read.union(self_projects)
+
 
 class Job(Base, AccessControlPermissionsMixin):
     __tablename__ = "jobs"
@@ -179,19 +200,18 @@ class Job(Base, AccessControlPermissionsMixin):
     def __repr__(self):
         return f"Job(path={self.path}, flowchart_id={self.flowchart}, submitted={self.submitted})"  # noqa: E501
 
+############################
+#
+# Special Model Methods
+#
+###########################
 
-class Project(Base, AccessControlPermissionsMixin):
-    __tablename__ = "projects"
+def _permissions_query(resource):
+    def inner(permission):
+        self_read = resource.query.filter(resource.authorized(permission))
+        self_projects = resource.query.filter(resource.projects.any(Project.authorized(permission)))
+        return self_read.union(self_projects)
+    return inner
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False, unique=True)
-    description = Column(String(1000), nullable=True)
-    path = Column(String, unique=True)
-
-    flowcharts = relationship(
-        "Flowchart", secondary=flowchart_project, back_populates="projects"
-    )
-    jobs = relationship("Job", secondary=job_project, back_populates="projects")
-
-    def __repr__(self):
-        return f"Project(name={self.name}, path={self.path}, description={self.description})"  # noqa: E501
+Job.permissions_query = _permissions_query(Job)
+Flowchart.permissions_query = _permissions_query(Flowchart)

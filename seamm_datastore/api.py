@@ -395,10 +395,22 @@ def finish_job(
         return True
 
 
-def get_flowcharts(_=None, as_json=False, current_user=None):
-    from seamm_datastore.database.models import Flowchart
+def get_flowcharts(_=None, as_json=False, limit=None, offset=None, count=False):
 
-    flowcharts = Flowchart.query.filter(Flowchart.authorized("read")).all()
+    from seamm_datastore.database.models import Flowchart
+    
+    flowcharts = Flowchart.permissions_query("read")
+
+    # Continue building query
+    if limit is not None:
+        flowcharts = flowcharts.limit(limit)
+    if offset is not None:
+        jobs = jobs.offset(offset)
+
+    if count is True:
+        flowcharts = flowcharts.count()
+    else:
+        flowcharts = flowcharts.all()
 
     if as_json:
         from seamm_datastore.database.schema import FlowchartSchema
@@ -423,20 +435,10 @@ def get_groups(_=None, as_json=False, current_user=None):
 
 def get_job(session, id, as_json=False):
 
-    from seamm_datastore.database.models import Job, Project
+    from seamm_datastore.database.models import Job
     from .util import NotAuthorizedError
 
-    authorized_job = Job.query.filter(Job.authorized("read"), Job.id == id)
-    project_job = Project.query.with_entities(Job).filter(
-        Project.authorized("read"), Job.id == id
-    )
-
-    project_job = Job.query.filter(
-        Job.projects.any(Project.authorized("read")), Job.id == id
-    )
-
-    # Do we get the job?
-    job = authorized_job.union(project_job).one_or_none()
+    job = Job.permissions_query(permission="read").filter(Job.id == id)
 
     if job is None and Job.query.get(id):
         raise NotAuthorizedError
@@ -451,42 +453,31 @@ def get_job(session, id, as_json=False):
 
 def get_jobs(_=None, as_json=False, limit=None, offset=None, count=False, status=None):
 
-    from seamm_datastore.database.models import Job, Project
+    from seamm_datastore.database.models import Job
 
-    # Get the jobs where the user has read permission
-    if status is None:
-        authorized_jobs = Job.query.filter(Job.authorized("read"))
-    else:
-        authorized_jobs = Job.query.filter(Job.authorized("read"), Job.status == status)
+    # Base permissions query for 'read' permission
+    authorized_jobs = Job.permissions_query(permission="read")
 
-    # Get jobs from projects where user has read permission
-    if status is None:
-        project_jobs = Job.query.filter(Job.projects.any(Project.authorized("read")))
-    else:
-        project_jobs = Job.query.filter(
-            Job.projects.any(Project.authorized("read")), Job.status == status
-        )
-
-    # Find union of these queries
-    jobs = authorized_jobs.union(project_jobs)
+    if status is not None:
+        authorized_jobs = authorized_jobs.filter(Job.status == status)
 
     # Continue building
     if limit is not None:
-        jobs = jobs.limit(limit)
+        authorized_jobs = authorized_jobs.limit(limit)
     if offset is not None:
-        jobs = jobs.offset(offset)
+        authorized_jobs = authorized_jobs.offset(offset)
 
     if count is True:
-        jobs = jobs.count()
+        authorized_jobs = authorized_jobs.count()
     else:
-        jobs = jobs.all()
+        authorized_jobs = authorized_jobs.all()
 
         if as_json:
             from seamm_datastore.database.schema import JobSchema
 
-            jobs = JobSchema(many=True).dump(jobs)
+            authorized_jobs = JobSchema(many=True).dump(authorized_jobs)
 
-    return jobs
+    return authorized_jobs
 
 
 def get_projects(
