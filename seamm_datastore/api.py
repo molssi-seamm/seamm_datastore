@@ -405,7 +405,7 @@ def get_flowcharts(_=None, as_json=False, limit=None, offset=None, count=False):
     if limit is not None:
         flowcharts = flowcharts.limit(limit)
     if offset is not None:
-        jobs = jobs.offset(offset)
+        flowcharts = flowcharts.offset(offset)
 
     if count is True:
         flowcharts = flowcharts.count()
