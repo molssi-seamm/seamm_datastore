@@ -227,6 +227,10 @@ class SEAMMDatastore:
     def list_projects(self, *args, **kwargs):
         pass
 
+    @manage_session(api.get_job)
+    def get_job(self, *args, **kwargs):
+        pass
+
     @manage_session(seamm_datastore.database.build.import_datastore)
     def import_datastore(self, *args, **kwargs):
         pass

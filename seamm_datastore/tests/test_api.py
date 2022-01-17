@@ -4,13 +4,15 @@ API Tests
 
 import pytest
 
+from seamm_datastore.util import NotAuthorizedError
+
 #from seamm_datastore.database.models import Job, Flowchart
 #rom seamm_datastore.connect import session_scope
 
 
 @pytest.fixture(scope="function")
 def many(admin_connection):
-    """Create a connection with many projects."""
+    """Create a connection with many jobs."""
     conn = admin_connection
 
     from seamm_datastore.connect import session_scope
@@ -37,3 +39,17 @@ def test_get_jobs(many, parameters, expected, first_id):
 
     assert len(jobs) == expected
     assert jobs[0]["id"] == first_id
+
+@pytest.mark.parametrize("job_id, authorized", [
+    (1,True),
+    (1, False)
+])
+def test_get_job(job_id, authorized, many):
+    
+    if authorized is False:
+        many.logout()
+        with pytest.raises(NotAuthorizedError):
+            many.get_job(job_id)
+    else:
+        job = many.get_job(job_id)
+        assert job["id"] == 1

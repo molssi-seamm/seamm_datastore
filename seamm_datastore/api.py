@@ -438,7 +438,7 @@ def get_job(session, id, as_json=False):
     from seamm_datastore.database.models import Job
     from .util import NotAuthorizedError
 
-    job = Job.permissions_query(permission="read").filter(Job.id == id)
+    job = Job.permissions_query(permission="read").filter_by(id=id).one_or_none()
 
     if job is None and Job.query.get(id):
         raise NotAuthorizedError
