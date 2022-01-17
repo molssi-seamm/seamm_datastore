@@ -132,6 +132,7 @@ class Role(Base):
 
     users = relationship("User", secondary=user_role, back_populates="roles")
 
+
 class Project(Base, AccessControlPermissionsMixin):
     __tablename__ = "projects"
 
@@ -147,6 +148,7 @@ class Project(Base, AccessControlPermissionsMixin):
 
     def __repr__(self):
         return f"Project(name={self.name}, path={self.path}, description={self.description})"  # noqa: E501
+
 
 class Flowchart(Base, AccessControlPermissionsMixin):
     __tablename__ = "flowcharts"
@@ -173,7 +175,9 @@ class Flowchart(Base, AccessControlPermissionsMixin):
 
     def permissions_query(self, permission):
         self_read = self.query.filter(self.authorized(permission))
-        self_projects = self.query.filter(self.projects.any(Project.authorized(permission)))
+        self_projects = self.query.filter(
+            self.projects.any(Project.authorized(permission))
+        )
 
         return self_read.union(self_projects)
 
@@ -200,18 +204,24 @@ class Job(Base, AccessControlPermissionsMixin):
     def __repr__(self):
         return f"Job(path={self.path}, flowchart_id={self.flowchart}, submitted={self.submitted})"  # noqa: E501
 
+
 ############################
 #
 # Special Model Methods
 #
 ###########################
 
+
 def _permissions_query(resource):
     def inner(permission):
         self_read = resource.query.filter(resource.authorized(permission))
-        self_projects = resource.query.filter(resource.projects.any(Project.authorized(permission)))
+        self_projects = resource.query.filter(
+            resource.projects.any(Project.authorized(permission))
+        )
         return self_read.union(self_projects)
+
     return inner
+
 
 Job.permissions_query = _permissions_query(Job)
 Flowchart.permissions_query = _permissions_query(Flowchart)

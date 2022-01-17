@@ -398,7 +398,7 @@ def finish_job(
 def get_flowcharts(_=None, as_json=False, limit=None, offset=None, count=False):
 
     from seamm_datastore.database.models import Flowchart
-    
+
     flowcharts = Flowchart.permissions_query("read")
 
     # Continue building query
