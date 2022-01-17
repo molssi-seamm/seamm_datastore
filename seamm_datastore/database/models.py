@@ -211,6 +211,9 @@ class Job(Base, AccessControlPermissionsMixin):
 #
 ###########################
 
+# Add a "permissions query" function to be added to flowcharts and jobs
+# For both of these items, permissions must be checked on the resource itself (job or flowchart)
+# and on projects containing the resource. 
 
 def _permissions_query(resource):
     def inner(permission):
