@@ -41,7 +41,6 @@ def many_flowcharts(admin_connection):
         from seamm_datastore.database.models import Flowchart
 
         for i in range(1, 101):
-            name = f"project {i}"
             path = f"pdir_{i}"
             flowchart = Flowchart(json={"Key": "value"}, path=path)
             sess.add(flowchart)
