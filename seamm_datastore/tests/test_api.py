@@ -29,6 +29,7 @@ def many_jobs(admin_connection):
 
     return conn
 
+
 @pytest.fixture(scope="function")
 def many_flowcharts(admin_connection):
     """Create a connection with many flowcharts."""
@@ -42,7 +43,7 @@ def many_flowcharts(admin_connection):
         for i in range(1, 101):
             name = f"project {i}"
             path = f"pdir_{i}"
-            flowchart = Flowchart(json={"Key":"value"}, path=path)
+            flowchart = Flowchart(json={"Key": "value"}, path=path)
             sess.add(flowchart)
         sess.commit()
     return conn
@@ -74,6 +75,7 @@ def test_get_job(job_id, authorized, many_jobs):
     else:
         job = many_jobs.get_job(job_id)
         assert job["id"] == 1
+
 
 @pytest.mark.parametrize(
     "parameters, expected, first_id",
