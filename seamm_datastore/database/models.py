@@ -197,28 +197,20 @@ class Project(Base, AccessControlPermissionsMixin):
         return f"Project(name={self.name}, path={self.path}, description={self.description})"  # noqa: E501
 
     @classmethod
-    def create(cls, name, description="", path=None, owner=None, group=None, as_json=False):
+    def create(cls, name, description="", path=None, group=None):
         """
         Create a project to add to the database.
 
         Parameters
         ----------
-        session : sqlalchemy.Session
-            The session used to access the database.
         name : str
             The name of the project, used for display and directory name.
         description : str
             A textual description of the project.
         path : str = None
             The path on disk to the project files.
-        owner : str or User = None
-            An optional user to own the project. Defaults to the currently logged in user.
         group : str or Group = None
             The group for the project. Defaults to user's primary group.
-        as_json : bool = False
-            If True, return the json description of the project; otherwise, the project id.
-        current_user : str or User = None
-            The user currently logged in.
 
         Returns
         -------
@@ -230,16 +222,14 @@ class Project(Base, AccessControlPermissionsMixin):
         # Check that the project doesn't already exist.
         project = cls.query.filter_by(name=name).one_or_none()
         if project is not None:
-            raise ValueError(f"Project {project} already found in the database")
+            raise ValueError(f"Project with name {project} already found in the database")
 
         # Sort out the user and get as a User object.
-        if owner is None:
-            if CURRENT_USER is None:
-                raise ValueError("The owner is required for adding a project. No owner specified or user logged in.")
-            else:
-                owner = CURRENT_USER()
-        if isinstance(owner, str):
-            owner = User.query.filter_by(username=owner).one()
+
+        if CURRENT_USER() is None:
+            raise ValueError("No user found. Log into your account to create a project.")
+        else:
+            owner = CURRENT_USER()
 
         # Get the group as a Group object. The default is the user's first group.
         if group is None:

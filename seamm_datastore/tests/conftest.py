@@ -35,3 +35,5 @@ def connection():
             if data.username != "admin":
                 user = data.username
                 break
+    db.login(username=user, password="default")
+    return db

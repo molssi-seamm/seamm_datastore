@@ -111,7 +111,7 @@ class SEAMMDatastore:
             sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
         )
 
-        from seamm_datastore.database.models import Base, Project
+        from seamm_datastore.database.models import Base, Project, User, Job, Group, Role, Flowchart
 
         if initialize:
             Base.metadata.drop_all(self.engine)
@@ -123,8 +123,6 @@ class SEAMMDatastore:
             seamm_datastore.database.build._build_initial(
                 self.Session(), default_project
             )
-
-            from seamm_datastore.database.models import Group, Role
 
             group = Group.query.filter_by(name="admin").one()
             admin_role = Role.query.filter_by(name="admin").one()
@@ -149,6 +147,14 @@ class SEAMMDatastore:
             raise ValueError("Invalid project name given for default.")
 
         self.default_project = default_project
+
+        self.User = User
+        self.Group = Group
+        self.Role = Role
+        self.Project = Project
+        self.Job = Job
+        self.Flowchart = Flowchart
+
 
     def login(self, username, password):
         from seamm_datastore.database.models import User
