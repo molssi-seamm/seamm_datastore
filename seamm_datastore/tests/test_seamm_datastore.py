@@ -2,6 +2,8 @@
 Unit and regression test for the seamm_datastore package.
 """
 
+from seamm_datastore import session_scope
+
 # Import package, test suite, and other packages as needed
 from pathlib import Path
 import pprint
@@ -26,14 +28,6 @@ def test_add_job_error(connection):
     connection.logout()
     with pytest.raises(LoginRequiredError):
         connection.add_job({"title": "fake job"})
-
-
-def test_get_users(connection):
-    users = connection.get_users()
-    if len(users) != 2:
-        pprint.pprint(users)
-    assert len(users) == 2
-
 
 def test_add_job(connection):
     path = (
@@ -62,4 +56,7 @@ def test_add_job(connection):
     )
 
     # Retrieve job
-    assert len(connection.get_jobs()) == 1
+    with session_scope(connection.Session) as sess:
+        from seamm_datastore.database.models import Job
+        jobs = sess.query(Job).all()
+        assert len(jobs) == 1

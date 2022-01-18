@@ -6,8 +6,6 @@ import json
 import os
 from pathlib import Path
 
-from seamm_datastore import api
-
 from seamm_datastore.util import parse_job_data
 
 

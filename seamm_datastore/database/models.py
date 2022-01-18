@@ -180,7 +180,6 @@ class Job(Base, AccessControlPermissionsMixin):
     def __repr__(self):
         return f"Job(path={self.path}, flowchart_id={self.flowchart}, submitted={self.submitted})"  # noqa: E501
 
-
 class Project(Base, AccessControlPermissionsMixin):
     __tablename__ = "projects"
 
@@ -196,3 +195,109 @@ class Project(Base, AccessControlPermissionsMixin):
 
     def __repr__(self):
         return f"Project(name={self.name}, path={self.path}, description={self.description})"  # noqa: E501
+
+    @classmethod
+    def create(cls, name, description="", path=None, owner=None, group=None, as_json=False):
+        """
+        Create a project to add to the database.
+
+        Parameters
+        ----------
+        session : sqlalchemy.Session
+            The session used to access the database.
+        name : str
+            The name of the project, used for display and directory name.
+        description : str
+            A textual description of the project.
+        path : str = None
+            The path on disk to the project files.
+        owner : str or User = None
+            An optional user to own the project. Defaults to the currently logged in user.
+        group : str or Group = None
+            The group for the project. Defaults to user's primary group.
+        as_json : bool = False
+            If True, return the json description of the project; otherwise, the project id.
+        current_user : str or User = None
+            The user currently logged in.
+
+        Returns
+        -------
+        Project
+            A Project object.
+        """
+        from flask_authorize.plugin import CURRENT_USER
+
+        # Check that the project doesn't already exist.
+        project = cls.query.filter_by(name=name).one_or_none()
+        if project is not None:
+            raise ValueError(f"Project {project} already found in the database")
+
+        # Sort out the user and get as a User object.
+        if owner is None:
+            if CURRENT_USER is None:
+                raise ValueError("The owner is required for adding a project. No owner specified or user logged in.")
+            else:
+                owner = CURRENT_USER()
+        if isinstance(owner, str):
+            owner = User.query.filter_by(username=owner).one()
+
+        # Get the group as a Group object. The default is the user's first group.
+        if group is None:
+            group = owner.groups[0]
+        elif isinstance(group, str):
+            group = Group.query.filter_by(name=group).one()
+
+        # Create the project
+        project = Project(
+            name=name, description=description, path=path, owner=owner, group=group
+        )
+
+        return project
+
+
+
+############################
+#
+# Special Model Methods
+#
+###########################
+
+# Add a "permissions query" function to be added to flowcharts and jobs
+# For both of these items, permissions must be checked on the
+# resource itself (job or flowchart)mand on projects containing the resource.
+
+from seamm_datastore.database.special import _create_project
+
+
+def _permissions_query(resource):
+    def inner(permission):
+        self_read = resource.query.filter(resource.authorized(permission))
+        self_projects = resource.query.filter(
+            resource.projects.any(Project.authorized(permission))
+        )
+        return self_read.union(self_projects)
+
+    return inner
+
+
+def _role_query(resource):
+    def inner(role):
+        from flask_authorize.plugin import CURRENT_USER
+        from seamm_datastore.util import NotAuthorizedError
+
+        role_names = [x.name for x in CURRENT_USER.roles]
+
+        if role not in role_names:
+            raise NotAuthorizedError
+        else:
+            return User.query
+
+    return inner
+
+
+Job.permissions_query = _permissions_query(Job)
+Flowchart.permissions_query = _permissions_query(Flowchart)
+
+User.role_query = _role_query(User)
+
+#Project.create = _add_project

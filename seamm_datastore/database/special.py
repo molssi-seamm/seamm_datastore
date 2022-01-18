@@ -6,14 +6,6 @@ import pprint  # noqa: F401
 
 from seamm_datastore.util import parse_flowchart
 
-
-def _build_query(filter, obj):
-    q = []
-    for key, value in filter.items():
-        q.append(getattr(obj, key).in_(value))
-    return q
-
-
 def add_flowchart(session, flowchart_info):
     from seamm_datastore.database.models import Flowchart
 
@@ -208,8 +200,7 @@ def add_job(
         return new_job
 
 
-def add_project(
-    session,
+def _create_project(
     name,
     description="",
     path=None,
@@ -272,19 +263,12 @@ def add_project(
         group_id = Group.query.filter_by(name=group).one()
         group = group_id
 
-    # Create the project and sotr in the database
+    # Create the project and store in the database
     project = Project(
         name=name, description=description, path=path, owner=owner, group=group
     )
-    session.add(project)
-    session.commit()
 
-    # Return the json or id as requested.
-    if as_json:
-        project_schema = ProjectSchema()
-        return project_schema.dump(project)
-    else:
-        return project
+    return project
 
 
 def add_user(

@@ -13,7 +13,6 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from flask_authorize import Authorize
 
 import seamm_datastore.database.build
-from seamm_datastore import api
 from .util import LoginRequiredError
 
 
@@ -175,58 +174,3 @@ class SEAMMDatastore:
             user = None
         return user
 
-    @manage_session(api.add_flowchart)
-    def add_flowchart(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.add_group)
-    def add_group(self, *args, **kwargs):
-        pass
-
-    @login_required
-    @manage_session(api.add_job)
-    def add_job(self, *args, **kwargs):
-        pass
-
-    @login_required
-    @manage_session(api.add_project)
-    def add_project(self, *args, **kwargs):
-        pass
-
-    @login_required
-    @manage_session(api.add_user)
-    def add_user(self, *args, **kwargs):
-        pass
-
-    @login_required
-    @manage_session(api.finish_job)
-    def finish_job(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.get_flowcharts)
-    def get_flowcharts(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.get_groups)
-    def get_groups(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.get_jobs)
-    def get_jobs(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.get_projects)
-    def get_projects(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.get_users)
-    def get_users(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.list_projects)
-    def list_projects(self, *args, **kwargs):
-        pass
-
-    @manage_session(seamm_datastore.database.build.import_datastore)
-    def import_datastore(self, *args, **kwargs):
-        pass

@@ -5,6 +5,8 @@ import pprint
 
 import pytest
 
+from seamm_datastore import session_scope
+
 
 @pytest.fixture(scope="function")
 def tester(connection_nologin):
@@ -18,33 +20,16 @@ def tester(connection_nologin):
 
     return conn
 
+def test_add_project(tester):
+    with session_scope(tester.Session) as sess:
+        from seamm_datastore.api import add_project
 
-@pytest.fixture(scope="function")
-def many(tester):
-    """Create a connection with many projects."""
-    conn = tester
-    for i in range(1, 101):
-        name = f"project {i}"
-        path = f"pdir_{i}"
-        conn.add_project(name, owner="tester", group="test", path=path)
+        project = add_project(sess, name="test_name", path="test_path", owner="tester")
 
-    return conn
+        assert project.owner == tester.current_user()
 
 
-def test_get_(connection):
-    projects = connection.get_projects()
-    if len(projects) != 1:
-        pprint.pprint(f"{projects=}")
-    assert len(projects) == 1
-
-
-def test_get_nologin(connection_nologin):
-    projects = connection_nologin.get_projects()
-    if len(projects) != 0:
-        pprint.pprint(f"{projects=}")
-    assert len(projects) == 0
-
-
+"""
 def test_add_many(tester):
     correct = []
     for i in range(1, 11):
@@ -57,31 +42,4 @@ def test_add_many(tester):
         pprint.pprint(f"{projects=}")
     assert len(projects) == 10
     assert projects == correct
-
-
-def test_many(many):
-    projects = many.list_projects()
-    if len(projects) != 100:
-        pprint.pprint(f"{projects=}")
-    assert len(projects) == 100
-
-
-def test_limit(many):
-    projects = many.list_projects(limit=10)
-    if len(projects) != 10:
-        pprint.pprint(f"{projects=}")
-    assert len(projects) == 10
-
-
-def test_offset(many):
-    correct = ["project 2", "project 3", "project 4"]
-    projects = many.list_projects(limit=3, offset=1)
-    if len(projects) != 3 or projects != correct:
-        pprint.pprint(f"{projects=}")
-    assert len(projects) == 3
-    assert projects == correct
-
-
-def test_count(many):
-    count = many.list_projects(count=True)
-    assert count == 100
+"""
