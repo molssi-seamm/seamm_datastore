@@ -189,3 +189,7 @@ class SEAMMDatastore:
         else:
             user = None
         return user
+
+    @manage_session(seamm_datastore.database.build.import_datastore)
+    def import_datastore(self, *args, **kwargs):
+        pass

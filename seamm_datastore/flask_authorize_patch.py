@@ -125,7 +125,7 @@ class AccessControlPermissionsMixin(PermissionsMixin):
         return or_(ret, or_(False, *clauses))
 
 
-def allowed(self, *args, **kwargs):
+def allowed(self, *args, **kwargs):  # pragma: no cover
     from flask_authorize.plugin import CURRENT_USER
 
     # look to flask-login for current user

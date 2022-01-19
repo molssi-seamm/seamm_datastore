@@ -27,9 +27,9 @@ def connection():
 
     db = seamm_datastore.connect(initialize=True)
 
-    with session_scope(db.Session) as sess:
+    with session_scope(db.Session) as _:
         from seamm_datastore.database.models import User
-        
+
         users = User.query.all()
         for data in users:
             if data.username != "admin":
@@ -37,3 +37,10 @@ def connection():
                 break
     db.login(username=user, password="default")
     return db
+
+
+@pytest.fixture(scope="function")
+def admin_connection(connection):
+    connection.login(username="admin", password="admin")
+
+    return connection
