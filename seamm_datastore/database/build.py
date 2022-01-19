@@ -2,11 +2,8 @@
 Automatic import of projects and jobs from directories.
 """
 
-import json
 import os
 from pathlib import Path
-
-from seamm_datastore.util import parse_job_data
 
 
 def _build_initial(session, default_project):
@@ -133,36 +130,32 @@ def import_datastore(session, location, as_json=True):
 
                     # Check for job_data.json - has to have this to be job
                     check_path = os.path.join(potential_job, "job_data.json")
+                    job_data = Job.parse_job_data(check_path)
 
-                    if os.path.exists(check_path):
-                        with open(check_path, "r") as fd:
-                            lines = fd.read().splitlines()
-                        # Old files may not have a header line
-                        if lines[0][0] == "{":
-                            text = "\n".join(lines)
-                        else:
-                            text = "\n".join(lines[1:])
-                        job_data_json = json.loads(text)
-                        job_data = parse_job_data(job_data_json)
-
-                        job = Job.create(
-                            job_data["id"],
-                            potential_job + "/flowchart.flow",
-                            project_names=job_data["project_names"],
-                            path=potential_job,
-                            title=job_data["title"],
-                            description=job_data.get("description", ""),
-                            submitted=job_data.get("submitted", None),
-                            started=job_data.get("started", None),
-                            finished=job_data.get("finished", None),
-                            status=job_data["status"],
-                        )
-                        session.add(job)
-                        jobs.append(job)
+                    job = Job.create(
+                        job_data["id"],
+                        potential_job + "/flowchart.flow",
+                        project_names=job_data["project_names"],
+                        path=potential_job,
+                        title=job_data["title"],
+                        description=job_data.get("description", ""),
+                        submitted=job_data.get("submitted", None),
+                        started=job_data.get("started", None),
+                        finished=job_data.get("finished", None),
+                        status=job_data["status"],
+                    )
+                    session.add(job)
+                    jobs.append(job)
 
     session.commit()
 
     # retrieve projects now that all the jobs have been added.
     projects = Project.query.filter(Project.name.in_(project_names)).all()
+
+    if as_json is True:
+        from seamm_datastore.database.schema import ProjectSchema, JobSchema
+
+        jobs = JobSchema(many=True).dump(jobs)
+        projects = ProjectSchema(many=True).dump(projects)
 
     return jobs, projects

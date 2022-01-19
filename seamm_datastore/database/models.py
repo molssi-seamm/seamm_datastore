@@ -370,8 +370,10 @@ class Job(Base, AccessControlPermissionsMixin):
 
         directory = os.path.dirname(path)
 
+        # Assumes first line is a comment
         with open(path) as f:
-            job_data_json = json.load(f)
+            f.readline()
+            job_data_json = json.loads(f.read())
 
         directory = job_data_json["working directory"]
         job_data = {
