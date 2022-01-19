@@ -111,7 +111,15 @@ class SEAMMDatastore:
             sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
         )
 
-        from seamm_datastore.database.models import Base, Project, User, Job, Group, Role, Flowchart
+        from seamm_datastore.database.models import (
+            Base,
+            Project,
+            User,
+            Job,
+            Group,
+            Role,
+            Flowchart,
+        )
 
         if initialize:
             Base.metadata.drop_all(self.engine)
@@ -141,6 +149,9 @@ class SEAMMDatastore:
         # Current user has to be bound before we can add anything else to be database.
         self.authorize = Authorize(current_user=self.current_user)
 
+        # Default group
+        self.default_group = Group.query.get(2).name
+
         # Now handle the project
         project = Project.query.filter_by(name=default_project).one_or_none()
         if not project:
@@ -154,7 +165,6 @@ class SEAMMDatastore:
         self.Project = Project
         self.Job = Job
         self.Flowchart = Flowchart
-
 
     def login(self, username, password):
         from seamm_datastore.database.models import User
@@ -179,4 +189,3 @@ class SEAMMDatastore:
         else:
             user = None
         return user
-
