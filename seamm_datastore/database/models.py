@@ -172,6 +172,7 @@ class Job(Base, AccessControlPermissionsMixin):
     last_update = Column(
         DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
     )
+    parameters = Column(JSON, nullable=True)
 
     flowchart = relationship("Flowchart", back_populates="jobs")
     projects = relationship("Project", secondary=job_project, back_populates="jobs")

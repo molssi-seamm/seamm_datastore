@@ -92,6 +92,7 @@ def add_job(
     path=None,
     title="",
     description="",
+    parameters={},
     submitted=datetime.datetime.now(datetime.timezone.utc),
     started=None,
     finished=None,
@@ -120,6 +121,8 @@ def add_job(
         The title of the job, used for display.
     description : str = ""
         A longer, textual description of the job.
+    parameters : dict = {}
+        The command-line parameters for the job.
     submitted : datetime.datetime = now()
         When the job was submitted as a datetime object. Defaults to now in UTC.
     started : datetime.datetime = None
@@ -189,6 +192,7 @@ def add_job(
         path=path,
         flowchart=flowchart,
         projects=projects,
+        parameters=parameters,
         status=status,
         submitted=submitted,
         started=started,
