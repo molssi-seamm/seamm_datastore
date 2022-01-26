@@ -528,6 +528,15 @@ class Job(Base, AccessControlPermissionsMixin):
         )
 
         return new_job
+    
+    @classmethod
+    def create_from_file(cls, job_data_file):
+        
+        job_data = cls.parse_job_data(job_data_file)
+
+        job = Job.create(job_data)
+
+        return job
 
 
 class Project(Base, AccessControlPermissionsMixin):

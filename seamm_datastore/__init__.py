@@ -7,6 +7,8 @@ The database models for the seamm datastore
 from .connect import session_scope  # noqa: F401
 from .connect import SEAMMDatastore as connect  # noqa: F401
 
+import seamm_datastore.api
+
 
 __all__ = ["connect"]
 
