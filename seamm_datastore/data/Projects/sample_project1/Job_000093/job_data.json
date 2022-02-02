@@ -15,7 +15,7 @@
    "start time": "2021-11-06T19:22:19.351502+00:00",
    "state": "finished",
    "submitted": "2021-11-06T19:22:11.188504+00:00",
-   "title": "Another test run",
+   "title": "A sample job - Tutorial 1",
    "uuid": "011ee23e55dd4afb8ddcf1916b9588f4",
    "working directory": "../seamm_datastore/seamm_datastore/data/Projects/sample_project1/Job_000093",
    "~cpuinfo": {

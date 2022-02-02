@@ -228,7 +228,64 @@ class Role(Base):
     users = relationship("User", secondary=user_role, back_populates="roles")
 
 
-class Flowchart(Base, AccessControlPermissionsMixin):
+#######################
+#
+# Base resource class
+#
+#######################
+
+
+class Resource(AccessControlPermissionsMixin):
+    @classmethod
+    def permissions_query(cls, permission):
+        self_read = cls.query.filter(cls.authorized(permission))
+        self_projects = cls.query.filter(
+            cls.projects.any(Project.authorized(permission))
+        )
+        return self_read.union(self_projects)
+
+    @classmethod
+    def get(
+        cls,
+        permission="read",
+        description=None,
+        title=None,
+        offset=None,
+        limit=None,
+        sort_by="id",
+        order="asc",
+    ):
+        """General get method for jobs, flowcharts, projects"""
+
+        perm_query = cls.permissions_query(permission.lower())
+
+        if description is not None:
+            # Build string
+            perm_query = perm_query.filter(cls.description.contains(description))
+
+        if title is not None:
+            perm_query = perm_query.filter(cls.title.contains(title))
+
+        if limit is not None:
+            perm_query = perm_query.limit(limit)
+
+        if offset is not None:
+            perm_query = perm_query.offset(offset)
+
+        if order.lower() == "desc":
+            perm_query = perm_query.order_by(cls.__dict__[sort_by].desc())
+
+        return perm_query.all()
+
+    @classmethod
+    def get_by_id(cls, id, permission="read"):
+        """General get method for retrieving by ID"""
+        perm_query = cls.permissions_query(permission.lower()).filter_by(id == id)
+
+        return perm_query.one()
+
+
+class Flowchart(Base, Resource):
     __tablename__ = "flowcharts"
 
     id = Column(Integer, nullable=False, primary_key=True)
@@ -334,7 +391,7 @@ class Flowchart(Base, AccessControlPermissionsMixin):
         return metadata, flowchart
 
 
-class Job(Base, AccessControlPermissionsMixin):
+class Job(Base, Resource):
     __tablename__ = "jobs"
 
     id = Column(Integer, primary_key=True)
@@ -528,10 +585,76 @@ class Job(Base, AccessControlPermissionsMixin):
         )
 
         return new_job
-    
+
+    @classmethod
+    def update(
+        cls,
+        id,
+        description=None,
+        title=None,
+        path=None,
+        submitted=None,
+        started=None,
+        finished=None,
+        status=None,
+        project_names=None,
+    ):
+        """Update method for existing jobs"""
+
+        possible_updates = [
+            "description",
+            "title",
+            "path",
+            "submitted",
+            "started",
+            "finished",
+            "status",
+            "projects",
+        ]
+
+        job = cls.permissions_query("update").filter_by(id=id).one_or_none()
+
+        if job is None:
+            raise ValueError(
+                f"Cannot update job with id {id}. User does not have permissions, or job does not exist in the database."  # noqa: E501
+            )
+
+        projects = None
+
+        # Check that the user has permissions for the specified projects
+        if project_names is not None:
+            projects = [
+                Project.query.filter_by(name=x).one_or_none() for x in project_names
+            ]
+            projects = [project for project in projects if project]
+
+            if not projects:
+                tmp = "', '".join(project_names)
+                raise NameError(
+                    "Projects listed for this job not found in database."
+                    f"\nPlease check your project names: '{tmp}'"
+                )
+
+            # Check the permissions of the projects to see if we can add a job to them
+            allowed_projects = Project.query.filter(Project.authorized("update")).all()
+            for project in projects:
+                if project not in allowed_projects:
+                    raise RuntimeError(
+                        f"You are not authorized to add jobs to {project} project."
+                    )
+        local = locals()
+        update_dict = {x: local[x] for x in possible_updates if local[x] is not None}
+
+        job = Job.query.get(id)
+
+        for k, v in update_dict.items():
+            job.__dict__[k] = v
+
+        return job
+
     @classmethod
     def create_from_file(cls, job_data_file):
-        
+
         job_data = cls.parse_job_data(job_data_file)
 
         job = Job.create(job_data)
@@ -539,7 +662,7 @@ class Job(Base, AccessControlPermissionsMixin):
         return job
 
 
-class Project(Base, AccessControlPermissionsMixin):
+class Project(Base, Resource):
     __tablename__ = "projects"
 
     id = Column(Integer, primary_key=True)
@@ -554,6 +677,10 @@ class Project(Base, AccessControlPermissionsMixin):
 
     def __repr__(self):
         return f"Project(name={self.name}, path={self.path}, description={self.description})"  # noqa: E501
+
+    @classmethod
+    def permissions_query(cls, permission):
+        return Project.query.filter(Project.authorized(permission))
 
     @classmethod
     def create(cls, name, description="", path=None, group=None):
@@ -606,46 +733,3 @@ class Project(Base, AccessControlPermissionsMixin):
         )
 
         return project
-
-
-############################
-#
-# Special Model Methods
-#
-###########################
-
-# Add a "permissions query" function to be added to flowcharts and jobs
-# For both of these items, permissions must be checked on the
-# resource itself (job or flowchart) and on projects containing the resource.
-
-
-def _permissions_query(resource):
-    def inner(permission):
-        self_read = resource.query.filter(resource.authorized(permission))
-        self_projects = resource.query.filter(
-            resource.projects.any(Project.authorized(permission))
-        )
-        return self_read.union(self_projects)
-
-    return inner
-
-
-def _role_query(resource):
-    def inner(role):
-        from flask_authorize.plugin import CURRENT_USER
-        from seamm_datastore.util import NotAuthorizedError
-
-        role_names = [x.name for x in CURRENT_USER.roles]
-
-        if role not in role_names:
-            raise NotAuthorizedError
-        else:
-            return User.query
-
-    return inner
-
-
-Job.permissions_query = _permissions_query(Job)
-Flowchart.permissions_query = _permissions_query(Flowchart)
-
-User.role_query = _role_query(User)

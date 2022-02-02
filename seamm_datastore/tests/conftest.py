@@ -21,7 +21,7 @@ def session():
     return sess
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def connection():
     from seamm_datastore import session_scope
 
@@ -39,8 +39,20 @@ def connection():
     return db
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def admin_connection(connection):
     connection.login(username="admin", password="admin")
 
     return connection
+
+
+@pytest.fixture(scope="function")
+def filled_db(connection):
+
+    # The lazy way to do this for now
+    import os
+
+    loc = os.path.dirname(os.path.abspath(__file__))
+    sample_data = os.path.join(loc, "..", "data", "Projects")
+
+    connection.import_datastore(sample_data)
