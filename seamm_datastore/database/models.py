@@ -20,11 +20,15 @@ from sqlalchemy.orm import relationship
 
 from sqlalchemy.ext.declarative import declarative_base
 
+from datetime import datetime
+
 # Patched flask authorize
 from seamm_datastore.flask_authorize_patch import (
     AccessControlPermissionsMixin,
     generate_association_table,
 )
+
+from seamm_datastore.util import NotAuthorizedError
 
 # The default is sqlalchemy unless we have
 # the dashboard installed and a db with
@@ -280,9 +284,13 @@ class Resource(AccessControlPermissionsMixin):
     @classmethod
     def get_by_id(cls, id, permission="read"):
         """General get method for retrieving by ID"""
-        perm_query = cls.permissions_query(permission.lower()).filter_by(id == id)
+        perm_query = cls.permissions_query(permission.lower()).filter_by(id = id).one_or_none()
+        regular_query = cls.query.filter_by(id=id).one_or_none()
 
-        return perm_query.one()
+        if perm_query is None and regular_query is not None:
+            raise NotAuthorizedError
+
+        return perm_query
 
 
 class Flowchart(Base, Resource):
@@ -648,6 +656,8 @@ class Job(Base, Resource):
         job = Job.query.get(id)
 
         for k, v in update_dict.items():
+            if k == "submitted" or k == "finished" or k == "started":
+                v = datetime.fromtimestamp(v / 1000)
             job.__dict__[k] = v
 
         return job

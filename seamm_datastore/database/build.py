@@ -108,12 +108,13 @@ def import_datastore(session, location, as_json=True):
                 "path": potential_project,
             }
 
-            project = Project.create(
-                name=project_name,
-                path=potential_project,
-                group=group,
-            )
-            session.add(project)
+            if project_name != "default":
+                project = Project.create(
+                    name=project_name,
+                    path=potential_project,
+                    group=group,
+                )
+                session.add(project)
 
             try:
                 session.commit()
@@ -130,22 +131,23 @@ def import_datastore(session, location, as_json=True):
 
                     # Check for job_data.json - has to have this to be job
                     check_path = os.path.join(potential_job, "job_data.json")
-                    job_data = Job.parse_job_data(check_path)
+                    if os.path.exists(check_path):
+                        job_data = Job.parse_job_data(check_path)
 
-                    job = Job.create(
-                        job_data["id"],
-                        potential_job + "/flowchart.flow",
-                        project_names=job_data["project_names"],
-                        path=potential_job,
-                        title=job_data["title"],
-                        description=job_data.get("description", ""),
-                        submitted=job_data.get("submitted", None),
-                        started=job_data.get("started", None),
-                        finished=job_data.get("finished", None),
-                        status=job_data["status"],
-                    )
-                    session.add(job)
-                    jobs.append(job)
+                        job = Job.create(
+                            job_data["id"],
+                            potential_job + "/flowchart.flow",
+                            project_names=job_data["project_names"],
+                            path=potential_job,
+                            title=job_data["title"],
+                            description=job_data.get("description", ""),
+                            submitted=job_data.get("submitted", None),
+                            started=job_data.get("started", None),
+                            finished=job_data.get("finished", None),
+                            status=job_data["status"],
+                        )
+                        session.add(job)
+                        jobs.append(job)
 
     session.commit()
 
