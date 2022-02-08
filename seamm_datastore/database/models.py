@@ -20,8 +20,6 @@ from sqlalchemy.orm import relationship
 
 from sqlalchemy.ext.declarative import declarative_base
 
-from datetime import datetime
-
 # Patched flask authorize
 from seamm_datastore.flask_authorize_patch import (
     AccessControlPermissionsMixin,
@@ -282,12 +280,14 @@ class Resource(AccessControlPermissionsMixin):
         return perm_query.all()
 
     @classmethod
-    def get_by_id(cls, id, permission="read"):
+    def get_by_id(cls, resource_id, permission="read"):
         """General get method for retrieving by ID"""
         perm_query = (
-            cls.permissions_query(permission.lower()).filter_by(id=id).one_or_none()
+            cls.permissions_query(permission.lower())
+            .filter_by(id=resource_id)
+            .one_or_none()
         )
-        regular_query = cls.query.filter_by(id=id).one_or_none()
+        regular_query = cls.query.filter(Job.id == id).one_or_none()
 
         if perm_query is None and regular_query is not None:
             raise NotAuthorizedError
@@ -532,7 +532,7 @@ class Job(Base, Resource):
 
         # Check if this job already exists
         try:
-            job = Job.query.filter_by(id=job_id).one_or_none()
+            job = Job.query.filter(Job.id == job_id).one_or_none()
         except KeyError:
             job = None
         if job:
@@ -599,7 +599,7 @@ class Job(Base, Resource):
     @classmethod
     def update(
         cls,
-        id,
+        job_id,
         description=None,
         title=None,
         path=None,
@@ -622,7 +622,7 @@ class Job(Base, Resource):
             "projects",
         ]
 
-        job = cls.permissions_query("update").filter_by(id=id).one_or_none()
+        job = cls.permissions_query("update").filter(Job.id == job_id).one_or_none()
 
         if job is None:
             raise ValueError(
@@ -655,7 +655,7 @@ class Job(Base, Resource):
         local = locals()
         update_dict = {x: local[x] for x in possible_updates if local[x] is not None}
 
-        job = Job.query.get(id)
+        job = Job.query.get(job_id)
 
         for k, v in update_dict.items():
             if k == "submitted" or k == "finished" or k == "started":
