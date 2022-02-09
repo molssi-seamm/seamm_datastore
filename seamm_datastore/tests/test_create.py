@@ -98,7 +98,7 @@ def test_add_job(connection):
 
     # connection.add_job(job1_data)
     job = connection.Job.create(
-        job_id=1,
+        id=1,
         flowchart_filename=str(path / "flowchart.flow"),
         project_names=["default"],
         path=str(path),

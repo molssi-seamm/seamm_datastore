@@ -280,14 +280,14 @@ class Resource(AccessControlPermissionsMixin):
         return perm_query.all()
 
     @classmethod
-    def get_by_id(cls, resource_id, permission="read"):
+    def get_by_id(cls, id, permission="read"):
         """General get method for retrieving by ID"""
         perm_query = (
             cls.permissions_query(permission.lower())
-            .filter_by(id=resource_id)
+            .filter_by(id=id)
             .one_or_none()
         )
-        regular_query = cls.query.filter(cls.id == resource_id).one_or_none()
+        regular_query = cls.query.filter(cls.id == id).one_or_none()
 
         if perm_query is None and regular_query is not None:
             raise NotAuthorizedError
@@ -485,7 +485,7 @@ class Job(Base, Resource):
     @classmethod
     def create(
         cls,
-        job_id,
+        id,
         flowchart_filename,
         project_names=["default"],
         path=None,
@@ -503,7 +503,7 @@ class Job(Base, Resource):
 
         Parameters
         ----------
-        job_id : int
+        id : int
             The id of the job, an integer > 0.
         flowchart_filename : str or pathlib.Path
             The path to the file containing the flowchart.
@@ -532,11 +532,11 @@ class Job(Base, Resource):
 
         # Check if this job already exists
         try:
-            job = Job.query.filter(Job.id == job_id).one_or_none()
+            job = Job.query.filter(Job.id == id).one_or_none()
         except KeyError:
             job = None
         if job:
-            raise ValueError(f"Job with ID {job_id} already found in the database")
+            raise ValueError(f"Job with ID {id} already found in the database")
 
         if submitted is None:
             submitted = datetime.datetime.now(datetime.timezone.utc)
@@ -582,7 +582,7 @@ class Job(Base, Resource):
 
         # Now add the job and update the database
         new_job = Job(
-            id=job_id,
+            id=id,
             title=title,
             description=description,
             path=path,
@@ -599,7 +599,7 @@ class Job(Base, Resource):
     @classmethod
     def update(
         cls,
-        job_id,
+        id,
         description=None,
         title=None,
         path=None,
@@ -622,7 +622,7 @@ class Job(Base, Resource):
             "projects",
         ]
 
-        job = cls.permissions_query("update").filter(Job.id == job_id).one_or_none()
+        job = cls.permissions_query("update").filter(Job.id == id).one_or_none()
 
         if job is None:
             raise ValueError(
@@ -655,7 +655,7 @@ class Job(Base, Resource):
         local = locals()
         update_dict = {x: local[x] for x in possible_updates if local[x] is not None}
 
-        job = Job.query.get(job_id)
+        job = Job.query.get(id)
 
         for k, v in update_dict.items():
             if k == "submitted" or k == "finished" or k == "started":
