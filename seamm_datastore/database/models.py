@@ -256,8 +256,11 @@ class Resource(AccessControlPermissionsMixin):
         limit=None,
         sort_by="id",
         order="asc",
+        only="all",
     ):
         """General get method for jobs, flowcharts, projects"""
+
+        from sqlalchemy import Column
 
         perm_query = cls.permissions_query(permission.lower())
 
@@ -277,7 +280,11 @@ class Resource(AccessControlPermissionsMixin):
         if order.lower() == "desc":
             perm_query = perm_query.order_by(cls.__dict__[sort_by].desc())
 
-        return perm_query.all()
+        if only != "all":
+            perm_query = perm_query.values(Column(only))
+            return perm_query
+        else:
+            return perm_query.all()
 
     @classmethod
     def get_by_id(cls, id, permission="read"):
