@@ -102,9 +102,9 @@ def test_get_queries(
     # times. Not the ideal way :)
     if sort == "last_update":
         if order == "desc":
-            assert records[0].last_update > records[1].last_update
+            assert records[0].last_update >= records[1].last_update
         else:
-            assert records[0].last_update < records[1].last_update
+            assert records[0].last_update <= records[1].last_update
     else:
         assert records[0].id == first_id
 
