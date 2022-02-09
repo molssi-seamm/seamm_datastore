@@ -283,9 +283,7 @@ class Resource(AccessControlPermissionsMixin):
     def get_by_id(cls, id, permission="read"):
         """General get method for retrieving by ID"""
         perm_query = (
-            cls.permissions_query(permission.lower())
-            .filter_by(id=id)
-            .one_or_none()
+            cls.permissions_query(permission.lower()).filter_by(id=id).one_or_none()
         )
         regular_query = cls.query.filter(cls.id == id).one_or_none()
 
