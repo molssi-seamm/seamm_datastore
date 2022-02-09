@@ -96,7 +96,18 @@ def test_get_queries(
     )
 
     assert len(records) == num_records
-    assert records[0].id == first_id
+
+    # Since the test relies on database that is built for testing, 
+    # we don't know for sure which one is added first. Confirm with 
+    # times. Not the ideal way :)
+    if sort == "last_update":
+        if order == "desc":
+            assert records[0].last_update > records[1].last_update
+        else:
+            assert records[0].last_update < records[1].last_update
+    else:
+        assert records[0].id == first_id
+   
     assert isinstance(records[0], resource)
 
 
