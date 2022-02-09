@@ -287,7 +287,7 @@ class Resource(AccessControlPermissionsMixin):
             .filter_by(id=resource_id)
             .one_or_none()
         )
-        regular_query = cls.query.filter(Job.id == id).one_or_none()
+        regular_query = cls.query.filter(cls.id == resource_id).one_or_none()
 
         if perm_query is None and regular_query is not None:
             raise NotAuthorizedError
