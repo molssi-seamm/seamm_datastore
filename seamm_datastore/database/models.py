@@ -660,12 +660,13 @@ class Job(Base, Resource):
         local = locals()
         update_dict = {x: local[x] for x in possible_updates if local[x] is not None}
 
-        job = Job.query.get(id)
+        job = cls.query.get(id)
 
         for k, v in update_dict.items():
             if k == "submitted" or k == "finished" or k == "started":
-                v = datetime.fromtimestamp(v / 1000)
-            job.__dict__[k] = v
+                update_dict[k] = datetime.fromtimestamp(v / 1000)
+
+        job.query.update(update_dict)
 
         return job
 
@@ -749,4 +750,34 @@ class Project(Base, Resource):
             name=name, description=description, path=path, owner=owner, group=group
         )
 
+        return project
+
+    @classmethod
+    def update(
+        cls,
+        id,
+        description=None,
+        name=None,
+        path=None,
+    ):
+        """Update method for existing jobs"""
+
+        possible_updates = [
+            "description",
+            "name",
+            "path",
+        ]
+
+        project = cls.permissions_query("update").filter(Project.id == id).one_or_none()
+
+        if project is None:
+            raise ValueError(
+                f"Cannot update job with id {id}. User does not have permissions, or job does not exist in the database."  # noqa: E501
+            )
+
+        local = locals()
+        update_dict = {x: local[x] for x in possible_updates if local[x] is not None}
+        project = Project.query.get(id)
+
+        project.query.update(update_dict)
         return project
