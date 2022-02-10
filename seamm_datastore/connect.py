@@ -213,7 +213,9 @@ class SEAMMDatastore:
     ):
 
         warn(
-            "Deprecation warning: This method will no longer be available in the next version of the seamm datastore. Job.create should be used instead."
+            "Deprecation warning: This method will no longer be available \
+            in the next version of the seamm datastore. \
+            Job.create should be used instead."
         )
 
         with session_scope(self.Session) as session:
@@ -260,7 +262,9 @@ class SEAMMDatastore:
             True if the finish time was successfully set, False otherwise.
         """
         warn(
-            "Deprecation warning: This method will no longer be available in the next version of the seamm datastore. Job.update should be used instead."
+            "Deprecation warning: This method will no longer be available \
+            in the next version of the seamm datastore. \
+            Job.update should be used instead."
         )
 
         from seamm_datastore.database.models import Job
@@ -269,7 +273,7 @@ class SEAMMDatastore:
             job = Job.get_by_id(job_id, permission="update")
 
             if job is None:
-                return Falsedatet
+                return False
             else:
                 job.finished = finish_time
                 job.status = status
