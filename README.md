@@ -17,7 +17,7 @@ import seamm_datastore
 # Create a database session
 connection = seamm_datastore.connect("sqlite:///:memory:")
 ```
-This will create a sqlite database stored in memory. Using `initialize=True` will result in a new database being created. You may substitute a different database URI in place of `sqlite:///memory`. If you are connecting to an existing database, you may leave out `initialize=True` if you would like the data in the database to be kept.
+This will create a sqlite database stored in memory. Using `initialize=True` will result in a new database being created. You may substitute a different database URI in place of `sqlite:///memory`. When connecting to a database on disk, you will need to specify an additional argument, `initialize=True`, if creating a new database.
 
 To login, use the login method. Your username is determined automatically by your username when running `connect` if `initialize` is `True.` An admin user is also create which you can use to login (username=`admin`, password=`admin`).
 

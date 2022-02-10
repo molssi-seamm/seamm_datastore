@@ -6,6 +6,7 @@ import os
 
 from functools import wraps
 from contextlib import contextmanager
+from warnings import warn
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -210,6 +211,11 @@ class SEAMMDatastore:
         finished=None,
         status="submitted",
     ):
+
+        warn(
+            "Deprecation warning: This method will no longer be available in the next version of the seamm datastore. Job.create should be used instead."
+        )
+
         with session_scope(self.Session) as session:
 
             job = self.Job.create(
@@ -226,3 +232,46 @@ class SEAMMDatastore:
             )
 
             session.add(job)
+
+    def finish_job(
+        self,
+        job_id,
+        finish_time,
+        status="finished",
+    ):
+        """Set the status and time that the job finished.
+
+        Parameters
+        ----------
+        job_id : int
+            The ID of the job, eg. 209
+        finish_time : datetime.datetime
+            The UTC time when the job finished.
+        status : str
+            The status, such as "error" or the default, "finished"
+        as_json : bool = False
+            Ignored
+        current_user : str or User = None
+            Ignored
+
+        Returns
+        -------
+        bool
+            True if the finish time was successfully set, False otherwise.
+        """
+        warn(
+            "Deprecation warning: This method will no longer be available in the next version of the seamm datastore. Job.update should be used instead."
+        )
+
+        from seamm_datastore.database.models import Job
+
+        with session_scope(self.Session) as session:
+            job = Job.get_by_id(job_id, permission="update")
+
+            if job is None:
+                return Falsedatet
+            else:
+                job.finished = finish_time
+                job.status = status
+                session.commit()
+                return True
