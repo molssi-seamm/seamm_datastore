@@ -544,7 +544,7 @@ class Job(Base, Resource):
             raise ValueError(f"Job with ID {id} already found in the database")
 
         if submitted is None:
-            submitted = datetime.datetime.now(datetime.timezone.utc)
+            submitted = datetime.utcnow()
 
         # Get the ids for the projects
         projects = [

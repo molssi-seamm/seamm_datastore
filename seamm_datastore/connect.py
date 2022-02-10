@@ -81,6 +81,9 @@ class SEAMMDatastore:
         default_project: str = "default",
     ):
 
+        if database_uri.lower() == "sqlite:///:memory:":
+            initialize = True
+
         # Default permissions
         if permissions is None:
             permissions = {
@@ -193,3 +196,33 @@ class SEAMMDatastore:
     @manage_session(seamm_datastore.database.build.import_datastore)
     def import_datastore(self, *args, **kwargs):
         pass
+
+    def add_job(
+        self,
+        id,
+        flowchart_filename,
+        project_names=["default"],
+        path=None,
+        title="",
+        description="",
+        submitted=None,
+        started=None,
+        finished=None,
+        status="submitted",
+    ):
+        with session_scope(self.Session) as session:
+
+            job = self.Job.create(
+                id,
+                flowchart_filename,
+                project_names,
+                path,
+                title,
+                description,
+                submitted,
+                started,
+                finished,
+                status,
+            )
+
+            session.add(job)
