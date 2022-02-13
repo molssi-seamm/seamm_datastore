@@ -6,6 +6,7 @@ import os
 
 from functools import wraps
 from contextlib import contextmanager
+from warnings import warn
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -13,7 +14,6 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from flask_authorize import Authorize
 
 import seamm_datastore.database.build
-from seamm_datastore import api
 from .util import LoginRequiredError
 
 
@@ -82,6 +82,9 @@ class SEAMMDatastore:
         default_project: str = "default",
     ):
 
+        if database_uri.lower() == "sqlite:///:memory:":
+            initialize = True
+
         # Default permissions
         if permissions is None:
             permissions = {
@@ -112,7 +115,15 @@ class SEAMMDatastore:
             sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
         )
 
-        from seamm_datastore.database.models import Base, Project
+        from seamm_datastore.database.models import (
+            Base,
+            Project,
+            User,
+            Job,
+            Group,
+            Role,
+            Flowchart,
+        )
 
         if initialize:
             Base.metadata.drop_all(self.engine)
@@ -124,8 +135,6 @@ class SEAMMDatastore:
             seamm_datastore.database.build._build_initial(
                 self.Session(), default_project
             )
-
-            from seamm_datastore.database.models import Group, Role
 
             group = Group.query.filter_by(name="admin").one()
             admin_role = Role.query.filter_by(name="admin").one()
@@ -144,12 +153,22 @@ class SEAMMDatastore:
         # Current user has to be bound before we can add anything else to be database.
         self.authorize = Authorize(current_user=self.current_user)
 
+        # Default group
+        self.default_group = Group.query.get(2).name
+
         # Now handle the project
         project = Project.query.filter_by(name=default_project).one_or_none()
         if not project:
             raise ValueError("Invalid project name given for default.")
 
         self.default_project = default_project
+
+        self.User = User
+        self.Group = Group
+        self.Role = Role
+        self.Project = Project
+        self.Job = Job
+        self.Flowchart = Flowchart
 
     def login(self, username, password):
         from seamm_datastore.database.models import User
@@ -175,58 +194,88 @@ class SEAMMDatastore:
             user = None
         return user
 
-    @manage_session(api.add_flowchart)
-    def add_flowchart(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.add_group)
-    def add_group(self, *args, **kwargs):
-        pass
-
-    @login_required
-    @manage_session(api.add_job)
-    def add_job(self, *args, **kwargs):
-        pass
-
-    @login_required
-    @manage_session(api.add_project)
-    def add_project(self, *args, **kwargs):
-        pass
-
-    @login_required
-    @manage_session(api.add_user)
-    def add_user(self, *args, **kwargs):
-        pass
-
-    @login_required
-    @manage_session(api.finish_job)
-    def finish_job(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.get_flowcharts)
-    def get_flowcharts(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.get_groups)
-    def get_groups(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.get_jobs)
-    def get_jobs(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.get_projects)
-    def get_projects(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.get_users)
-    def get_users(self, *args, **kwargs):
-        pass
-
-    @manage_session(api.list_projects)
-    def list_projects(self, *args, **kwargs):
-        pass
-
     @manage_session(seamm_datastore.database.build.import_datastore)
     def import_datastore(self, *args, **kwargs):
         pass
+
+    def add_job(
+        self,
+        id,
+        flowchart_filename,
+        project_names=["default"],
+        path=None,
+        title="",
+        description="",
+        submitted=None,
+        started=None,
+        finished=None,
+        status="submitted",
+    ):
+
+        warn(
+            "Deprecation warning: This method will no longer be available \
+            in the next version of the seamm datastore. \
+            Job.create should be used instead."
+        )
+
+        with session_scope(self.Session) as session:
+
+            job = self.Job.create(
+                id,
+                flowchart_filename,
+                project_names,
+                path,
+                title,
+                description,
+                submitted,
+                started,
+                finished,
+                status,
+            )
+
+            session.add(job)
+
+    def finish_job(
+        self,
+        job_id,
+        finish_time,
+        status="finished",
+    ):
+        """Set the status and time that the job finished.
+
+        Parameters
+        ----------
+        job_id : int
+            The ID of the job, eg. 209
+        finish_time : datetime.datetime
+            The UTC time when the job finished.
+        status : str
+            The status, such as "error" or the default, "finished"
+        as_json : bool = False
+            Ignored
+        current_user : str or User = None
+            Ignored
+
+        Returns
+        -------
+        bool
+            True if the finish time was successfully set, False otherwise.
+        """
+        warn(
+            "Deprecation warning: This method will no longer be available \
+            in the next version of the seamm datastore. \
+            Job.update should be used instead."
+        )
+
+        from seamm_datastore.database.models import Job
+
+        with session_scope(self.Session) as session:
+            job = Job.get_by_id(job_id, permission="update")
+
+            if job is None:
+                return False
+            else:
+                job.finished = finish_time
+                job.status = status
+                session.commit()
+                return True

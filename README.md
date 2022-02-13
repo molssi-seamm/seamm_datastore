@@ -15,23 +15,48 @@ This package contains SQLAlchemy models for the SEAMM datastore. The following g
 import seamm_datastore
 
 # Create a database session
-connection = seamm_datastore.SEAMMDatastore("sqlite:///:memory:", initialize=True, username="your_username", password="your_password")
+connection = seamm_datastore.connect("sqlite:///:memory:")
+```
+This will create a sqlite database stored in memory. Using `initialize=True` will result in a new database being created. You may substitute a different database URI in place of `sqlite:///memory`. When connecting to a database on disk, you will need to specify an additional argument, `initialize=True`, if creating a new database.
+
+To login, use the login method. Your username is determined automatically by your username when running `connect` if `initialize` is `True.` An admin user is also create which you can use to login (username=`admin`, password=`admin`).
+
+```python
+connection.login(username="YOUR_USERNAME", password="default")
 ```
 
-The `SEAMMDatastore` class has associated functions which can be used to add to the database using the same permission system that the seamm dashboard uses. Use the `.add_job` method to add a job and `get_jobs` to get all of the jobs the user is authorized to view.
+To import a datastore at a particular location, do:
 
-To retrieve all the users and dump the info to JSON:
+```python
+connection.import_datastore(FILEPATH)
+```
+
+To use the sample data in this repository,
+
+```python
+jobs, projects = connection.import_datastore("seamm_datastore/data/Projects")
+```
+
+JSON data of the added jobs and projects will be returned.
+
+The `SEAMMDatastore` class has bound database models and a SQLAlchemy session factory which you can work with. These can be interacted with the same as other sqlalchemy models. To retrieve jobs for which you have "read" permissions from the database, use the bound SQLAlchemy models:
+
+```
+jobs = connection.Job.permissions_query("read").all()
+```
+
+To dump to json:
 
 ```python
 from seamm_datastore.database.schema import JobSchema
 
-# Create user schema
-users = JobSchema(many=True)
+# Create job schema
+jobs_schema = JobSchema(many=True)
 
 # To retrieve all users in db
-all_jobs = connection.get_jobs()
+all_jobs = connection.Job.permissions_query("read").all()
 
-users_json = users.dump(all_jobs)
+jobs_json = jobs_schema.dump(all_jobs)
 ```
 
 ## Permissions

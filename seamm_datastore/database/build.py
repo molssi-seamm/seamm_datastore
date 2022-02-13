@@ -2,13 +2,8 @@
 Automatic import of projects and jobs from directories.
 """
 
-import json
 import os
 from pathlib import Path
-
-from seamm_datastore import api
-
-from seamm_datastore.util import parse_job_data
 
 
 def _build_initial(session, default_project):
@@ -83,7 +78,7 @@ def import_datastore(session, location, as_json=True):
         The number of projects and jobs added to the database.
     """
 
-    from seamm_datastore.database.models import Project
+    from seamm_datastore.database.models import Project, Job
 
     jobs = []
     project_names = []
@@ -113,20 +108,21 @@ def import_datastore(session, location, as_json=True):
                 "path": potential_project,
             }
 
-            try:
-                api.add_project(
-                    session,
+            if project_name != "default":
+                project = Project.create(
                     name=project_name,
                     path=potential_project,
-                    owner=username,
                     group=group,
-                    as_json=as_json,
                 )
-                project_names.append(project_data["name"])
-            except Exception:
-                # Project exists, we don't need to add it.
-                # Pass here because we should still try importing jobs.
+                session.add(project)
+
+            try:
+                session.commit()
+            except Exception as e:
                 session.rollback()
+                raise e
+
+            project_names.append(project_data["name"])
 
             for potential_job in os.listdir(potential_project):
                 potential_job = os.path.join(potential_project, potential_job)
@@ -135,40 +131,33 @@ def import_datastore(session, location, as_json=True):
 
                     # Check for job_data.json - has to have this to be job
                     check_path = os.path.join(potential_job, "job_data.json")
-
                     if os.path.exists(check_path):
-                        with open(check_path, "r") as fd:
-                            lines = fd.read().splitlines()
-                        # Old files may not have a header line
-                        if lines[0][0] == "{":
-                            text = "\n".join(lines)
-                        else:
-                            text = "\n".join(lines[1:])
-                        job_data_json = json.loads(text)
-                        job_data = parse_job_data(job_data_json)
+                        job_data = Job.parse_job_data(check_path)
 
-                        try:
-                            job = api.add_job(
-                                session,
-                                job_data["id"],
-                                potential_job + "/flowchart.flow",
-                                project_names=job_data["project_names"],
-                                path=potential_job,
-                                title=job_data["title"],
-                                description=job_data.get("description", ""),
-                                submitted=job_data.get("submitted", None),
-                                started=job_data.get("started", None),
-                                finished=job_data.get("finished", None),
-                                status=job_data["status"],
-                                as_json=as_json,
-                            )
-                            jobs.append(job)
-                        except Exception as e:
-                            print(f"Exception --> {str(e)}")
-                            # Job has already been added.
-                            session.rollback()
+                        job = Job.create(
+                            job_data["id"],
+                            potential_job + "/flowchart.flow",
+                            project_names=job_data["project_names"],
+                            path=potential_job,
+                            title=job_data["title"],
+                            description=job_data.get("description", ""),
+                            submitted=job_data.get("submitted", None),
+                            started=job_data.get("started", None),
+                            finished=job_data.get("finished", None),
+                            status=job_data["status"],
+                        )
+                        session.add(job)
+                        jobs.append(job)
+
+    session.commit()
 
     # retrieve projects now that all the jobs have been added.
     projects = Project.query.filter(Project.name.in_(project_names)).all()
+
+    if as_json is True:
+        from seamm_datastore.database.schema import ProjectSchema, JobSchema
+
+        jobs = JobSchema(many=True).dump(jobs)
+        projects = ProjectSchema(many=True).dump(projects)
 
     return jobs, projects

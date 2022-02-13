@@ -21,27 +21,38 @@ def session():
     return sess
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def connection():
-    db = seamm_datastore.connect(initialize=True)
-    users = db.get_users()
-    for data in users:
-        if data["username"] != "admin":
-            user = data["username"]
-            break
+    from seamm_datastore import session_scope
 
+    db = seamm_datastore.connect(initialize=True)
+
+    with session_scope(db.Session) as _:
+        from seamm_datastore.database.models import User
+
+        users = User.query.all()
+        for data in users:
+            if data.username != "admin":
+                user = data.username
+                break
     db.login(username=user, password="default")
     return db
 
 
-@pytest.fixture(scope="function")
-def admin_connection():
-    db = seamm_datastore.connect(initialize=True)
-    db.login(username="admin", password="admin")
-    return db
+@pytest.fixture()
+def admin_connection(connection):
+    connection.login(username="admin", password="admin")
+
+    return connection
 
 
 @pytest.fixture(scope="function")
-def connection_nologin():
-    db = seamm_datastore.connect(initialize=True)
-    return db
+def filled_db(connection):
+
+    # The lazy way to do this for now
+    import os
+
+    loc = os.path.dirname(os.path.abspath(__file__))
+    sample_data = os.path.join(loc, "..", "data", "Projects")
+
+    connection.import_datastore(sample_data)

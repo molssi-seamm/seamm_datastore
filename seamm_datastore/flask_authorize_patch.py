@@ -37,6 +37,9 @@ except ImportError:
 __all__ = ["generate_association_table", "AccessControlPermissionsMixin"]
 
 
+PipedList.cache_ok = False
+
+
 def generate_association_table(
     entity_name, resource_name, entity_tablename=None, resource_tablename=None
 ):
@@ -125,7 +128,7 @@ class AccessControlPermissionsMixin(PermissionsMixin):
         return or_(ret, or_(False, *clauses))
 
 
-def allowed(self, *args, **kwargs):
+def allowed(self, *args, **kwargs):  # pragma: no cover
     from flask_authorize.plugin import CURRENT_USER
 
     # look to flask-login for current user
