@@ -603,7 +603,7 @@ class Job(Base, Resource):
             submitted=submitted,
             started=started,
             finished=finished,
-            parameters={},
+            parameters=parameters,
         )
 
         return new_job

@@ -96,8 +96,7 @@ def test_add_job(connection):
     )
     path = path.expanduser().resolve()
 
-    # connection.add_job(job1_data)
-    job = connection.Job.create(
+    job_data = dict(
         id=1,
         flowchart_filename=str(path / "flowchart.flow"),
         project_names=["default"],
@@ -108,9 +107,21 @@ def test_add_job(connection):
         started=parser.parse("2016-08-29T09:12:34.000000+00:00"),
         finished=parser.parse("2016-08-29T09:13:34.000000+00:00"),
         status="finished",
+        parameters={"job": "parameter"},
     )
 
+    job = connection.Job.create(**job_data)
+
     assert job.id == 1
+
+    expected = dict(
+        id=1,
+        path=str(path),
+        title="test job",
+        description="description of the job",
+        status="finished",
+        parameters={"job": "parameter"},
+    )
 
     # Retrieve job
     with session_scope(connection.Session) as sess:
@@ -120,3 +131,7 @@ def test_add_job(connection):
         sess.commit()
         jobs = sess.query(Job).all()
         assert len(jobs) == 1
+
+        # Check the data - add times later
+        for k, v in expected.items():
+            assert getattr(job, k) == v
