@@ -134,20 +134,27 @@ def import_datastore(session, location, as_json=True):
                     if os.path.exists(check_path):
                         job_data = Job.parse_job_data(check_path)
 
-                        job = Job.create(
-                            job_data["id"],
-                            potential_job + "/flowchart.flow",
-                            project_names=job_data["project_names"],
-                            path=potential_job,
-                            title=job_data["title"],
-                            description=job_data.get("description", ""),
-                            submitted=job_data.get("submitted", None),
-                            started=job_data.get("started", None),
-                            finished=job_data.get("finished", None),
-                            status=job_data["status"],
-                        )
-                        session.add(job)
-                        jobs.append(job)
+                        try:
+                            job = Job.create(
+                                job_data["id"],
+                                potential_job + "/flowchart.flow",
+                                project_names=job_data["project_names"],
+                                path=potential_job,
+                                title=job_data["title"],
+                                description=job_data.get("description", ""),
+                                submitted=job_data.get("submitted", None),
+                                started=job_data.get("started", None),
+                                finished=job_data.get("finished", None),
+                                status=job_data["status"],
+                            )
+                        except Exception:
+                            print(
+                                f"Job {job_data['id']} not imported because it is "
+                                "already in the database."
+                            )
+                        else:
+                            session.add(job)
+                            jobs.append(job)
 
     session.commit()
 
