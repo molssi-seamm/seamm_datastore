@@ -209,6 +209,7 @@ class SEAMMDatastore:
         submitted=None,
         started=None,
         finished=None,
+        parameters=None,
         status="submitted",
     ):
 
@@ -217,6 +218,9 @@ class SEAMMDatastore:
             in the next version of the seamm datastore. \
             Job.create should be used instead."
         )
+
+        if parameters is None:
+            parameters = {}
 
         with session_scope(self.Session) as session:
 
@@ -230,6 +234,7 @@ class SEAMMDatastore:
                 submitted,
                 started,
                 finished,
+                parameters,
                 status,
             )
 

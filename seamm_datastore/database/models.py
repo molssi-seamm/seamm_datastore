@@ -499,6 +499,7 @@ class Job(Base, Resource):
         submitted=None,
         started=None,
         finished=None,
+        parameters=None,
         status="submitted",
     ):
         """Create a new job to add to the datastore.
@@ -526,6 +527,8 @@ class Job(Base, Resource):
             When the job was started, if it was. Preferably in UTC.
         finished : datetime.datetime = None
             When the job finished, if it has. Preferably in UTC.
+        parameters : dict
+            The command-line parameters for the job.
         status : str = "submitted"
             The status of the job: "submitted", "running", "finished", "error", etc.
 
@@ -585,6 +588,9 @@ class Job(Base, Resource):
         if flowchart is None:
             flowchart = Flowchart.create_from_file(flowchart_filename)
 
+        if parameters is None:
+            parameters = {}
+
         # Now add the job and update the database
         new_job = Job(
             id=id,
@@ -597,6 +603,7 @@ class Job(Base, Resource):
             submitted=submitted,
             started=started,
             finished=finished,
+            parameters=parameters,
         )
 
         return new_job
