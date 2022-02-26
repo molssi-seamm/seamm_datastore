@@ -108,19 +108,21 @@ def import_datastore(session, location, as_json=True):
                 "path": potential_project,
             }
 
-            if project_name != "default":
+            try:
                 project = Project.create(
                     name=project_name,
                     path=potential_project,
                     group=group,
                 )
                 session.add(project)
-
-            try:
                 session.commit()
-            except Exception as e:
+            except ValueError:
+                # Project already in DB
+                print(
+                    f"Project {project_name} not imported because it is "
+                    "already in the database."
+                )
                 session.rollback()
-                raise e
 
             project_names.append(project_data["name"])
 
