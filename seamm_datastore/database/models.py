@@ -787,5 +787,5 @@ class Project(Base, Resource):
         update_dict = {x: local[x] for x in possible_updates if local[x] is not None}
         project = Project.query.get(id)
 
-        Project.query.filter(Project.id==id).update(update_dict)
+        Project.query.filter(Project.id == id).update(update_dict)
         return project
