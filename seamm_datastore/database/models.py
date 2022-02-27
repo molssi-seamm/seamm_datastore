@@ -264,6 +264,9 @@ class Resource(AccessControlPermissionsMixin):
 
         perm_query = cls.permissions_query(permission.lower())
 
+        if order.lower() == "desc":
+            perm_query = perm_query.order_by(cls.__dict__[sort_by].desc())
+
         if description is not None:
             # Build string
             perm_query = perm_query.filter(cls.description.contains(description))
@@ -276,9 +279,6 @@ class Resource(AccessControlPermissionsMixin):
 
         if offset is not None:
             perm_query = perm_query.offset(offset)
-
-        if order.lower() == "desc":
-            perm_query = perm_query.order_by(cls.__dict__[sort_by].desc())
 
         if only != "all":
             perm_query = perm_query.values(Column(only))
