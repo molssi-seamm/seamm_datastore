@@ -281,7 +281,7 @@ class Resource(AccessControlPermissionsMixin):
             perm_query = perm_query.offset(offset)
 
         if only != "all":
-            perm_query = perm_query.values(Column(only))
+            perm_query = perm_query.values(*(cls.__dict__[x] for x in only))
             return perm_query
         else:
             return perm_query.all()
