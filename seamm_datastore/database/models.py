@@ -260,8 +260,6 @@ class Resource(AccessControlPermissionsMixin):
     ):
         """General get method for jobs, flowcharts, projects"""
 
-        from sqlalchemy import Column
-
         perm_query = cls.permissions_query(permission.lower())
 
         if order.lower() == "desc":
