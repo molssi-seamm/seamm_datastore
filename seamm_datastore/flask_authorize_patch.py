@@ -62,15 +62,23 @@ def generate_association_table(
     def entity_relationship(cls):
         return relationship(
             f"{entity_name}",
-            backref=backref(f"special_{resource_tablename}", lazy="dynamic", cascade="save-update, merge, "
-                                                "delete, delete-orphan"))
+            backref=backref(
+                f"special_{resource_tablename}",
+                lazy="dynamic",
+                cascade="save-update, merge, " "delete, delete-orphan",
+            ),
+        )
 
     @declared_attr
     def resource_relationship(cls):
         return relationship(
             f"{resource_name}",
-            backref=backref(f"special_{entity_tablename}", lazy="dynamic", cascade="save-update, merge, "
-                                                "delete, delete-orphan"))
+            backref=backref(
+                f"special_{entity_tablename}",
+                lazy="dynamic",
+                cascade="save-update, merge, " "delete, delete-orphan",
+            ),
+        )
 
     class PermissionsAssociationMixin:
         __tablename__ = f"{entity_tablename}_{resource_tablename}_association"
