@@ -667,13 +667,14 @@ class Job(Base, Resource):
         local = locals()
         update_dict = {x: local[x] for x in possible_updates if local[x] is not None}
 
-        job = cls.query.get(id)
-
         for k, v in update_dict.items():
             if k == "submitted" or k == "finished" or k == "started":
-                update_dict[k] = datetime.fromtimestamp(v / 1000)
+                if v:
+                    update_dict[k] = datetime.fromtimestamp(v / 1000)
+                else:
+                    update_dict[k] = None
 
-        job.query.update(update_dict)
+        Job.query.filter(Job.id == id).update(update_dict)
 
         return job
 
@@ -786,5 +787,5 @@ class Project(Base, Resource):
         update_dict = {x: local[x] for x in possible_updates if local[x] is not None}
         project = Project.query.get(id)
 
-        project.query.update(update_dict)
+        Project.query.filter(Project.id==id).update(update_dict)
         return project
