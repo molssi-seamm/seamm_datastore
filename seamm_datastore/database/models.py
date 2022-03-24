@@ -304,23 +304,20 @@ class Flowchart(Base, Resource):
     id = Column(Integer, nullable=False, primary_key=True)
     sha256 = Column(String(75), nullable=True)
     sha256_strict = Column(String(75), nullable=True)
-    # TODO - consider removing path
-    path = Column(String, nullable=True)
     flowchart_version = Column(Float, nullable=True, unique=False)
     doi = Column(Text, nullable=True)
+    conceptdoi = Column(Text, nullable=True)
     title = Column(String(100), nullable=True)
     description = Column(Text, nullable=True)
     creators = Column(JSON, nullable=True)
     keywords = Column(JSON, nullable=True)
     json = Column(JSON, nullable=False)
+    flowchart_metadata = Column(JSON, nullable=True)
 
     jobs = relationship("Job", back_populates="flowchart", lazy=True)
     projects = relationship(
         "Project", secondary=flowchart_project, back_populates="flowcharts"
     )
-
-    def __repr__(self):
-        return f"Flowchart(id={self.id}, description={self.description}, path={self.path})"  # noqa: E501
 
     @classmethod
     def create(cls, **flowchart_info):
@@ -339,6 +336,38 @@ class Flowchart(Base, Resource):
 
         if flowchart:
             raise ValueError(f"Flowchart already in datastore. ID: {flowchart.id}")
+
+        # These are basically all of the columns in a flowchart
+        column_metadata = [
+            "title",
+            "keywords",
+            "creators",
+            "doi",
+            "conceptdoi",
+            "sha256",
+            "sha256_strict",
+            "json",
+            "description",
+            "flowchart_version",
+            "flowchart_metadata",
+        ]
+
+        if "path" in flowchart_info.keys():
+            del flowchart_info["path"]
+
+        flowchart_info["flowchart_metadata"] = {}
+
+        # This will remove any keyword in the metadata that is not explicitly stored and save it in the
+        # 'flowchart_metadata' column
+        to_remove = []
+        for k, v in flowchart_info.items():
+            if k not in column_metadata:
+                flowchart_info["flowchart_metadata"][k] = v
+                to_remove.append(k)
+
+        # delete keys that are in flowchart metatdata column from flowchart_info
+        for k in to_remove:
+            del flowchart_info[k]
 
         new_flowchart = Flowchart(**flowchart_info)
 
