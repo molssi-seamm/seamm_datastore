@@ -615,6 +615,7 @@ class Job(Base, Resource):
 
         if flowchart is None:
             flowchart = Flowchart.create_from_file(flowchart_filename)
+            flowchart.projects = projects
 
         if parameters is None:
             parameters = {}
