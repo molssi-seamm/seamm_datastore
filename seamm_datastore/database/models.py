@@ -357,7 +357,8 @@ class Flowchart(Base, Resource):
 
         flowchart_info["flowchart_metadata"] = {}
 
-        # This will remove any keyword in the metadata that is not explicitly stored and save it in the
+        # This will remove any keyword in the metadata that is not explicitly
+        # stored and save it in the
         # 'flowchart_metadata' column
         to_remove = []
         for k, v in flowchart_info.items():
