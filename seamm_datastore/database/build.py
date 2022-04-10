@@ -156,6 +156,7 @@ def import_datastore(session, location, as_json=True):
                             )
                         else:
                             session.add(job)
+                            session.commit()
                             jobs.append(job)
 
     session.commit()
