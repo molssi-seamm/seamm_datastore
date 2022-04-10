@@ -214,13 +214,13 @@ class SEAMMDatastore:
     ):
 
         warn(
-            "Deprecation warning: This method will no longer be available \
-            in the next version of the seamm datastore. \
-            Job.create should be used instead."
+            "Deprecation warning: This method will no longer be available",
+            " in the next version of the seamm datastore.",
+            " Job.create should be used instead.",
         )
 
         if parameters is None:
-            parameters = {}
+            parameters = {"cmdline": []}
 
         with session_scope(self.Session) as session:
 
