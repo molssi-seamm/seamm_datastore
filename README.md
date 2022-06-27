@@ -1,4 +1,4 @@
-seamm_datastore
+SEAMM Datastore
 ==============================
 [//]: # (Badges)
 [![GitHub Actions Build Status](https://github.com/molssi-seamm/seamm_datastore/workflows/CI/badge.svg)](https://github.com/molssi-seamm/seamm_datastore/actions?query=workflow%3ACI)
