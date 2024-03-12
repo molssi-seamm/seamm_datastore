@@ -57,28 +57,28 @@ format: ## reformat with black
 	black --extend-exclude '_version.py' $(MODULE)
 
 typing: ## check typing
-	pytype seamm_datastore
+	pytype $(MODULE)
 
 test: ## run tests quickly with the default Python
-	pytest -rP seamm_datastore/tests
+	pytest -rP $(MODULE)/tests
 
 test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source seamm_datastore -m pytest
+	coverage run --source $(MODULE) -m pytest
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/seamm_datastore.rst
+	rm -f docs/$(MODULE).rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ seamm_datastore
+	sphinx-apidoc -o docs/ $(MODULE)
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
-	rm -f docs/seamm_datastore.rst
+	rm -f docs/$(MODULE).rst
 	rm -f docs/modules.rst
 
 servedocs: docs ## compile the docs watching for changes
@@ -93,12 +93,10 @@ check-release: clean ## check the release for errors
 	python -m twine check dist/*
 
 dist: clean ## builds source and wheel package
-	python setup.py sdist
-	python setup.py bdist_wheel
-	ls -l dist
+	python -m build
 
 install: uninstall ## install the package to the active Python's site-packages
-	python setup.py install
+	python install .
 
 uninstall: clean ## uninstall the package
-	pip uninstall --yes seamm_datastore
+	pip uninstall --yes $(MODULE)
