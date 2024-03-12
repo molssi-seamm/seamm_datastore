@@ -96,7 +96,7 @@ dist: clean ## builds source and wheel package
 	python -m build
 
 install: uninstall ## install the package to the active Python's site-packages
-	python install .
+	pip install .
 
 uninstall: clean ## uninstall the package
 	pip uninstall --yes $(MODULE)
