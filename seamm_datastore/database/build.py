@@ -134,36 +134,39 @@ def import_datastore(session, location, as_json=True):
                     # Check for job_data.json - has to have this to be job
                     check_path = os.path.join(potential_job, "job_data.json")
                     if os.path.exists(check_path):
-                        job_data = Job.parse_job_data(check_path)
-
-                        if "command line" in job_data:
-                            parameters = {"cmdline": job_data["command line"]}
-                        else:
-                            parameters = {"cmdline": []}
-
                         try:
-                            job = Job.create(
-                                job_data["id"],
-                                potential_job + "/flowchart.flow",
-                                project_names=job_data["project_names"],
-                                path=potential_job,
-                                title=job_data["title"],
-                                description=job_data.get("description", ""),
-                                submitted=job_data.get("submitted", None),
-                                started=job_data.get("started", None),
-                                finished=job_data.get("finished", None),
-                                status=job_data["status"],
-                                parameters=parameters,
-                            )
-                        except Exception:
-                            print(
-                                f"Job {job_data['id']} not imported because it is "
-                                "already in the database."
-                            )
+                            job_data = Job.parse_job_data(check_path)
+                        except Exception as e:
+                            print(f"Could not read the job data {check_path}: {str(e)}")
                         else:
-                            session.add(job)
-                            session.commit()
-                            jobs.append(job)
+                            if "command line" in job_data:
+                                parameters = {"cmdline": job_data["command line"]}
+                            else:
+                                parameters = {"cmdline": []}
+
+                            try:
+                                job = Job.create(
+                                    job_data["id"],
+                                    potential_job + "/flowchart.flow",
+                                    project_names=job_data["project_names"],
+                                    path=potential_job,
+                                    title=job_data["title"],
+                                    description=job_data.get("description", ""),
+                                    submitted=job_data.get("submitted", None),
+                                    started=job_data.get("started", None),
+                                    finished=job_data.get("finished", None),
+                                    status=job_data["status"],
+                                    parameters=parameters,
+                                )
+                            except Exception:
+                                print(
+                                    f"Job {job_data['id']} not imported because it is "
+                                    "already in the database."
+                                )
+                            else:
+                                session.add(job)
+                                session.commit()
+                                jobs.append(job)
 
     session.commit()
 
