@@ -6,7 +6,6 @@ import os
 
 
 def test_build(connection):
-
     from seamm_datastore.database.models import Flowchart
 
     loc = os.path.abspath(os.path.dirname(__file__))

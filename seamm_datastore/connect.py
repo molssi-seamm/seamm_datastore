@@ -81,7 +81,6 @@ class SEAMMDatastore:
         datastore_location: str = None,
         default_project: str = "default",
     ):
-
         if database_uri.lower() == "sqlite:///:memory:":
             initialize = True
 
@@ -212,7 +211,6 @@ class SEAMMDatastore:
         parameters=None,
         status="submitted",
     ):
-
         warn(
             "Deprecation warning: This method will no longer be available",
             " in the next version of the seamm datastore.",
@@ -223,7 +221,6 @@ class SEAMMDatastore:
             parameters = {"cmdline": []}
 
         with session_scope(self.Session) as session:
-
             job = self.Job.create(
                 id,
                 flowchart_filename,

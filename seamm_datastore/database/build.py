@@ -130,7 +130,6 @@ def import_datastore(session, location, as_json=True):
                 potential_job = os.path.join(potential_project, potential_job)
 
                 if os.path.isdir(potential_job):
-
                     # Check for job_data.json - has to have this to be job
                     check_path = os.path.join(potential_job, "job_data.json")
                     if os.path.exists(check_path):

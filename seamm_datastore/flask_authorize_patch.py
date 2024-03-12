@@ -43,7 +43,6 @@ PipedList.cache_ok = False
 def generate_association_table(
     entity_name, resource_name, entity_tablename=None, resource_tablename=None
 ):
-
     # Make them plural by adding 's' :)
     if not entity_tablename:
         entity_tablename = entity_name.lower() + "s"
@@ -183,7 +182,6 @@ def allowed(self, *args, **kwargs):  # pragma: no cover
     # must have authorization to proceed.
     operation = set(self.permission)
     for arg in args:
-
         if not isinstance(arg.__class__, six.class_types):
             continue
 

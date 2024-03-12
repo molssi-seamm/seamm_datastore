@@ -321,7 +321,6 @@ class Flowchart(Base, Resource):
 
     @classmethod
     def create(cls, **flowchart_info):
-
         try:
             flowchart = cls.query.filter_by(
                 sha256_strict=flowchart_info["sha256_strict"]
@@ -709,7 +708,6 @@ class Job(Base, Resource):
 
     @classmethod
     def create_from_file(cls, job_data_file):
-
         job_data = cls.parse_job_data(job_data_file)
 
         job = Job.create(job_data)
