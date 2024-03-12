@@ -112,7 +112,6 @@ def test_get_queries(
 
 
 def test_job_update_error(filled_db):
-
     from seamm_datastore.database.models import Job
 
     with pytest.raises(ValueError):
@@ -120,7 +119,6 @@ def test_job_update_error(filled_db):
 
 
 def test_job_update(filled_db):
-
     from seamm_datastore.database.models import Job
 
     job = Job.update(92, description="This is a new description.")

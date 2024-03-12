@@ -48,7 +48,6 @@ def admin_connection(connection):
 
 @pytest.fixture(scope="function")
 def filled_db(connection):
-
     # The lazy way to do this for now
     import os
 

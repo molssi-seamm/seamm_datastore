@@ -21,13 +21,11 @@ def test_project_create(connection):
 
 
 def test_project_exists(connection):
-
     with pytest.raises(ValueError):
         connection.Project.create(name="default")
 
 
 def test_project_no_user(connection):
-
     with pytest.raises(ValueError):
         connection.logout()
         connection.Project.create(name="test")
@@ -43,7 +41,6 @@ def test_project_create_group(connection):
 
 
 def test_flowchart_parse(connection):
-
     this_file = os.path.dirname(os.path.abspath(__file__))
     filepath = os.path.join(this_file, "..", "data", "sample_flowchart_v2.flow")
 
@@ -59,7 +56,6 @@ def test_flowchart_parse(connection):
 
 
 def test_flowchart_from_file(connection):
-
     this_file = os.path.dirname(os.path.abspath(__file__))
     filepath = os.path.join(this_file, "..", "data", "sample_flowchart_v2.flow")
 
@@ -72,7 +68,6 @@ def test_flowchart_from_file(connection):
 
 
 def test_create_user(connection):
-
     user = connection.User.create(username="test", password="test")
 
     assert user.username == "test"
