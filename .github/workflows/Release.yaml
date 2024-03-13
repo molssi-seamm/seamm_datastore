@@ -36,7 +36,7 @@ jobs:
     - name: Run linters
       shell: bash -l {0}
       run: |
-        black --check --diff  --extend-exclude '_version.py' seamm_datastore
+        black --check --diff  --extend-exclude '_version.py|alembic/' seamm_datastore
         flake8 seamm_datastore
 
   test:
