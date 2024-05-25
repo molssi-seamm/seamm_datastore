@@ -97,8 +97,15 @@ class AccessControlPermissionsMixin(PermissionsMixin):
     @classmethod
     def authorized(cls, check):
         from flask_authorize.plugin import CURRENT_USER
+        from sqlalchemy.sql.expression import true
 
         current_user = CURRENT_USER()
+
+        # check if the user is an admin 
+        # return True if admin - they're allowed to do anything!
+        if current_user:
+            if "admin" in [x.name for x in current_user.roles]:
+                return true()
 
         ret = super().authorized(check)
 
@@ -132,7 +139,8 @@ class AccessControlPermissionsMixin(PermissionsMixin):
             ]
             clauses.append(cls.id.in_(overlapping_groups))
 
-        return or_(ret, or_(False, *clauses))
+        check = or_(ret, or_(False, *clauses))
+        return check
 
 
 def allowed(self, *args, **kwargs):  # pragma: no cover
@@ -151,6 +159,11 @@ def allowed(self, *args, **kwargs):  # pragma: no cover
     if user is None:
         if not current_app.config["AUTHORIZE_ALLOW_ANONYMOUS_ACTIONS"]:
             return False
+        
+    # check if the user is an admin 
+    # return True if admin - they're allowed to do anything!
+    if "admin" in [x.name for x in user.roles]:
+        return True
 
     # authorize if user has relevant role
     if len(self.has_role):
