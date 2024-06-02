@@ -101,7 +101,7 @@ class AccessControlPermissionsMixin(PermissionsMixin):
 
         current_user = CURRENT_USER()
 
-        # check if the user is an admin 
+        # check if the user is an admin
         # return True if admin - they're allowed to do anything!
         if current_user:
             if "admin" in [x.name for x in current_user.roles]:
@@ -159,8 +159,8 @@ def allowed(self, *args, **kwargs):  # pragma: no cover
     if user is None:
         if not current_app.config["AUTHORIZE_ALLOW_ANONYMOUS_ACTIONS"]:
             return False
-        
-    # check if the user is an admin 
+
+    # check if the user is an admin
     # return True if admin - they're allowed to do anything!
     if "admin" in [x.name for x in user.roles]:
         return True
