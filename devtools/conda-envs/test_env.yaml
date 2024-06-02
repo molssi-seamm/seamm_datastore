@@ -25,6 +25,7 @@ dependencies:
   - flake8
 
   # Documentation
+  - sphinx_rtd_theme
   - pydata-sphinx-theme
   - sphinx-design
 
