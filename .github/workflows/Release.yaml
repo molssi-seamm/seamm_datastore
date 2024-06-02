@@ -11,7 +11,7 @@ jobs:
     name: Release
     uses: molssi-seamm/devops/.github/workflows/Release.yaml@main
     with:
-      src : mopac_step
+      src : seamm_datastore
       test_dir: seamm_datastore/tests
     secrets: inherit
 
