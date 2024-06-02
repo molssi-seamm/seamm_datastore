@@ -166,12 +166,20 @@ class User(Base):
             role = Role.query.filter_by(name=role_name).one()
             new_user.roles.append(role)
 
-        if groups is None:
-            groups = [Group.query.get(2).name]
+        if not groups:
+            new_group = Group.create(username, [])
+            new_user.groups.append(new_group)
+        else:
+            for group_name in groups:
+                group = Group.query.filter_by(name=group_name).one()
+                new_user.groups.append(group)
 
-        for group_name in groups:
-            group = Group.query.filter_by(name=group_name).one()
-            new_user.groups.append(group)
+        if not roles:
+            new_user.roles.append(Role.query.filter_by(name="user").one())
+        else:
+            for role in roles:
+                role = Role.query.filter_by(name=role).one()
+                new_user.roles.append(role)
 
         return new_user
 

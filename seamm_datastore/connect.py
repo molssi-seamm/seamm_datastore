@@ -152,9 +152,6 @@ class SEAMMDatastore:
         # Current user has to be bound before we can add anything else to be database.
         self.authorize = Authorize(current_user=self.current_user)
 
-        # Default group
-        self.default_group = Group.query.get(2).name
-
         # Now handle the project
         project = Project.query.filter_by(name=default_project).one_or_none()
         if not project:

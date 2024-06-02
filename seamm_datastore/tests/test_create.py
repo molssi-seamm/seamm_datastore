@@ -71,7 +71,7 @@ def test_create_user(connection):
     user = connection.User.create(username="test", password="test")
 
     assert user.username == "test"
-    assert user.groups[0].name == connection.default_group
+    assert user.groups[0].name == user.username
 
 
 def test_add_job(connection):
