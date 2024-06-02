@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seamm_datastore.database package &mdash; seamm_datastore  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            seamm_datastore
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">seamm_datastore</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">seamm_datastore.database package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/seamm_datastore.database.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="seamm-datastore-database-package">
+<h1>seamm_datastore.database package<a class="headerlink" href="#seamm-datastore-database-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-seamm_datastore.database.build">
+<span id="seamm-datastore-database-build-module"></span><h2>seamm_datastore.database.build module<a class="headerlink" href="#module-seamm_datastore.database.build" title="Link to this heading"></a></h2>
+<p>Automatic import of projects and jobs from directories.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="seamm_datastore.database.build.import_datastore">
+<span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.build.</span></span><span class="sig-name descname"><span class="pre">import_datastore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_json</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/build.html#import_datastore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.build.import_datastore" title="Link to this definition"></a></dt>
+<dd><p>Import all the projects and jobs at &lt;location&gt;.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session</strong> (<em>SQLAlchemy or flask session</em>)</p></li>
+<li><p><strong>location</strong> (<em>str or path</em>) – The location to check for jobs or projects. Usually the projects directory in a
+datastore.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>(n_projects, n_jobs)</strong> – The number of projects and jobs added to the database.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int, integer</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-seamm_datastore.database.models">
+<span id="seamm-datastore-database-models-module"></span><h2>seamm_datastore.database.models module<a class="headerlink" href="#module-seamm_datastore.database.models" title="Link to this heading"></a></h2>
+<p>Table models for SEAMM datastore SQLAlchemy database.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.models.</span></span><span class="sig-name descname"><span class="pre">Flowchart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Flowchart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Flowchart" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code>, <a class="reference internal" href="#seamm_datastore.database.models.Resource" title="seamm_datastore.database.models.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.conceptdoi">
+<span class="sig-name descname"><span class="pre">conceptdoi</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.conceptdoi" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.create">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flowchart_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Flowchart.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.create" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.create_from_file">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Flowchart.create_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.create_from_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.creators">
+<span class="sig-name descname"><span class="pre">creators</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.creators" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.description">
+<span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.doi">
+<span class="sig-name descname"><span class="pre">doi</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.doi" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.flowchart_metadata">
+<span class="sig-name descname"><span class="pre">flowchart_metadata</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.flowchart_metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.flowchart_version">
+<span class="sig-name descname"><span class="pre">flowchart_version</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.flowchart_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.group">
+<span class="sig-name descname"><span class="pre">group</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.group" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.group_id">
+<span class="sig-name descname"><span class="pre">group_id</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.group_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.group_permissions">
+<span class="sig-name descname"><span class="pre">group_permissions</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.group_permissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.jobs">
+<span class="sig-name descname"><span class="pre">jobs</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.jobs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.json">
+<span class="sig-name descname"><span class="pre">json</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.json" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.keywords">
+<span class="sig-name descname"><span class="pre">keywords</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.keywords" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.other_permissions">
+<span class="sig-name descname"><span class="pre">other_permissions</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.other_permissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.owner">
+<span class="sig-name descname"><span class="pre">owner</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.owner" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.owner_id">
+<span class="sig-name descname"><span class="pre">owner_id</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.owner_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.owner_permissions">
+<span class="sig-name descname"><span class="pre">owner_permissions</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.owner_permissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.parse_flowchart_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parse_flowchart_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Flowchart.parse_flowchart_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.parse_flowchart_file" title="Link to this definition"></a></dt>
+<dd><p>Function for parsing information from flowchart</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – The path to the flowchart.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>metadata</strong> – A json containing flowchart information to be added to the database.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.projects">
+<span class="sig-name descname"><span class="pre">projects</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.projects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.sha256">
+<span class="sig-name descname"><span class="pre">sha256</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.sha256" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.sha256_strict">
+<span class="sig-name descname"><span class="pre">sha256_strict</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.sha256_strict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Flowchart.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#seamm_datastore.database.models.Flowchart.title" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Group">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.models.</span></span><span class="sig-name descname"><span class="pre">Group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Group" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Group.create">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">users</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Group.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Group.create" title="Link to this definition"></a></dt>
+<dd><p>Add a project to the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the project, used for display and directory name.</p></li>
+<li><p><strong>users</strong> (<em>list</em>) – A list of usernames to add to the group</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Group object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#seamm_datastore.database.models.Group" title="seamm_datastore.database.models.Group">Group</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Group.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#seamm_datastore.database.models.Group.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Group.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#seamm_datastore.database.models.Group.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Group.special_projects">
+<span class="sig-name descname"><span class="pre">special_projects</span></span><a class="headerlink" href="#seamm_datastore.database.models.Group.special_projects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Group.users">
+<span class="sig-name descname"><span class="pre">users</span></span><a class="headerlink" href="#seamm_datastore.database.models.Group.users" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.GroupProjectAssociation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.models.</span></span><span class="sig-name descname"><span class="pre">GroupProjectAssociation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#GroupProjectAssociation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.GroupProjectAssociation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PermissionsAssociationMixin</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.GroupProjectAssociation.entity_id">
+<span class="sig-name descname"><span class="pre">entity_id</span></span><a class="headerlink" href="#seamm_datastore.database.models.GroupProjectAssociation.entity_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.GroupProjectAssociation.groups">
+<span class="sig-name descname"><span class="pre">groups</span></span><a class="headerlink" href="#seamm_datastore.database.models.GroupProjectAssociation.groups" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.GroupProjectAssociation.permissions">
+<span class="sig-name descname"><span class="pre">permissions</span></span><a class="headerlink" href="#seamm_datastore.database.models.GroupProjectAssociation.permissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.GroupProjectAssociation.projects">
+<span class="sig-name descname"><span class="pre">projects</span></span><a class="headerlink" href="#seamm_datastore.database.models.GroupProjectAssociation.projects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.GroupProjectAssociation.resource_id">
+<span class="sig-name descname"><span class="pre">resource_id</span></span><a class="headerlink" href="#seamm_datastore.database.models.GroupProjectAssociation.resource_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.models.</span></span><span class="sig-name descname"><span class="pre">Job</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Job"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Job" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code>, <a class="reference internal" href="#seamm_datastore.database.models.Resource" title="seamm_datastore.database.models.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.create">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flowchart_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['default']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">submitted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">started</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">finished</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'submitted'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Job.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Job.create" title="Link to this definition"></a></dt>
+<dd><p>Create a new job to add to the datastore.</p>
+<p>This method requires a user to be logged in and to have appropriate permissions
+for the project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>int</em>) – The id of the job, an integer &gt; 0.</p></li>
+<li><p><strong>flowchart_filename</strong> (<em>str or pathlib.Path</em>) – The path to the file containing the flowchart.</p></li>
+<li><p><strong>project_names</strong> (<em>[str]</em>) – A list of projects that the flowchart belongs to.</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – The directory path for the job.</p></li>
+<li><p><strong>title</strong> (<em>str = “”</em>) – The title of the job, used for display.</p></li>
+<li><p><strong>description</strong> (<em>str = “”</em>) – A longer, textual description of the job.</p></li>
+<li><p><strong>submitted</strong> (<em>datetime.datetime = now()</em>) – When the job was submitted as a datetime object. Defaults to now in UTC.</p></li>
+<li><p><strong>started</strong> (<em>datetime.datetime = None</em>) – When the job was started, if it was. Preferably in UTC.</p></li>
+<li><p><strong>finished</strong> (<em>datetime.datetime = None</em>) – When the job finished, if it has. Preferably in UTC.</p></li>
+<li><p><strong>parameters</strong> (<em>dict</em>) – The command-line parameters for the job.</p></li>
+<li><p><strong>status</strong> (<em>str = “submitted”</em>) – The status of the job: “submitted”, “running”, “finished”, “error”, etc.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The json of the job data, or the Job object, depending on “as_json”.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>json or <a class="reference internal" href="#seamm_datastore.database.models.Job" title="seamm_datastore.database.models.Job">Job</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.create_from_file">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_data_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Job.create_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Job.create_from_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.description">
+<span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.finished" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.flowchart">
+<span class="sig-name descname"><span class="pre">flowchart</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.flowchart" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.flowchart_id">
+<span class="sig-name descname"><span class="pre">flowchart_id</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.flowchart_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.group">
+<span class="sig-name descname"><span class="pre">group</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.group" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.group_id">
+<span class="sig-name descname"><span class="pre">group_id</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.group_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.group_permissions">
+<span class="sig-name descname"><span class="pre">group_permissions</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.group_permissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.last_update">
+<span class="sig-name descname"><span class="pre">last_update</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.last_update" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.other_permissions">
+<span class="sig-name descname"><span class="pre">other_permissions</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.other_permissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.owner">
+<span class="sig-name descname"><span class="pre">owner</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.owner" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.owner_id">
+<span class="sig-name descname"><span class="pre">owner_id</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.owner_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.owner_permissions">
+<span class="sig-name descname"><span class="pre">owner_permissions</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.owner_permissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.parameters" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.parse_job_data">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parse_job_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Job.parse_job_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Job.parse_job_data" title="Link to this definition"></a></dt>
+<dd><p>Parse job_data.json at path</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.path">
+<span class="sig-name descname"><span class="pre">path</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.projects">
+<span class="sig-name descname"><span class="pre">projects</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.projects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.started">
+<span class="sig-name descname"><span class="pre">started</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.started" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.status">
+<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.submitted">
+<span class="sig-name descname"><span class="pre">submitted</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.submitted" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#seamm_datastore.database.models.Job.title" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Job.update">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">submitted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">started</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">finished</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Job.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Job.update" title="Link to this definition"></a></dt>
+<dd><p>Update method for existing jobs</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.models.</span></span><span class="sig-name descname"><span class="pre">Project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Project" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code>, <a class="reference internal" href="#seamm_datastore.database.models.Resource" title="seamm_datastore.database.models.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.create">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Project.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Project.create" title="Link to this definition"></a></dt>
+<dd><p>Create a project to add to the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the project, used for display and directory name.</p></li>
+<li><p><strong>description</strong> (<em>str</em>) – A textual description of the project.</p></li>
+<li><p><strong>path</strong> (<em>str = None</em>) – The path on disk to the project files.</p></li>
+<li><p><strong>group</strong> (<em>str or Group = None</em>) – The group for the project. Defaults to user’s primary group.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Project object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#seamm_datastore.database.models.Project" title="seamm_datastore.database.models.Project">Project</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.description">
+<span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.flowcharts">
+<span class="sig-name descname"><span class="pre">flowcharts</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.flowcharts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.group">
+<span class="sig-name descname"><span class="pre">group</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.group" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.group_id">
+<span class="sig-name descname"><span class="pre">group_id</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.group_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.group_permissions">
+<span class="sig-name descname"><span class="pre">group_permissions</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.group_permissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.jobs">
+<span class="sig-name descname"><span class="pre">jobs</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.jobs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.other_permissions">
+<span class="sig-name descname"><span class="pre">other_permissions</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.other_permissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.owner">
+<span class="sig-name descname"><span class="pre">owner</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.owner" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.owner_id">
+<span class="sig-name descname"><span class="pre">owner_id</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.owner_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.owner_permissions">
+<span class="sig-name descname"><span class="pre">owner_permissions</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.owner_permissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.path">
+<span class="sig-name descname"><span class="pre">path</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.permissions_query">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">permissions_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">permission</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Project.permissions_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Project.permissions_query" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.special_groups">
+<span class="sig-name descname"><span class="pre">special_groups</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.special_groups" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.special_users">
+<span class="sig-name descname"><span class="pre">special_users</span></span><a class="headerlink" href="#seamm_datastore.database.models.Project.special_users" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Project.update">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Project.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Project.update" title="Link to this definition"></a></dt>
+<dd><p>Update method for existing jobs</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Resource">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.models.</span></span><span class="sig-name descname"><span class="pre">Resource</span></span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Resource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Resource" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="api/seamm_datastore.html#seamm_datastore.flask_authorize_patch.AccessControlPermissionsMixin" title="seamm_datastore.flask_authorize_patch.AccessControlPermissionsMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessControlPermissionsMixin</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Resource.get">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">permission</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'read'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_by</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'asc'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Resource.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Resource.get" title="Link to this definition"></a></dt>
+<dd><p>General get method for jobs, flowcharts, projects</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Resource.get_by_id">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permission</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'read'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Resource.get_by_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Resource.get_by_id" title="Link to this definition"></a></dt>
+<dd><p>General get method for retrieving by ID</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Resource.permissions_query">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">permissions_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">permission</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Resource.permissions_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Resource.permissions_query" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Role">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.models.</span></span><span class="sig-name descname"><span class="pre">Role</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#Role"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.Role" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Role.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#seamm_datastore.database.models.Role.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Role.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#seamm_datastore.database.models.Role.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.Role.users">
+<span class="sig-name descname"><span class="pre">users</span></span><a class="headerlink" href="#seamm_datastore.database.models.Role.users" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.models.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#User"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.User" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.added">
+<span class="sig-name descname"><span class="pre">added</span></span><a class="headerlink" href="#seamm_datastore.database.models.User.added" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.create">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['user']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#User.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.User.create" title="Link to this definition"></a></dt>
+<dd><p>Create a new user to be added to the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>username</strong> (<em>str</em>) – The username that identifies the user.</p></li>
+<li><p><strong>password</strong> (<em>str</em>) – The secret password for the user.</p></li>
+<li><p><strong>first_name</strong> (<em>str = None</em>) – The user’s first (given) name.</p></li>
+<li><p><strong>last_name</strong> (<em>str = None</em>) – The user’s last (family) name.</p></li>
+<li><p><strong>email</strong> (<em>str = None</em>) – The user’s principal email address.</p></li>
+<li><p><strong>roles</strong> (<em>[str] = [“user”]</em>) – A list of roles for the user. Defaults to just “user”.</p></li>
+<li><p><strong>groups</strong> (<em>[str] = None</em>) – A list of groups that the user belongs to.
+Defaults to the first group in the database.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.email">
+<span class="sig-name descname"><span class="pre">email</span></span><a class="headerlink" href="#seamm_datastore.database.models.User.email" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.first_name">
+<span class="sig-name descname"><span class="pre">first_name</span></span><a class="headerlink" href="#seamm_datastore.database.models.User.first_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.groups">
+<span class="sig-name descname"><span class="pre">groups</span></span><a class="headerlink" href="#seamm_datastore.database.models.User.groups" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#seamm_datastore.database.models.User.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.last_name">
+<span class="sig-name descname"><span class="pre">last_name</span></span><a class="headerlink" href="#seamm_datastore.database.models.User.last_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.password">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">password</span></span><a class="headerlink" href="#seamm_datastore.database.models.User.password" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.password_hash">
+<span class="sig-name descname"><span class="pre">password_hash</span></span><a class="headerlink" href="#seamm_datastore.database.models.User.password_hash" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.roles">
+<span class="sig-name descname"><span class="pre">roles</span></span><a class="headerlink" href="#seamm_datastore.database.models.User.roles" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.special_projects">
+<span class="sig-name descname"><span class="pre">special_projects</span></span><a class="headerlink" href="#seamm_datastore.database.models.User.special_projects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.status">
+<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#seamm_datastore.database.models.User.status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.username">
+<span class="sig-name descname"><span class="pre">username</span></span><a class="headerlink" href="#seamm_datastore.database.models.User.username" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.User.verify_password">
+<span class="sig-name descname"><span class="pre">verify_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#User.verify_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.User.verify_password" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.UserProjectAssociation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.models.</span></span><span class="sig-name descname"><span class="pre">UserProjectAssociation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/models.html#UserProjectAssociation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.models.UserProjectAssociation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PermissionsAssociationMixin</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.UserProjectAssociation.entity_id">
+<span class="sig-name descname"><span class="pre">entity_id</span></span><a class="headerlink" href="#seamm_datastore.database.models.UserProjectAssociation.entity_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.UserProjectAssociation.permissions">
+<span class="sig-name descname"><span class="pre">permissions</span></span><a class="headerlink" href="#seamm_datastore.database.models.UserProjectAssociation.permissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.UserProjectAssociation.projects">
+<span class="sig-name descname"><span class="pre">projects</span></span><a class="headerlink" href="#seamm_datastore.database.models.UserProjectAssociation.projects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.UserProjectAssociation.resource_id">
+<span class="sig-name descname"><span class="pre">resource_id</span></span><a class="headerlink" href="#seamm_datastore.database.models.UserProjectAssociation.resource_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.models.UserProjectAssociation.users">
+<span class="sig-name descname"><span class="pre">users</span></span><a class="headerlink" href="#seamm_datastore.database.models.UserProjectAssociation.users" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-seamm_datastore.database.schema">
+<span id="seamm-datastore-database-schema-module"></span><h2>seamm_datastore.database.schema module<a class="headerlink" href="#module-seamm_datastore.database.schema" title="Link to this heading"></a></h2>
+<p>Marshmallow models for serialization and deserialization.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.FlowchartSchema">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.schema.</span></span><span class="sig-name descname"><span class="pre">FlowchartSchema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/schema.html#FlowchartSchema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.schema.FlowchartSchema" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SQLAlchemyAutoSchema</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.FlowchartSchema.Meta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/seamm_datastore/database/schema.html#FlowchartSchema.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.schema.FlowchartSchema.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.FlowchartSchema.Meta.exclude">
+<span class="sig-name descname"><span class="pre">exclude</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('json',</span> <span class="pre">'owner_permissions',</span> <span class="pre">'group_permissions',</span> <span class="pre">'other_permissions',</span> <span class="pre">'sha256')</span></em><a class="headerlink" href="#seamm_datastore.database.schema.FlowchartSchema.Meta.exclude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.FlowchartSchema.Meta.include_fk">
+<span class="sig-name descname"><span class="pre">include_fk</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#seamm_datastore.database.schema.FlowchartSchema.Meta.include_fk" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.FlowchartSchema.Meta.include_relationships">
+<span class="sig-name descname"><span class="pre">include_relationships</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#seamm_datastore.database.schema.FlowchartSchema.Meta.include_relationships" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.FlowchartSchema.Meta.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#seamm_datastore.database.schema.FlowchartSchema.Meta.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#seamm_datastore.database.models.Flowchart" title="seamm_datastore.database.models.Flowchart"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flowchart</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.FlowchartSchema.dump_fields">
+<span class="sig-name descname"><span class="pre">dump_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.FlowchartSchema.dump_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.FlowchartSchema.exclude">
+<span class="sig-name descname"><span class="pre">exclude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MutableSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.FlowchartSchema.exclude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.FlowchartSchema.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.FlowchartSchema.fields" title="Link to this definition"></a></dt>
+<dd><p>Dictionary mapping field_names -&gt; <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> objects</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.FlowchartSchema.load_fields">
+<span class="sig-name descname"><span class="pre">load_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.FlowchartSchema.load_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.FlowchartSchema.opts">
+<span class="sig-name descname"><span class="pre">opts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SchemaOpts</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;marshmallow_sqlalchemy.schema.SQLAlchemyAutoSchemaOpts</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#seamm_datastore.database.schema.FlowchartSchema.opts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.GroupSchema">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.schema.</span></span><span class="sig-name descname"><span class="pre">GroupSchema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/schema.html#GroupSchema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.schema.GroupSchema" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SQLAlchemyAutoSchema</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.GroupSchema.Meta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/seamm_datastore/database/schema.html#GroupSchema.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.schema.GroupSchema.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.GroupSchema.Meta.include_fk">
+<span class="sig-name descname"><span class="pre">include_fk</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#seamm_datastore.database.schema.GroupSchema.Meta.include_fk" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.GroupSchema.Meta.include_relationships">
+<span class="sig-name descname"><span class="pre">include_relationships</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#seamm_datastore.database.schema.GroupSchema.Meta.include_relationships" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.GroupSchema.Meta.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#seamm_datastore.database.schema.GroupSchema.Meta.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#seamm_datastore.database.models.Group" title="seamm_datastore.database.models.Group"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.GroupSchema.dump_fields">
+<span class="sig-name descname"><span class="pre">dump_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.GroupSchema.dump_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.GroupSchema.exclude">
+<span class="sig-name descname"><span class="pre">exclude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MutableSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.GroupSchema.exclude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.GroupSchema.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.GroupSchema.fields" title="Link to this definition"></a></dt>
+<dd><p>Dictionary mapping field_names -&gt; <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> objects</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.GroupSchema.load_fields">
+<span class="sig-name descname"><span class="pre">load_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.GroupSchema.load_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.GroupSchema.opts">
+<span class="sig-name descname"><span class="pre">opts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SchemaOpts</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;marshmallow_sqlalchemy.schema.SQLAlchemyAutoSchemaOpts</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#seamm_datastore.database.schema.GroupSchema.opts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.JobSchema">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.schema.</span></span><span class="sig-name descname"><span class="pre">JobSchema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/schema.html#JobSchema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.schema.JobSchema" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SQLAlchemyAutoSchema</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.JobSchema.Meta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/seamm_datastore/database/schema.html#JobSchema.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.schema.JobSchema.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.JobSchema.Meta.exclude">
+<span class="sig-name descname"><span class="pre">exclude</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('flowchart',</span> <span class="pre">'owner_permissions',</span> <span class="pre">'group_permissions',</span> <span class="pre">'other_permissions')</span></em><a class="headerlink" href="#seamm_datastore.database.schema.JobSchema.Meta.exclude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.JobSchema.Meta.include_fk">
+<span class="sig-name descname"><span class="pre">include_fk</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#seamm_datastore.database.schema.JobSchema.Meta.include_fk" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.JobSchema.Meta.include_relationships">
+<span class="sig-name descname"><span class="pre">include_relationships</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#seamm_datastore.database.schema.JobSchema.Meta.include_relationships" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.JobSchema.Meta.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#seamm_datastore.database.schema.JobSchema.Meta.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#seamm_datastore.database.models.Job" title="seamm_datastore.database.models.Job"><code class="xref py py-class docutils literal notranslate"><span class="pre">Job</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.JobSchema.dump_fields">
+<span class="sig-name descname"><span class="pre">dump_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.JobSchema.dump_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.JobSchema.exclude">
+<span class="sig-name descname"><span class="pre">exclude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MutableSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.JobSchema.exclude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.JobSchema.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.JobSchema.fields" title="Link to this definition"></a></dt>
+<dd><p>Dictionary mapping field_names -&gt; <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> objects</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.JobSchema.load_fields">
+<span class="sig-name descname"><span class="pre">load_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.JobSchema.load_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.JobSchema.opts">
+<span class="sig-name descname"><span class="pre">opts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SchemaOpts</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;marshmallow_sqlalchemy.schema.SQLAlchemyAutoSchemaOpts</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#seamm_datastore.database.schema.JobSchema.opts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.LocalDateTime">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.schema.</span></span><span class="sig-name descname"><span class="pre">LocalDateTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/schema.html#LocalDateTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.schema.LocalDateTime" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DateTime</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.ProjectSchema">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.schema.</span></span><span class="sig-name descname"><span class="pre">ProjectSchema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/schema.html#ProjectSchema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.schema.ProjectSchema" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SQLAlchemyAutoSchema</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.ProjectSchema.Meta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/seamm_datastore/database/schema.html#ProjectSchema.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.schema.ProjectSchema.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.ProjectSchema.Meta.exclude">
+<span class="sig-name descname"><span class="pre">exclude</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('owner_permissions',</span> <span class="pre">'group_permissions',</span> <span class="pre">'other_permissions')</span></em><a class="headerlink" href="#seamm_datastore.database.schema.ProjectSchema.Meta.exclude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.ProjectSchema.Meta.include_fk">
+<span class="sig-name descname"><span class="pre">include_fk</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#seamm_datastore.database.schema.ProjectSchema.Meta.include_fk" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.ProjectSchema.Meta.include_relationships">
+<span class="sig-name descname"><span class="pre">include_relationships</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#seamm_datastore.database.schema.ProjectSchema.Meta.include_relationships" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.ProjectSchema.Meta.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#seamm_datastore.database.schema.ProjectSchema.Meta.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#seamm_datastore.database.models.Project" title="seamm_datastore.database.models.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.ProjectSchema.dump_fields">
+<span class="sig-name descname"><span class="pre">dump_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.ProjectSchema.dump_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.ProjectSchema.exclude">
+<span class="sig-name descname"><span class="pre">exclude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MutableSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.ProjectSchema.exclude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.ProjectSchema.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.ProjectSchema.fields" title="Link to this definition"></a></dt>
+<dd><p>Dictionary mapping field_names -&gt; <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> objects</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.ProjectSchema.load_fields">
+<span class="sig-name descname"><span class="pre">load_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.ProjectSchema.load_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.ProjectSchema.opts">
+<span class="sig-name descname"><span class="pre">opts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SchemaOpts</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;marshmallow_sqlalchemy.schema.SQLAlchemyAutoSchemaOpts</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#seamm_datastore.database.schema.ProjectSchema.opts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.RoleSchema">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.schema.</span></span><span class="sig-name descname"><span class="pre">RoleSchema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/schema.html#RoleSchema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.schema.RoleSchema" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SQLAlchemyAutoSchema</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.RoleSchema.Meta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/seamm_datastore/database/schema.html#RoleSchema.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.schema.RoleSchema.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.RoleSchema.Meta.include_fk">
+<span class="sig-name descname"><span class="pre">include_fk</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#seamm_datastore.database.schema.RoleSchema.Meta.include_fk" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.RoleSchema.Meta.include_relationships">
+<span class="sig-name descname"><span class="pre">include_relationships</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#seamm_datastore.database.schema.RoleSchema.Meta.include_relationships" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.RoleSchema.Meta.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#seamm_datastore.database.schema.RoleSchema.Meta.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#seamm_datastore.database.models.Role" title="seamm_datastore.database.models.Role"><code class="xref py py-class docutils literal notranslate"><span class="pre">Role</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.RoleSchema.dump_fields">
+<span class="sig-name descname"><span class="pre">dump_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.RoleSchema.dump_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.RoleSchema.exclude">
+<span class="sig-name descname"><span class="pre">exclude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MutableSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.RoleSchema.exclude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.RoleSchema.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.RoleSchema.fields" title="Link to this definition"></a></dt>
+<dd><p>Dictionary mapping field_names -&gt; <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> objects</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.RoleSchema.load_fields">
+<span class="sig-name descname"><span class="pre">load_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.RoleSchema.load_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.RoleSchema.opts">
+<span class="sig-name descname"><span class="pre">opts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SchemaOpts</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;marshmallow_sqlalchemy.schema.SQLAlchemyAutoSchemaOpts</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#seamm_datastore.database.schema.RoleSchema.opts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.UserSchema">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seamm_datastore.database.schema.</span></span><span class="sig-name descname"><span class="pre">UserSchema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/seamm_datastore/database/schema.html#UserSchema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.schema.UserSchema" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SQLAlchemyAutoSchema</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.UserSchema.Meta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/seamm_datastore/database/schema.html#UserSchema.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.database.schema.UserSchema.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.UserSchema.Meta.exclude">
+<span class="sig-name descname"><span class="pre">exclude</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('password_hash',)</span></em><a class="headerlink" href="#seamm_datastore.database.schema.UserSchema.Meta.exclude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.UserSchema.Meta.include_fk">
+<span class="sig-name descname"><span class="pre">include_fk</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#seamm_datastore.database.schema.UserSchema.Meta.include_fk" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.UserSchema.Meta.include_relationships">
+<span class="sig-name descname"><span class="pre">include_relationships</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#seamm_datastore.database.schema.UserSchema.Meta.include_relationships" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.UserSchema.Meta.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#seamm_datastore.database.schema.UserSchema.Meta.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#seamm_datastore.database.models.User" title="seamm_datastore.database.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.UserSchema.dump_fields">
+<span class="sig-name descname"><span class="pre">dump_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.UserSchema.dump_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.UserSchema.exclude">
+<span class="sig-name descname"><span class="pre">exclude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MutableSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.UserSchema.exclude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.UserSchema.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.UserSchema.fields" title="Link to this definition"></a></dt>
+<dd><p>Dictionary mapping field_names -&gt; <code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code> objects</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.UserSchema.load_fields">
+<span class="sig-name descname"><span class="pre">load_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ma_fields.Field</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#seamm_datastore.database.schema.UserSchema.load_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seamm_datastore.database.schema.UserSchema.opts">
+<span class="sig-name descname"><span class="pre">opts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SchemaOpts</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;marshmallow_sqlalchemy.schema.SQLAlchemyAutoSchemaOpts</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#seamm_datastore.database.schema.UserSchema.opts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-seamm_datastore.database">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-seamm_datastore.database" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jessica A. Nash (The Molecular Sciences Software Institute). Project structure based on the Computational Molecular Science Python Cookiecutter version 1.5.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

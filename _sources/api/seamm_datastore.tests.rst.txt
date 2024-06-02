@@ -1,0 +1,61 @@
+seamm\_datastore.tests package
+==============================
+
+Submodules
+----------
+
+seamm\_datastore.tests.conftest module
+--------------------------------------
+
+.. automodule:: seamm_datastore.tests.conftest
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+seamm\_datastore.tests.test\_build module
+-----------------------------------------
+
+.. automodule:: seamm_datastore.tests.test_build
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+seamm\_datastore.tests.test\_create module
+------------------------------------------
+
+.. automodule:: seamm_datastore.tests.test_create
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+seamm\_datastore.tests.test\_errors module
+------------------------------------------
+
+.. automodule:: seamm_datastore.tests.test_errors
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+seamm\_datastore.tests.test\_methods module
+-------------------------------------------
+
+.. automodule:: seamm_datastore.tests.test_methods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+seamm\_datastore.tests.test\_seamm\_datastore module
+----------------------------------------------------
+
+.. automodule:: seamm_datastore.tests.test_seamm_datastore
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: seamm_datastore.tests
+   :members:
+   :undoc-members:
+   :show-inheritance:

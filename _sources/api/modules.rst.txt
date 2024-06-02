@@ -1,0 +1,7 @@
+seamm_datastore
+===============
+
+.. toctree::
+   :maxdepth: 4
+
+   seamm_datastore

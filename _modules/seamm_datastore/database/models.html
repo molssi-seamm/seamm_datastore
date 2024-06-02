@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seamm_datastore.database.models &mdash; seamm_datastore  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            seamm_datastore
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">seamm_datastore</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">seamm_datastore.database.models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for seamm_datastore.database.models</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Table models for SEAMM datastore SQLAlchemy database.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">werkzeug.security</span> <span class="kn">import</span> <span class="n">generate_password_hash</span><span class="p">,</span> <span class="n">check_password_hash</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Column</span><span class="p">,</span>
+    <span class="n">Integer</span><span class="p">,</span>
+    <span class="n">String</span><span class="p">,</span>
+    <span class="n">DateTime</span><span class="p">,</span>
+    <span class="n">ForeignKey</span><span class="p">,</span>
+    <span class="n">Table</span><span class="p">,</span>
+    <span class="n">Text</span><span class="p">,</span>
+    <span class="n">JSON</span><span class="p">,</span>
+    <span class="n">Float</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">relationship</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+
+<span class="c1"># Patched flask authorize</span>
+<span class="kn">from</span> <span class="nn">seamm_datastore.flask_authorize_patch</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AccessControlPermissionsMixin</span><span class="p">,</span>
+    <span class="n">generate_association_table</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">seamm_datastore.util</span> <span class="kn">import</span> <span class="n">NotAuthorizedError</span>
+
+<span class="c1"># The default is sqlalchemy unless we have</span>
+<span class="c1"># the dashboard installed and a db with</span>
+<span class="c1"># a bound engine.</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+
+    <span class="k">assert</span> <span class="s2">&quot;seamm_dashboard&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+    <span class="kn">from</span> <span class="nn">seamm_dashboard</span> <span class="kn">import</span> <span class="n">db</span>
+
+    <span class="n">Base</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Model</span>
+<span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+    <span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+<span class="c1">#############################</span>
+<span class="c1">#</span>
+<span class="c1"># SQLAlchemy Models</span>
+<span class="c1">#</span>
+<span class="c1">#############################</span>
+
+<span class="c1"># Authentication Mapping Tables for Access Control</span>
+<span class="n">UserProjectMixin</span> <span class="o">=</span> <span class="n">generate_association_table</span><span class="p">(</span><span class="s2">&quot;User&quot;</span><span class="p">,</span> <span class="s2">&quot;Project&quot;</span><span class="p">)</span>
+<span class="n">GroupProjectMixin</span> <span class="o">=</span> <span class="n">generate_association_table</span><span class="p">(</span><span class="s2">&quot;Group&quot;</span><span class="p">,</span> <span class="s2">&quot;Project&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="UserProjectAssociation">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.UserProjectAssociation">[docs]</a>
+<span class="k">class</span> <span class="nc">UserProjectAssociation</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span> <span class="n">UserProjectMixin</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="GroupProjectAssociation">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.GroupProjectAssociation">[docs]</a>
+<span class="k">class</span> <span class="nc">GroupProjectAssociation</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span> <span class="n">GroupProjectMixin</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<span class="n">user_group</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
+    <span class="s2">&quot;user_group&quot;</span><span class="p">,</span>
+    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;users.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;groups.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">user_role</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
+    <span class="s2">&quot;user_role&quot;</span><span class="p">,</span>
+    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;users.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;roles.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="p">)</span>
+
+
+<span class="n">flowchart_project</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
+    <span class="s2">&quot;flowchart_project&quot;</span><span class="p">,</span>
+    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;flowchart&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;flowcharts.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;project&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;projects.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">job_project</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
+    <span class="s2">&quot;job_project&quot;</span><span class="p">,</span>
+    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;job&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;jobs.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;project&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;projects.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="User">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.User">[docs]</a>
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;users&quot;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">first_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+    <span class="n">last_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">password_hash</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+    <span class="n">added</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;active&quot;</span><span class="p">)</span>
+
+    <span class="n">roles</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Role&quot;</span><span class="p">,</span> <span class="n">secondary</span><span class="o">=</span><span class="n">user_role</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;users&quot;</span><span class="p">)</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Group&quot;</span><span class="p">,</span> <span class="n">secondary</span><span class="o">=</span><span class="n">user_group</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;users&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">password</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;password is not a readable attribute&quot;</span><span class="p">)</span>
+
+    <span class="nd">@password</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password_hash</span> <span class="o">=</span> <span class="n">generate_password_hash</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
+
+<div class="viewcode-block" id="User.verify_password">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.User.verify_password">[docs]</a>
+    <span class="k">def</span> <span class="nf">verify_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">check_password_hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">password_hash</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="User.create">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.User.create">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">username</span><span class="p">,</span>
+        <span class="n">password</span><span class="p">,</span>
+        <span class="n">first_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">last_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">email</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">roles</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">],</span>
+        <span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new user to be added to the database.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        username : str</span>
+<span class="sd">            The username that identifies the user.</span>
+<span class="sd">        password : str</span>
+<span class="sd">            The secret password for the user.</span>
+<span class="sd">        first_name : str = None</span>
+<span class="sd">            The user&#39;s first (given) name.</span>
+<span class="sd">        last_name : str = None</span>
+<span class="sd">            The user&#39;s last (family) name.</span>
+<span class="sd">        email : str = None</span>
+<span class="sd">            The user&#39;s principal email address.</span>
+<span class="sd">        roles : [str] = [&quot;user&quot;]</span>
+<span class="sd">            A list of roles for the user. Defaults to just &quot;user&quot;.</span>
+<span class="sd">        groups : [str] = None</span>
+<span class="sd">            A list of groups that the user belongs to.</span>
+<span class="sd">            Defaults to the first group in the database.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check if the user already exists.</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;User </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2"> already found in the database&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create the new user and store in the database</span>
+        <span class="n">new_user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span>
+            <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
+            <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="n">first_name</span><span class="p">,</span>
+            <span class="n">last_name</span><span class="o">=</span><span class="n">last_name</span><span class="p">,</span>
+            <span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">role_name</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">:</span>
+            <span class="n">role</span> <span class="o">=</span> <span class="n">Role</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">role_name</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+            <span class="n">new_user</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">groups</span><span class="p">:</span>
+            <span class="n">new_group</span> <span class="o">=</span> <span class="n">Group</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">new_user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_group</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+                <span class="n">group</span> <span class="o">=</span> <span class="n">Group</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">group_name</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+                <span class="n">new_user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">roles</span><span class="p">:</span>
+            <span class="n">new_user</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Role</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">:</span>
+                <span class="n">role</span> <span class="o">=</span> <span class="n">Role</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">role</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+                <span class="n">new_user</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_user</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Group">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Group">[docs]</a>
+<span class="k">class</span> <span class="nc">Group</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;groups&quot;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">users</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;User&quot;</span><span class="p">,</span> <span class="n">secondary</span><span class="o">=</span><span class="n">user_group</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;groups&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Group.create">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Group.create">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">users</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a project to the database.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            The name of the project, used for display and directory name.</span>
+<span class="sd">        users : list</span>
+<span class="sd">            A list of usernames to add to the group</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Group</span>
+<span class="sd">            A Group object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check that the group doesn&#39;t already exist.</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Group &#39;</span><span class="si">{</span><span class="n">group</span><span class="si">}</span><span class="s2">&#39; already exists.&quot;</span><span class="p">)</span>
+
+        <span class="n">group</span> <span class="o">=</span> <span class="n">Group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">username</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid username </span><span class="si">{username}</span><span class="s2"> supplied.&quot;</span><span class="p">)</span>
+
+            <span class="n">group</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">group</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Role">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Role">[docs]</a>
+<span class="k">class</span> <span class="nc">Role</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;roles&quot;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">users</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;User&quot;</span><span class="p">,</span> <span class="n">secondary</span><span class="o">=</span><span class="n">user_role</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;roles&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="c1">#######################</span>
+<span class="c1">#</span>
+<span class="c1"># Base resource class</span>
+<span class="c1">#</span>
+<span class="c1">#######################</span>
+
+
+<div class="viewcode-block" id="Resource">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Resource">[docs]</a>
+<span class="k">class</span> <span class="nc">Resource</span><span class="p">(</span><span class="n">AccessControlPermissionsMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="Resource.permissions_query">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Resource.permissions_query">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">permissions_query</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">permission</span><span class="p">):</span>
+        <span class="n">self_read</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">authorized</span><span class="p">(</span><span class="n">permission</span><span class="p">))</span>
+        <span class="n">self_projects</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">projects</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">Project</span><span class="o">.</span><span class="n">authorized</span><span class="p">(</span><span class="n">permission</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">self_read</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">self_projects</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Resource.get">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Resource.get">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">permission</span><span class="o">=</span><span class="s2">&quot;read&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sort_by</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span>
+        <span class="n">order</span><span class="o">=</span><span class="s2">&quot;asc&quot;</span><span class="p">,</span>
+        <span class="n">only</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;General get method for jobs, flowcharts, projects&quot;&quot;&quot;</span>
+
+        <span class="n">perm_query</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">permissions_query</span><span class="p">(</span><span class="n">permission</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;desc&quot;</span><span class="p">:</span>
+            <span class="n">perm_query</span> <span class="o">=</span> <span class="n">perm_query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">sort_by</span><span class="p">]</span><span class="o">.</span><span class="n">desc</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">description</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Build string</span>
+            <span class="n">perm_query</span> <span class="o">=</span> <span class="n">perm_query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">description</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">perm_query</span> <span class="o">=</span> <span class="n">perm_query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">perm_query</span> <span class="o">=</span> <span class="n">perm_query</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">perm_query</span> <span class="o">=</span> <span class="n">perm_query</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">only</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="n">perm_query</span> <span class="o">=</span> <span class="n">perm_query</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">only</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">perm_query</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">perm_query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Resource.get_by_id">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Resource.get_by_id">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_by_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">permission</span><span class="o">=</span><span class="s2">&quot;read&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;General get method for retrieving by ID&quot;&quot;&quot;</span>
+        <span class="n">perm_query</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">permissions_query</span><span class="p">(</span><span class="n">permission</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">regular_query</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">perm_query</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">regular_query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NotAuthorizedError</span>
+
+        <span class="k">return</span> <span class="n">perm_query</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Flowchart">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Flowchart">[docs]</a>
+<span class="k">class</span> <span class="nc">Flowchart</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span> <span class="n">Resource</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;flowcharts&quot;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">sha256</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">75</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">sha256_strict</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">75</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">flowchart_version</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">doi</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">conceptdoi</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">creators</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">JSON</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">keywords</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">JSON</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">json</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">JSON</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">flowchart_metadata</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">JSON</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">jobs</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Job&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;flowchart&quot;</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">projects</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;Project&quot;</span><span class="p">,</span> <span class="n">secondary</span><span class="o">=</span><span class="n">flowchart_project</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;flowcharts&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="Flowchart.create">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Flowchart.create">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">flowchart_info</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">flowchart</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span>
+                <span class="n">sha256_strict</span><span class="o">=</span><span class="n">flowchart_info</span><span class="p">[</span><span class="s2">&quot;sha256_strict&quot;</span><span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">flowchart</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="n">flowchart_info</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">flowchart</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">flowchart</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Flowchart already in datastore. ID: </span><span class="si">{</span><span class="n">flowchart</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># These are basically all of the columns in a flowchart</span>
+        <span class="n">column_metadata</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;keywords&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;creators&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;doi&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;conceptdoi&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;sha256&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;sha256_strict&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;json&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;flowchart_version&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;flowchart_metadata&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="s2">&quot;path&quot;</span> <span class="ow">in</span> <span class="n">flowchart_info</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">del</span> <span class="n">flowchart_info</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span>
+
+        <span class="n">flowchart_info</span><span class="p">[</span><span class="s2">&quot;flowchart_metadata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># This will remove any keyword in the metadata that is not explicitly</span>
+        <span class="c1"># stored and save it in the</span>
+        <span class="c1"># &#39;flowchart_metadata&#39; column</span>
+        <span class="n">to_remove</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">flowchart_info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">column_metadata</span><span class="p">:</span>
+                <span class="n">flowchart_info</span><span class="p">[</span><span class="s2">&quot;flowchart_metadata&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                <span class="n">to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+        <span class="c1"># delete keys that are in flowchart metatdata column from flowchart_info</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">to_remove</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">flowchart_info</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+        <span class="n">new_flowchart</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="p">(</span><span class="o">**</span><span class="n">flowchart_info</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_flowchart</span></div>
+
+
+<div class="viewcode-block" id="Flowchart.create_from_file">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Flowchart.create_from_file">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="n">metadata</span><span class="p">,</span> <span class="n">flowchart</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">parse_flowchart_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flowchart</span>
+        <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">**</span><span class="n">metadata</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Flowchart.parse_flowchart_file">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Flowchart.parse_flowchart_file">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parse_flowchart_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function for parsing information from flowchart</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path: str</span>
+<span class="sd">            The path to the flowchart.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        metadata: dict</span>
+<span class="sd">            A json containing flowchart information to be added to the database.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">import</span> <span class="nn">re</span>
+        <span class="kn">import</span> <span class="nn">json</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">version_info</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="s2">&quot; 1.&quot;</span> <span class="ow">in</span> <span class="n">version_info</span><span class="p">:</span>
+            <span class="n">metadata_pattern</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">flowchart_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;{.+}&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot; 2.&quot;</span> <span class="ow">in</span> <span class="n">version_info</span><span class="p">:</span>
+            <span class="c1"># Flowchart is version 2.</span>
+            <span class="n">metadata_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;#metadata</span><span class="se">\n</span><span class="s2">({.+?})</span><span class="se">\n</span><span class="s2">#&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+            <span class="n">flowchart_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;#flowchart</span><span class="se">\n</span><span class="s2">({.+})</span><span class="se">\n</span><span class="s2">?#&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># TODO Maybe raise custom exception. SEAMM Flowchart version error</span>
+            <span class="c1"># Value Error for now</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+
+        <span class="c1"># Handle the metadata</span>
+        <span class="k">if</span> <span class="n">metadata_pattern</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">metadata_pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># metadata as a json, flowchart (json) as text.</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;flowchart_version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">version_info</span><span class="p">)</span>
+        <span class="n">flowchart</span> <span class="o">=</span> <span class="n">flowchart_pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">flowchart</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Job">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Job">[docs]</a>
+<span class="k">class</span> <span class="nc">Job</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span> <span class="n">Resource</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;jobs&quot;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">flowchart_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;flowcharts.id&quot;</span><span class="p">))</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">submitted</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">started</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;imported&quot;</span><span class="p">)</span>
+    <span class="n">last_update</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">DateTime</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">onupdate</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span>
+    <span class="p">)</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">JSON</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">flowchart</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Flowchart&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;jobs&quot;</span><span class="p">)</span>
+    <span class="n">projects</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Project&quot;</span><span class="p">,</span> <span class="n">secondary</span><span class="o">=</span><span class="n">job_project</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;jobs&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Job(path=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">, flowchart_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">flowchart</span><span class="si">}</span><span class="s2">, submitted=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">submitted</span><span class="si">}</span><span class="s2">)&quot;</span>  <span class="c1"># noqa: E501</span>
+
+<div class="viewcode-block" id="Job.parse_job_data">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Job.parse_job_data">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parse_job_data</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse job_data.json at path&quot;&quot;&quot;</span>
+
+        <span class="kn">import</span> <span class="nn">os</span>
+        <span class="kn">import</span> <span class="nn">json</span>
+
+        <span class="kn">from</span> <span class="nn">dateutil</span> <span class="kn">import</span> <span class="n">parser</span>
+
+        <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timezone</span>
+
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="c1"># Assumes first line is a comment</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">job_data_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">job_data_json</span><span class="p">[</span><span class="s2">&quot;working directory&quot;</span><span class="p">]</span>
+        <span class="n">job_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">directory</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span>
+                <span class="n">job_data_json</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">job_data_json</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span>
+                <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;project_names&quot;</span><span class="p">:</span> <span class="n">job_data_json</span><span class="p">[</span><span class="s2">&quot;projects&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">job_data_json</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">job_data_json</span><span class="p">[</span><span class="s2">&quot;job id&quot;</span><span class="p">],</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="s2">&quot;end time&quot;</span> <span class="ow">in</span> <span class="n">job_data_json</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">job_data</span><span class="p">[</span><span class="s2">&quot;finished&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">job_data_json</span><span class="p">[</span><span class="s2">&quot;end time&quot;</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">job_data</span><span class="p">[</span><span class="s2">&quot;finished&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
+                    <span class="n">job_data_json</span><span class="p">[</span><span class="s2">&quot;end time&quot;</span><span class="p">]</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;start time&quot;</span> <span class="ow">in</span> <span class="n">job_data_json</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">job_data</span><span class="p">[</span><span class="s2">&quot;started&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span>
+                    <span class="n">job_data_json</span><span class="p">[</span><span class="s2">&quot;start time&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">job_data</span><span class="p">[</span><span class="s2">&quot;started&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
+                    <span class="n">job_data_json</span><span class="p">[</span><span class="s2">&quot;start time&quot;</span><span class="p">]</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;submitted time&quot;</span> <span class="ow">in</span> <span class="n">job_data_json</span><span class="p">:</span>
+            <span class="n">job_data</span><span class="p">[</span><span class="s2">&quot;submitted&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span>
+                <span class="n">job_data_json</span><span class="p">[</span><span class="s2">&quot;submitted time&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;started&quot;</span> <span class="ow">in</span> <span class="n">job_data</span><span class="p">:</span>
+            <span class="n">job_data</span><span class="p">[</span><span class="s2">&quot;submitted&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">job_data</span><span class="p">[</span><span class="s2">&quot;started&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">job_data</span></div>
+
+
+<div class="viewcode-block" id="Job.create">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Job.create">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="nb">id</span><span class="p">,</span>
+        <span class="n">flowchart_filename</span><span class="p">,</span>
+        <span class="n">project_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">],</span>
+        <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">submitted</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">started</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">finished</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="s2">&quot;submitted&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new job to add to the datastore.</span>
+
+<span class="sd">        This method requires a user to be logged in and to have appropriate permissions</span>
+<span class="sd">        for the project.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        id : int</span>
+<span class="sd">            The id of the job, an integer &gt; 0.</span>
+<span class="sd">        flowchart_filename : str or pathlib.Path</span>
+<span class="sd">            The path to the file containing the flowchart.</span>
+<span class="sd">        project_names : [str]</span>
+<span class="sd">            A list of projects that the flowchart belongs to.</span>
+<span class="sd">        path : str</span>
+<span class="sd">            The directory path for the job.</span>
+<span class="sd">        title : str = &quot;&quot;</span>
+<span class="sd">            The title of the job, used for display.</span>
+<span class="sd">        description : str = &quot;&quot;</span>
+<span class="sd">            A longer, textual description of the job.</span>
+<span class="sd">        submitted : datetime.datetime = now()</span>
+<span class="sd">            When the job was submitted as a datetime object. Defaults to now in UTC.</span>
+<span class="sd">        started : datetime.datetime = None</span>
+<span class="sd">            When the job was started, if it was. Preferably in UTC.</span>
+<span class="sd">        finished : datetime.datetime = None</span>
+<span class="sd">            When the job finished, if it has. Preferably in UTC.</span>
+<span class="sd">        parameters : dict</span>
+<span class="sd">            The command-line parameters for the job.</span>
+<span class="sd">        status : str = &quot;submitted&quot;</span>
+<span class="sd">            The status of the job: &quot;submitted&quot;, &quot;running&quot;, &quot;finished&quot;, &quot;error&quot;, etc.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        json or Job</span>
+<span class="sd">            The json of the job data, or the Job object, depending on &quot;as_json&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check if this job already exists</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Job</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">job</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Job with ID </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> already found in the database&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">submitted</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">submitted</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+        <span class="c1"># Get the ids for the projects</span>
+        <span class="n">projects</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Project</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">project_names</span>
+        <span class="p">]</span>
+        <span class="n">projects</span> <span class="o">=</span> <span class="p">[</span><span class="n">project</span> <span class="k">for</span> <span class="n">project</span> <span class="ow">in</span> <span class="n">projects</span> <span class="k">if</span> <span class="n">project</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">projects</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="s2">&quot;&#39;, &#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_names</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span>
+                <span class="s2">&quot;Projects listed for this job not found in database.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Please check your project names: &#39;</span><span class="si">{</span><span class="n">tmp</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check the permissions of the projects to see if we can add a job to them</span>
+        <span class="n">allowed_projects</span> <span class="o">=</span> <span class="n">Project</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Project</span><span class="o">.</span><span class="n">authorized</span><span class="p">(</span><span class="s2">&quot;update&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">project</span> <span class="ow">in</span> <span class="n">projects</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">project</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_projects</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;You are not authorized to add jobs to </span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2"> project.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Handle the flowchart - we&#39;ll only want to add it if we&#39;re adding the job.</span>
+        <span class="n">flowchart_info</span><span class="p">,</span> <span class="n">fl</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">parse_flowchart_file</span><span class="p">(</span><span class="n">flowchart_filename</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">flowchart</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span>
+                <span class="n">sha256_strict</span><span class="o">=</span><span class="n">flowchart_info</span><span class="p">[</span><span class="s2">&quot;sha256_strict&quot;</span><span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">flowchart</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="n">flowchart_info</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">flowchart</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">flowchart</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">flowchart</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">create_from_file</span><span class="p">(</span><span class="n">flowchart_filename</span><span class="p">)</span>
+            <span class="n">flowchart</span><span class="o">.</span><span class="n">projects</span> <span class="o">=</span> <span class="n">projects</span>
+
+        <span class="k">if</span> <span class="n">parameters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Now add the job and update the database</span>
+        <span class="n">new_job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+            <span class="n">flowchart</span><span class="o">=</span><span class="n">flowchart</span><span class="p">,</span>
+            <span class="n">projects</span><span class="o">=</span><span class="n">projects</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
+            <span class="n">submitted</span><span class="o">=</span><span class="n">submitted</span><span class="p">,</span>
+            <span class="n">started</span><span class="o">=</span><span class="n">started</span><span class="p">,</span>
+            <span class="n">finished</span><span class="o">=</span><span class="n">finished</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_job</span></div>
+
+
+<div class="viewcode-block" id="Job.update">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Job.update">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="nb">id</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">submitted</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">started</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">finished</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">project_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update method for existing jobs&quot;&quot;&quot;</span>
+
+        <span class="n">possible_updates</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;path&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;submitted&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;started&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;finished&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;projects&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="n">job</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">permissions_query</span><span class="p">(</span><span class="s2">&quot;update&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Job</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">job</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Cannot update job with id </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">. User does not have permissions, or job does not exist in the database.&quot;</span>  <span class="c1"># noqa: E501</span>
+            <span class="p">)</span>
+
+        <span class="n">projects</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Check that the user has permissions for the specified projects</span>
+        <span class="k">if</span> <span class="n">project_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">projects</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">Project</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">project_names</span>
+            <span class="p">]</span>
+            <span class="n">projects</span> <span class="o">=</span> <span class="p">[</span><span class="n">project</span> <span class="k">for</span> <span class="n">project</span> <span class="ow">in</span> <span class="n">projects</span> <span class="k">if</span> <span class="n">project</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">projects</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="s2">&quot;&#39;, &#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_names</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span>
+                    <span class="s2">&quot;Projects listed for this job not found in database.&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Please check your project names: &#39;</span><span class="si">{</span><span class="n">tmp</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Check the permissions of the projects to see if we can add a job to them</span>
+            <span class="n">allowed_projects</span> <span class="o">=</span> <span class="n">Project</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Project</span><span class="o">.</span><span class="n">authorized</span><span class="p">(</span><span class="s2">&quot;update&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">project</span> <span class="ow">in</span> <span class="n">projects</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">project</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_projects</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;You are not authorized to add jobs to </span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2"> project.&quot;</span>
+                    <span class="p">)</span>
+        <span class="n">local</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
+        <span class="n">update_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">local</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">possible_updates</span> <span class="k">if</span> <span class="n">local</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">update_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">&quot;submitted&quot;</span> <span class="ow">or</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">&quot;finished&quot;</span> <span class="ow">or</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">&quot;started&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+                    <span class="n">update_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">v</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">update_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">Job</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Job</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">update_dict</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">job</span></div>
+
+
+<div class="viewcode-block" id="Job.create_from_file">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Job.create_from_file">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">job_data_file</span><span class="p">):</span>
+        <span class="n">job_data</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">parse_job_data</span><span class="p">(</span><span class="n">job_data_file</span><span class="p">)</span>
+
+        <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">job_data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">job</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Project">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Project">[docs]</a>
+<span class="k">class</span> <span class="nc">Project</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span> <span class="n">Resource</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;projects&quot;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">1000</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">flowcharts</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;Flowchart&quot;</span><span class="p">,</span> <span class="n">secondary</span><span class="o">=</span><span class="n">flowchart_project</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;projects&quot;</span>
+    <span class="p">)</span>
+    <span class="n">jobs</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Job&quot;</span><span class="p">,</span> <span class="n">secondary</span><span class="o">=</span><span class="n">job_project</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;projects&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Project(name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, path=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">, description=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">)&quot;</span>  <span class="c1"># noqa: E501</span>
+
+<div class="viewcode-block" id="Project.permissions_query">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Project.permissions_query">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">permissions_query</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">permission</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Project</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Project</span><span class="o">.</span><span class="n">authorized</span><span class="p">(</span><span class="n">permission</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Project.create">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Project.create">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a project to add to the database.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            The name of the project, used for display and directory name.</span>
+<span class="sd">        description : str</span>
+<span class="sd">            A textual description of the project.</span>
+<span class="sd">        path : str = None</span>
+<span class="sd">            The path on disk to the project files.</span>
+<span class="sd">        group : str or Group = None</span>
+<span class="sd">            The group for the project. Defaults to user&#39;s primary group.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Project</span>
+<span class="sd">            A Project object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">flask_authorize.plugin</span> <span class="kn">import</span> <span class="n">CURRENT_USER</span>
+
+        <span class="c1"># Check that the project doesn&#39;t already exist.</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Project with name </span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2"> already found in the database&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Sort out the user and get as a User object.</span>
+
+        <span class="k">if</span> <span class="n">CURRENT_USER</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;No user found. Log into your account to create a project.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">owner</span> <span class="o">=</span> <span class="n">CURRENT_USER</span><span class="p">()</span>
+
+        <span class="c1"># Get the group as a Group object. The default is the user&#39;s first group.</span>
+        <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">owner</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">Group</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">group</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+
+        <span class="c1"># Create the project</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="n">Project</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">owner</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">project</span></div>
+
+
+<div class="viewcode-block" id="Project.update">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Project.update">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="nb">id</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update method for existing jobs&quot;&quot;&quot;</span>
+
+        <span class="n">possible_updates</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;path&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="n">project</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">permissions_query</span><span class="p">(</span><span class="s2">&quot;update&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Project</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Cannot update job with id </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">. User does not have permissions, or job does not exist in the database.&quot;</span>  <span class="c1"># noqa: E501</span>
+            <span class="p">)</span>
+
+        <span class="n">local</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
+        <span class="n">update_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">local</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">possible_updates</span> <span class="k">if</span> <span class="n">local</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="n">Project</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+
+        <span class="n">Project</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Project</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">update_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">project</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jessica A. Nash (The Molecular Sciences Software Institute). Project structure based on the Computational Molecular Science Python Cookiecutter version 1.5.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

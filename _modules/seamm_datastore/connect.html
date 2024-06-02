@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seamm_datastore.connect &mdash; seamm_datastore  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            seamm_datastore
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">seamm_datastore</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">seamm_datastore.connect</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for seamm_datastore.connect</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Class and functions for connection to database.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">scoped_session</span><span class="p">,</span> <span class="n">sessionmaker</span>
+
+<span class="kn">from</span> <span class="nn">flask_authorize</span> <span class="kn">import</span> <span class="n">Authorize</span>
+
+<span class="kn">import</span> <span class="nn">seamm_datastore.database.build</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">LoginRequiredError</span>
+
+
+<div class="viewcode-block" id="manage_session">
+<a class="viewcode-back" href="../../api/seamm_datastore.html#seamm_datastore.connect.manage_session">[docs]</a>
+<span class="k">def</span> <span class="nf">manage_session</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator for closing sqlalchemy sessions when attached to SEAMMDatastore</span>
+<span class="sd">    class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_wrap_method</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">_manage_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">session_scope</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Session</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret</span>
+
+        <span class="k">return</span> <span class="n">_manage_session</span>
+
+    <span class="k">return</span> <span class="n">_wrap_method</span></div>
+
+
+
+<div class="viewcode-block" id="session_scope">
+<a class="viewcode-back" href="../../api/seamm_datastore.html#seamm_datastore.connect.session_scope">[docs]</a>
+<span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">session_scope</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provide a transactional scope around a series of operations.&quot;&quot;&quot;</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">session</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">session</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="k">raise</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="login_required">
+<a class="viewcode-back" href="../../api/seamm_datastore.html#seamm_datastore.connect.login_required">[docs]</a>
+<span class="k">def</span> <span class="nf">login_required</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator for actions requiring current user&quot;&quot;&quot;</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_check_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_user</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">LoginRequiredError</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">current_user</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_user</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="k">return</span> <span class="n">_check_user</span></div>
+
+
+
+<div class="viewcode-block" id="current_app">
+<a class="viewcode-back" href="../../api/seamm_datastore.html#seamm_datastore.connect.current_app">[docs]</a>
+<span class="k">class</span> <span class="nc">current_app</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fake current_app&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extensions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sqlalchemy&quot;</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="SEAMMDatastore">
+<a class="viewcode-back" href="../../api/seamm_datastore.html#seamm_datastore.connect.SEAMMDatastore">[docs]</a>
+<span class="k">class</span> <span class="nc">SEAMMDatastore</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">database_uri</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sqlite:///:memory:&quot;</span><span class="p">,</span>
+        <span class="n">initialize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">permissions</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">datastore_location</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">default_project</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">database_uri</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;sqlite:///:memory:&quot;</span><span class="p">:</span>
+            <span class="n">initialize</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Default permissions</span>
+        <span class="k">if</span> <span class="n">permissions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">permissions</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;owner&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">,</span> <span class="s2">&quot;update&quot;</span><span class="p">,</span> <span class="s2">&quot;delete&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">,</span> <span class="s2">&quot;update&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;world&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="p">}</span>
+
+        <span class="k">global</span> <span class="n">fake_app</span>
+        <span class="n">fake_app</span> <span class="o">=</span> <span class="n">current_app</span><span class="p">(</span>
+            <span class="n">config</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;AUTHORIZE_DEFAULT_PERMISSIONS&quot;</span><span class="p">:</span> <span class="n">permissions</span><span class="p">,</span>
+                <span class="s2">&quot;AUTHORIZE_MODEL_PARSER&quot;</span><span class="p">:</span> <span class="s2">&quot;table&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;AUTHORIZE_IGNORE_PROPERTY&quot;</span><span class="p">:</span> <span class="s2">&quot;__check_access__&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Set datastore location</span>
+        <span class="k">if</span> <span class="n">datastore_location</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">datastore_location</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">datastore_location</span> <span class="o">=</span> <span class="n">datastore_location</span>
+
+        <span class="c1"># Create engine and session</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">database_uri</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Session</span> <span class="o">=</span> <span class="n">scoped_session</span><span class="p">(</span>
+            <span class="n">sessionmaker</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">autoflush</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">bind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">seamm_datastore.database.models</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="n">Base</span><span class="p">,</span>
+            <span class="n">Project</span><span class="p">,</span>
+            <span class="n">User</span><span class="p">,</span>
+            <span class="n">Job</span><span class="p">,</span>
+            <span class="n">Group</span><span class="p">,</span>
+            <span class="n">Role</span><span class="p">,</span>
+            <span class="n">Flowchart</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">initialize</span><span class="p">:</span>
+            <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">drop_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+        <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+        <span class="n">Base</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">query_property</span><span class="p">()</span>
+
+        <span class="c1"># Set up the database.</span>
+        <span class="k">if</span> <span class="n">initialize</span><span class="p">:</span>
+            <span class="n">seamm_datastore</span><span class="o">.</span><span class="n">database</span><span class="o">.</span><span class="n">build</span><span class="o">.</span><span class="n">_build_initial</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Session</span><span class="p">(),</span> <span class="n">default_project</span>
+            <span class="p">)</span>
+
+            <span class="n">group</span> <span class="o">=</span> <span class="n">Group</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+            <span class="n">admin_role</span> <span class="o">=</span> <span class="n">Role</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+
+            <span class="c1"># Log in the admin user and create specified user</span>
+            <span class="k">if</span> <span class="n">username</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span> <span class="s2">&quot;admin&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_user</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">roles</span><span class="o">=</span><span class="p">[</span><span class="n">admin_role</span><span class="p">],</span> <span class="n">groups</span><span class="o">=</span><span class="p">[</span><span class="n">group</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">username</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_user</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Current user has to be bound before we can add anything else to be database.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">authorize</span> <span class="o">=</span> <span class="n">Authorize</span><span class="p">(</span><span class="n">current_user</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_user</span><span class="p">)</span>
+
+        <span class="c1"># Now handle the project</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="n">Project</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">default_project</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">project</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid project name given for default.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_project</span> <span class="o">=</span> <span class="n">default_project</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">User</span> <span class="o">=</span> <span class="n">User</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Group</span> <span class="o">=</span> <span class="n">Group</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Role</span> <span class="o">=</span> <span class="n">Role</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Project</span> <span class="o">=</span> <span class="n">Project</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Job</span> <span class="o">=</span> <span class="n">Job</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Flowchart</span> <span class="o">=</span> <span class="n">Flowchart</span>
+
+<div class="viewcode-block" id="SEAMMDatastore.login">
+<a class="viewcode-back" href="../../api/seamm_datastore.html#seamm_datastore.connect.SEAMMDatastore.login">[docs]</a>
+    <span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">seamm_datastore.database.models</span> <span class="kn">import</span> <span class="n">User</span>
+
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">verify_password</span><span class="p">(</span><span class="n">password</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Login unsuccessful. Check username and password.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user</span> <span class="o">=</span> <span class="n">username</span></div>
+
+
+<div class="viewcode-block" id="SEAMMDatastore.logout">
+<a class="viewcode-back" href="../../api/seamm_datastore.html#seamm_datastore.connect.SEAMMDatastore.logout">[docs]</a>
+    <span class="k">def</span> <span class="nf">logout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="c1"># Seems like a good place for @property, but can&#39;t use because flask authorize</span>
+    <span class="c1"># requires this to be callable.</span>
+<div class="viewcode-block" id="SEAMMDatastore.current_user">
+<a class="viewcode-back" href="../../api/seamm_datastore.html#seamm_datastore.connect.SEAMMDatastore.current_user">[docs]</a>
+    <span class="k">def</span> <span class="nf">current_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">seamm_datastore.database.models</span> <span class="kn">import</span> <span class="n">User</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user</span><span class="p">:</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_user</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">user</span></div>
+
+
+<div class="viewcode-block" id="SEAMMDatastore.import_datastore">
+<a class="viewcode-back" href="../../api/seamm_datastore.html#seamm_datastore.connect.SEAMMDatastore.import_datastore">[docs]</a>
+    <span class="nd">@manage_session</span><span class="p">(</span><span class="n">seamm_datastore</span><span class="o">.</span><span class="n">database</span><span class="o">.</span><span class="n">build</span><span class="o">.</span><span class="n">import_datastore</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">import_datastore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="SEAMMDatastore.add_job">
+<a class="viewcode-back" href="../../api/seamm_datastore.html#seamm_datastore.connect.SEAMMDatastore.add_job">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_job</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="nb">id</span><span class="p">,</span>
+        <span class="n">flowchart_filename</span><span class="p">,</span>
+        <span class="n">project_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">],</span>
+        <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">submitted</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">started</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">finished</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="s2">&quot;submitted&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Deprecation warning: This method will no longer be available&quot;</span><span class="p">,</span>
+            <span class="s2">&quot; in the next version of the seamm datastore.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot; Job.create should be used instead.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parameters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cmdline&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+        <span class="k">with</span> <span class="n">session_scope</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Session</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Job</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="nb">id</span><span class="p">,</span>
+                <span class="n">flowchart_filename</span><span class="p">,</span>
+                <span class="n">project_names</span><span class="p">,</span>
+                <span class="n">path</span><span class="p">,</span>
+                <span class="n">title</span><span class="p">,</span>
+                <span class="n">description</span><span class="p">,</span>
+                <span class="n">submitted</span><span class="p">,</span>
+                <span class="n">started</span><span class="p">,</span>
+                <span class="n">finished</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="p">,</span>
+                <span class="n">status</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">job</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SEAMMDatastore.finish_job">
+<a class="viewcode-back" href="../../api/seamm_datastore.html#seamm_datastore.connect.SEAMMDatastore.finish_job">[docs]</a>
+    <span class="k">def</span> <span class="nf">finish_job</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">job_id</span><span class="p">,</span>
+        <span class="n">finish_time</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="s2">&quot;finished&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the status and time that the job finished.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        job_id : int</span>
+<span class="sd">            The ID of the job, eg. 209</span>
+<span class="sd">        finish_time : datetime.datetime</span>
+<span class="sd">            The UTC time when the job finished.</span>
+<span class="sd">        status : str</span>
+<span class="sd">            The status, such as &quot;error&quot; or the default, &quot;finished&quot;</span>
+<span class="sd">        as_json : bool = False</span>
+<span class="sd">            Ignored</span>
+<span class="sd">        current_user : str or User = None</span>
+<span class="sd">            Ignored</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the finish time was successfully set, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Deprecation warning: This method will no longer be available </span><span class="se">\</span>
+<span class="s2">            in the next version of the seamm datastore. </span><span class="se">\</span>
+<span class="s2">            Job.update should be used instead.&quot;</span>
+        <span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">seamm_datastore.database.models</span> <span class="kn">import</span> <span class="n">Job</span>
+
+        <span class="k">with</span> <span class="n">session_scope</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Session</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">permission</span><span class="o">=</span><span class="s2">&quot;update&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">job</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">job</span><span class="o">.</span><span class="n">finished</span> <span class="o">=</span> <span class="n">finish_time</span>
+                <span class="n">job</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+                <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jessica A. Nash (The Molecular Sciences Software Institute). Project structure based on the Computational Molecular Science Python Cookiecutter version 1.5.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

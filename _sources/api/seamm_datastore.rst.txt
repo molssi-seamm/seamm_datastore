@@ -1,0 +1,46 @@
+seamm\_datastore package
+========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   seamm_datastore.database
+   seamm_datastore.tests
+
+Submodules
+----------
+
+seamm\_datastore.connect module
+-------------------------------
+
+.. automodule:: seamm_datastore.connect
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+seamm\_datastore.flask\_authorize\_patch module
+-----------------------------------------------
+
+.. automodule:: seamm_datastore.flask_authorize_patch
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+seamm\_datastore.util module
+----------------------------
+
+.. automodule:: seamm_datastore.util
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: seamm_datastore
+   :members:
+   :undoc-members:
+   :show-inheritance:
