@@ -11,4 +11,4 @@ jobs:
     uses: molssi-seamm/devops/.github/workflows/BranchCI.yaml@main
     with:
       src : seamm_datastore
-
+      test_dir: seamm_datastore/tests
