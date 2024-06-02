@@ -23,5 +23,13 @@ dependencies:
   # For development
   - black
   - flake8
-  - twine
+
+  # Documentation
+  - pydata-sphinx-theme
+  - sphinx-design
+
+  # Pip-only installs
+  - pip:
+    # Documentation
+    - sphinx-copybutton
 
