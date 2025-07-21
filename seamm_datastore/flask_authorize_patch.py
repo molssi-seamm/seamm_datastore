@@ -6,7 +6,6 @@ context.
 """
 
 import types
-import six
 
 from sqlalchemy import Column, ForeignKey, Integer, or_
 from sqlalchemy.orm import relationship, backref
