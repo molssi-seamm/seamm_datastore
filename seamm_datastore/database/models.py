@@ -40,9 +40,11 @@ try:
 except AssertionError:
     Base = declarative_base()
 
+
 def utc_now():
     """Return the current UTC datetime."""
     return datetime.now(timezone.utc)
+
 
 #############################
 #
@@ -456,9 +458,7 @@ class Job(Base, Resource):
     started = Column(DateTime, nullable=True)
     finished = Column(DateTime, nullable=True)
     status = Column(String, nullable=False, default="imported")
-    last_update = Column(
-        DateTime, nullable=False, default=utc_now, onupdate=utc_now
-    )
+    last_update = Column(DateTime, nullable=False, default=utc_now, onupdate=utc_now)
     parameters = Column(JSON, nullable=True)
 
     flowchart = relationship("Flowchart", back_populates="jobs")
