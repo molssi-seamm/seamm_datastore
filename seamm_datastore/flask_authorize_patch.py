@@ -6,7 +6,6 @@ context.
 """
 
 import types
-import six
 
 from sqlalchemy import Column, ForeignKey, Integer, or_
 from sqlalchemy.orm import relationship, backref
@@ -159,11 +158,11 @@ def allowed(self, *args, **kwargs):  # pragma: no cover
     if user is None:
         if not current_app.config["AUTHORIZE_ALLOW_ANONYMOUS_ACTIONS"]:
             return False
-
-    # check if the user is an admin
-    # return True if admin - they're allowed to do anything!
-    if "admin" in [x.name for x in user.roles]:
-        return True
+    else:
+        # check if the user is an admin
+        # return True if admin - they're allowed to do anything!
+        if "admin" in [x.name for x in user.roles]:
+            return True
 
     # authorize if user has relevant role
     if len(self.has_role):
@@ -195,7 +194,7 @@ def allowed(self, *args, **kwargs):  # pragma: no cover
     # must have authorization to proceed.
     operation = set(self.permission)
     for arg in args:
-        if not isinstance(arg.__class__, six.class_types):
+        if not isinstance(arg.__class__, type):
             continue
 
         # check role restrictions/allowances
