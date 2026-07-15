@@ -3,12 +3,14 @@ Class and functions for connection to database.
 """
 
 import os
+import time
 
 from functools import wraps
 from contextlib import contextmanager
 from warnings import warn
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 from flask_authorize import Authorize
@@ -24,7 +26,9 @@ def manage_session(function):
 
     def _wrap_method(method):
         def _manage_session(self, *args, **kwargs):
-            with session_scope(self.Session) as session:
+            with session_scope(
+                self.Session, timeout=getattr(self, "timeout", 20.0)
+            ) as session:
                 ret = function(session, as_json=True, *args, **kwargs)
             return ret
 
@@ -34,17 +38,55 @@ def manage_session(function):
 
 
 @contextmanager
-def session_scope(session):
-    """Provide a transactional scope around a series of operations."""
+def session_scope(session, timeout=20.0):
+    """Provide a transactional scope around a series of operations.
+
+    Parameters
+    ----------
+    session : callable
+        A session factory (e.g. a ``scoped_session``) returning a new session.
+    timeout : float
+        Seconds to keep retrying the commit while the (SQLite) database is
+        locked by another process. Together with the connection-level
+        ``PRAGMA busy_timeout`` this lets many jobs register in the datastore
+        at the same time -- e.g. a batch of SLURM jobs starting together --
+        without failing with "database is locked". Default: 20 s.
+    """
     session = session()
     try:
         yield session
-        session.commit()
+        _commit_with_retry(session, timeout)
     except Exception:
         session.rollback()
         raise
     finally:
         session.close()
+
+
+def _commit_with_retry(session, timeout):
+    """Commit, retrying while the database is locked, up to ``timeout`` seconds.
+
+    On SQLite a COMMIT that fails with ``SQLITE_BUSY`` leaves the transaction
+    open, so the pending work is retried by simply calling ``commit`` again --
+    we deliberately do *not* roll back between attempts. This backs up the
+    connection's ``PRAGMA busy_timeout`` for the case (e.g. a shared network
+    filesystem) where the busy handler is not honoured and BUSY is returned
+    immediately.
+    """
+    deadline = time.monotonic() + max(0.0, timeout)
+    delay = 0.1
+    while True:
+        try:
+            session.commit()
+            return
+        except OperationalError as e:
+            if "database is locked" not in str(e).lower():
+                raise
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise
+            time.sleep(min(delay, remaining))
+            delay = min(delay * 2, 2.0)
 
 
 def login_required(method):
@@ -80,6 +122,7 @@ class SEAMMDatastore:
         password: str = None,
         datastore_location: str = None,
         default_project: str = "default",
+        timeout: float = 20.0,
     ):
         if database_uri.lower() == "sqlite:///:memory:":
             initialize = True
@@ -108,7 +151,21 @@ class SEAMMDatastore:
             self.datastore_location = datastore_location
 
         # Create engine and session
+        self.timeout = timeout
         self.engine = create_engine(database_uri)
+
+        # For a file-based SQLite database, wait (rather than failing
+        # immediately) when another process holds the write lock. This lets
+        # many jobs register in the datastore at the same time, e.g. when a
+        # batch of SLURM jobs start together.
+        if "sqlite" in database_uri.lower() and ":memory:" not in database_uri.lower():
+            busy_ms = int(max(0.0, timeout) * 1000)
+
+            @event.listens_for(self.engine, "connect")
+            def _set_sqlite_busy_timeout(dbapi_connection, connection_record):
+                cursor = dbapi_connection.cursor()
+                cursor.execute(f"PRAGMA busy_timeout={busy_ms}")
+                cursor.close()
 
         self.Session = scoped_session(
             sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
@@ -217,7 +274,9 @@ class SEAMMDatastore:
         if parameters is None:
             parameters = {"cmdline": []}
 
-        with session_scope(self.Session) as session:
+        with session_scope(
+            self.Session, timeout=getattr(self, "timeout", 20.0)
+        ) as session:
             job = self.Job.create(
                 id,
                 flowchart_filename,
@@ -260,15 +319,15 @@ class SEAMMDatastore:
         bool
             True if the finish time was successfully set, False otherwise.
         """
-        warn(
-            "Deprecation warning: This method will no longer be available \
+        warn("Deprecation warning: This method will no longer be available \
             in the next version of the seamm datastore. \
-            Job.update should be used instead."
-        )
+            Job.update should be used instead.")
 
         from seamm_datastore.database.models import Job
 
-        with session_scope(self.Session) as session:
+        with session_scope(
+            self.Session, timeout=getattr(self, "timeout", 20.0)
+        ) as session:
             job = Job.get_by_id(job_id, permission="update")
 
             if job is None:
