@@ -1,22 +1,20 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>seamm_datastore.tests.test_seamm_datastore &mdash; seamm_datastore  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -79,7 +77,7 @@
 
 <div class="viewcode-block" id="test_connected">
 <a class="viewcode-back" href="../../../seamm_datastore.tests.html#seamm_datastore.tests.test_seamm_datastore.test_connected">[docs]</a>
-<span class="k">def</span> <span class="nf">test_connected</span><span class="p">(</span><span class="n">admin_connection</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_connected</span><span class="p">(</span><span class="n">admin_connection</span><span class="p">):</span>
     <span class="k">assert</span> <span class="n">admin_connection</span><span class="o">.</span><span class="n">current_user</span><span class="p">()</span><span class="o">.</span><span class="n">username</span> <span class="o">==</span> <span class="s2">&quot;admin&quot;</span>
     <span class="k">assert</span> <span class="n">admin_connection</span><span class="o">.</span><span class="n">default_project</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span></div>
 
@@ -87,7 +85,7 @@
 
 <div class="viewcode-block" id="test_connection_logout">
 <a class="viewcode-back" href="../../../seamm_datastore.tests.html#seamm_datastore.tests.test_seamm_datastore.test_connection_logout">[docs]</a>
-<span class="k">def</span> <span class="nf">test_connection_logout</span><span class="p">(</span><span class="n">connection</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_connection_logout</span><span class="p">(</span><span class="n">connection</span><span class="p">):</span>
     <span class="n">connection</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
     <span class="k">assert</span> <span class="n">connection</span><span class="o">.</span><span class="n">current_user</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span></div>
 

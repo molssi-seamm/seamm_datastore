@@ -18,29 +18,29 @@ seamm\_datastore.connect module
 
 .. automodule:: seamm_datastore.connect
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 seamm\_datastore.flask\_authorize\_patch module
 -----------------------------------------------
 
 .. automodule:: seamm_datastore.flask_authorize_patch
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 seamm\_datastore.util module
 ----------------------------
 
 .. automodule:: seamm_datastore.util
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Module contents
 ---------------
 
 .. automodule:: seamm_datastore
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
