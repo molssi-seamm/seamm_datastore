@@ -2,7 +2,7 @@
 Table models for SEAMM datastore SQLAlchemy database.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from sqlalchemy import (
@@ -16,9 +16,7 @@ from sqlalchemy import (
     JSON,
     Float,
 )
-from sqlalchemy.orm import relationship
-
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, declarative_base
 
 # Patched flask authorize
 from seamm_datastore.flask_authorize_patch import (
@@ -38,8 +36,15 @@ try:
     from seamm_dashboard import db
 
     Base = db.Model
+
 except AssertionError:
     Base = declarative_base()
+
+
+def utc_now():
+    """Return the current UTC datetime."""
+    return datetime.now(timezone.utc)
+
 
 #############################
 #
@@ -99,7 +104,7 @@ class User(Base):
     last_name = Column(String)
     email = Column(String, unique=True)
     password_hash = Column(String)
-    added = Column(DateTime, nullable=False, default=datetime.utcnow)
+    added = Column(DateTime, nullable=False, default=utc_now)
     status = Column(String, default="active")
 
     roles = relationship("Role", secondary=user_role, back_populates="users")
@@ -449,13 +454,11 @@ class Job(Base, Resource):
     title = Column(String, nullable=True)
     description = Column(Text, nullable=True)
     path = Column(String, unique=True)
-    submitted = Column(DateTime, nullable=False, default=datetime.utcnow)
+    submitted = Column(DateTime, nullable=False, default=utc_now)
     started = Column(DateTime, nullable=True)
     finished = Column(DateTime, nullable=True)
     status = Column(String, nullable=False, default="imported")
-    last_update = Column(
-        DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    last_update = Column(DateTime, nullable=False, default=utc_now, onupdate=utc_now)
     parameters = Column(JSON, nullable=True)
 
     flowchart = relationship("Flowchart", back_populates="jobs")
@@ -582,7 +585,7 @@ class Job(Base, Resource):
             raise ValueError(f"Job with ID {id} already found in the database")
 
         if submitted is None:
-            submitted = datetime.utcnow()
+            submitted = utc_now()
 
         # Get the ids for the projects
         projects = [
