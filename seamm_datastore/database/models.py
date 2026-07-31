@@ -16,6 +16,7 @@ from sqlalchemy import (
     JSON,
     Float,
 )
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import relationship, declarative_base
 
 # Patched flask authorize
@@ -316,7 +317,10 @@ class Flowchart(Base, Resource):
 
     id = Column(Integer, nullable=False, primary_key=True)
     sha256 = Column(String(75), nullable=True)
-    sha256_strict = Column(String(75), nullable=True)
+    # Unique (NULLs excepted) so that concurrent submission of jobs sharing
+    # the same flowchart cannot race past the application-level check in
+    # `get_or_create_from_file` and insert duplicate rows for the same hash.
+    sha256_strict = Column(String(75), nullable=True, unique=True)
     flowchart_version = Column(Float, nullable=True, unique=False)
     doi = Column(Text, nullable=True)
     conceptdoi = Column(Text, nullable=True)
@@ -335,14 +339,22 @@ class Flowchart(Base, Resource):
     @classmethod
     def create(cls, **flowchart_info):
         try:
-            flowchart = cls.query.filter_by(
-                sha256_strict=flowchart_info["sha256_strict"]
-            ).one_or_none()
+            # `.first()` (ordered by id) rather than `.one_or_none()`: if a
+            # datastore already has duplicate rows for this hash (from before
+            # this race was fixed, or a not-yet-migrated database), degrade to
+            # the oldest match instead of raising MultipleResultsFound.
+            flowchart = (
+                cls.query.filter_by(sha256_strict=flowchart_info["sha256_strict"])
+                .order_by(cls.id)
+                .first()
+            )
         except KeyError:
             try:
-                flowchart = Flowchart.query.filter_by(
-                    id=flowchart_info["id"]
-                ).one_or_none()
+                flowchart = (
+                    Flowchart.query.filter_by(id=flowchart_info["id"])
+                    .order_by(cls.id)
+                    .first()
+                )
             except KeyError:
                 flowchart = None
 
@@ -396,6 +408,72 @@ class Flowchart(Base, Resource):
             del metadata["name"]
 
         return cls.create(**metadata)
+
+    @classmethod
+    def get_or_create_from_file(cls, path, projects=None):
+        """Find the Flowchart matching the file's hash, or create it.
+
+        This is the race-tolerant get-or-create used by ``Job.create``. When
+        several jobs that share the same flowchart are submitted at nearly
+        the same time (e.g. a job array), each one may see "no flowchart with
+        this hash yet" before any of the others have committed theirs. Rather
+        than let that race insert duplicate rows -- which then makes every
+        later lookup by hash raise ``MultipleResultsFound`` -- the insert
+        is attempted in a SAVEPOINT (``session.begin_nested``) and a UNIQUE
+        constraint violation on ``sha256_strict`` (see the column definition)
+        is caught: we fall back to the row the other, faster job created
+        instead of failing.
+
+        Parameters
+        ----------
+        path : str or pathlib.Path
+            The path to the flowchart file.
+        projects : [Project] = None
+            Projects to associate with the flowchart, only used if it is
+            newly created.
+
+        Returns
+        -------
+        Flowchart
+            The existing or newly created flowchart.
+        """
+        metadata, _ = cls.parse_flowchart_file(path)
+        sha256_strict = metadata.get("sha256_strict")
+
+        def _find():
+            if sha256_strict is None:
+                return None
+            return (
+                cls.query.filter_by(sha256_strict=sha256_strict)
+                .order_by(cls.id)
+                .first()
+            )
+
+        flowchart = _find()
+        if flowchart is not None:
+            return flowchart
+
+        session = cls.query.session
+        try:
+            with session.begin_nested():
+                # `create_from_file` (via `create`) re-does the same lookup
+                # and raises ValueError if it now finds a match -- which can
+                # happen here if another job's insert committed in the
+                # window between our `_find()` above and this one. Treated
+                # the same as an IntegrityError: someone else won the race.
+                flowchart = cls.create_from_file(path)
+                if projects:
+                    flowchart.projects = projects
+                session.add(flowchart)
+                session.flush()
+        except (IntegrityError, ValueError) as exc:
+            flowchart = _find()
+            if flowchart is None:
+                # Not a duplicate hash after all -- some other constraint
+                # failed, so the original error is the useful one.
+                raise exc
+
+        return flowchart
 
     @staticmethod
     def parse_flowchart_file(path):
@@ -609,23 +687,11 @@ class Job(Base, Resource):
                 )
 
         # Handle the flowchart - we'll only want to add it if we're adding the job.
-        flowchart_info, fl = Flowchart.parse_flowchart_file(flowchart_filename)
-
-        try:
-            flowchart = Flowchart.query.filter_by(
-                sha256_strict=flowchart_info["sha256_strict"]
-            ).one_or_none()
-        except KeyError:
-            try:
-                flowchart = Flowchart.query.filter_by(
-                    id=flowchart_info["id"]
-                ).one_or_none()
-            except KeyError:
-                flowchart = None
-
-        if flowchart is None:
-            flowchart = Flowchart.create_from_file(flowchart_filename)
-            flowchart.projects = projects
+        # `get_or_create_from_file` is race-tolerant: it's safe when several jobs
+        # sharing this same flowchart are submitted concurrently (e.g. a job array).
+        flowchart = Flowchart.get_or_create_from_file(
+            flowchart_filename, projects=projects
+        )
 
         if parameters is None:
             parameters = {}
