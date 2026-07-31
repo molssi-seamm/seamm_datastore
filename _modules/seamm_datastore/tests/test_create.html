@@ -13,8 +13,8 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -164,6 +164,175 @@
 
     <span class="k">assert</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span> <span class="o">==</span> <span class="s2">&quot;test&quot;</span>
     <span class="k">assert</span> <span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span></div>
+
+
+
+<div class="viewcode-block" id="test_flowchart_duplicate_hash_raises">
+<a class="viewcode-back" href="../../../api/seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_flowchart_duplicate_hash_raises">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_flowchart_duplicate_hash_raises</span><span class="p">(</span><span class="n">connection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Directly re-creating the same flowchart via `create` is still an error.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">seamm_datastore</span><span class="w"> </span><span class="kn">import</span> <span class="n">session_scope</span>
+
+    <span class="n">this_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_file</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;sample_flowchart_v2.flow&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">session_scope</span><span class="p">(</span><span class="n">connection</span><span class="o">.</span><span class="n">Session</span><span class="p">)</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">connection</span><span class="o">.</span><span class="n">Flowchart</span><span class="o">.</span><span class="n">create_from_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+        <span class="n">connection</span><span class="o">.</span><span class="n">Flowchart</span><span class="o">.</span><span class="n">create_from_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="test_flowchart_sha256_strict_unique_constraint">
+<a class="viewcode-back" href="../../../api/seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_flowchart_sha256_strict_unique_constraint">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_flowchart_sha256_strict_unique_constraint</span><span class="p">(</span><span class="n">connection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The DB itself must reject a second flowcharts row for the same hash.</span>
+
+<span class="sd">    This is the schema-level half of the fix for</span>
+<span class="sd">    https://github.com/molssi-seamm/seamm_datastore/issues/37 : previously</span>
+<span class="sd">    nothing stopped two rows from sharing a ``sha256_strict``, which is what</span>
+<span class="sd">    let the concurrent-submission race described in the issue corrupt the</span>
+<span class="sd">    table in the first place.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.exc</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntegrityError</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">seamm_datastore</span><span class="w"> </span><span class="kn">import</span> <span class="n">session_scope</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">seamm_datastore.database.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flowchart</span>
+
+    <span class="n">this_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_file</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;sample_flowchart_v2.flow&quot;</span><span class="p">)</span>
+
+    <span class="n">metadata</span><span class="p">,</span> <span class="n">flowchart_json</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">parse_flowchart_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">session_scope</span><span class="p">(</span><span class="n">connection</span><span class="o">.</span><span class="n">Session</span><span class="p">)</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">Flowchart</span><span class="p">(</span>
+                <span class="n">sha256_strict</span><span class="o">=</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;sha256_strict&quot;</span><span class="p">],</span>
+                <span class="n">sha256</span><span class="o">=</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;sha256&quot;</span><span class="p">],</span>
+                <span class="n">json</span><span class="o">=</span><span class="n">flowchart_json</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">IntegrityError</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">session_scope</span><span class="p">(</span><span class="n">connection</span><span class="o">.</span><span class="n">Session</span><span class="p">)</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">Flowchart</span><span class="p">(</span>
+                    <span class="n">sha256_strict</span><span class="o">=</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;sha256_strict&quot;</span><span class="p">],</span>
+                    <span class="n">sha256</span><span class="o">=</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;sha256&quot;</span><span class="p">],</span>
+                    <span class="n">json</span><span class="o">=</span><span class="n">flowchart_json</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="test_flowchart_get_or_create_concurrent_race">
+<a class="viewcode-back" href="../../../api/seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_flowchart_get_or_create_concurrent_race">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_flowchart_get_or_create_concurrent_race</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A get-or-create that loses a race to another job&#39;s commit must fall</span>
+<span class="sd">    back to the winner&#39;s row instead of crashing.</span>
+
+<span class="sd">    Reproduces https://github.com/molssi-seamm/seamm_datastore/issues/37 : a</span>
+<span class="sd">    job array submitting several jobs that share a flowchart which isn&#39;t</span>
+<span class="sd">    registered yet. Each sees &quot;no flowchart with this hash&quot; and races to</span>
+<span class="sd">    insert it; before this fix, every insert after the first left a</span>
+<span class="sd">    duplicate row, and every later lookup by hash crashed with</span>
+<span class="sd">    MultipleResultsFound.</span>
+
+<span class="sd">    The race is reproduced deterministically -- a competing row for the same</span>
+<span class="sd">    hash is committed by a second, raw connection to the same database file,</span>
+<span class="sd">    timed to land in the window between our own lookup and our own insert --</span>
+<span class="sd">    rather than depending on real thread scheduling, which is flaky against</span>
+<span class="sd">    SQLite&#39;s single-writer locking.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
+
+    <span class="kn">import</span><span class="w"> </span><span class="nn">seamm_datastore</span>
+
+    <span class="n">this_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_file</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;sample_flowchart_v2.flow&quot;</span><span class="p">)</span>
+
+    <span class="n">db_path</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;race.db&quot;</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">seamm_datastore</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">database_uri</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;sqlite:///</span><span class="si">{</span><span class="n">db_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">initialize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">)</span>
+
+    <span class="c1"># `seamm_datastore.database.models` (and the flask_authorize patch it</span>
+    <span class="c1"># loads) must not be imported before the first `connect()` call sets up</span>
+    <span class="c1"># the fake app config the patch relies on -- so import it only now.</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">seamm_datastore.database.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flowchart</span>
+
+    <span class="n">metadata</span><span class="p">,</span> <span class="n">flowchart_json</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">parse_flowchart_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="n">sha256_strict</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;sha256_strict&quot;</span><span class="p">]</span>
+
+    <span class="n">original_parse</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">parse_flowchart_file</span>
+    <span class="n">call_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">racy_parse</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">call_count</span>
+        <span class="n">call_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">call_count</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># `get_or_create_from_file` has already looked up this hash and</span>
+            <span class="c1"># found nothing (call #1, above) and is about to build its own</span>
+            <span class="c1"># row (this is the second parse, from inside `create_from_file`</span>
+            <span class="c1"># in the nested-transaction attempt) -- commit a competitor now,</span>
+            <span class="c1"># simulating another job&#39;s insert winning the race.</span>
+            <span class="n">raw</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">db_path</span><span class="p">))</span>
+            <span class="n">raw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="s2">&quot;INSERT INTO flowcharts (sha256_strict, json) VALUES (?, ?)&quot;</span><span class="p">,</span>
+                <span class="p">(</span><span class="n">sha256_strict</span><span class="p">,</span> <span class="n">flowchart_json</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">raw</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="n">raw</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">original_parse</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="n">Flowchart</span><span class="o">.</span><span class="n">parse_flowchart_file</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">racy_parse</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">seamm_datastore</span><span class="o">.</span><span class="n">session_scope</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Session</span><span class="p">)</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+            <span class="n">flowchart</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">get_or_create_from_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">flowchart</span><span class="p">)</span>
+            <span class="n">flowchart_id</span> <span class="o">=</span> <span class="n">flowchart</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">Flowchart</span><span class="o">.</span><span class="n">parse_flowchart_file</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">original_parse</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">flowchart_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="c1"># Only one flowchart row should exist for this hash despite the race.</span>
+    <span class="k">with</span> <span class="n">seamm_datastore</span><span class="o">.</span><span class="n">session_scope</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Session</span><span class="p">)</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Flowchart</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">sha256_strict</span><span class="o">=</span><span class="n">sha256_strict</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">flowchart_id</span></div>
+
+
+
+<div class="viewcode-block" id="test_job_create_shared_flowchart_reuses_row">
+<a class="viewcode-back" href="../../../api/seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_job_create_shared_flowchart_reuses_row">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_job_create_shared_flowchart_reuses_row</span><span class="p">(</span><span class="n">connection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Two jobs that use the same flowchart file must share one Flowchart row.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+        <span class="o">/</span> <span class="s2">&quot;..&quot;</span>
+        <span class="o">/</span> <span class="s2">&quot;..&quot;</span>
+        <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+        <span class="o">/</span> <span class="s2">&quot;Projects&quot;</span>
+        <span class="o">/</span> <span class="s2">&quot;sample_project1&quot;</span>
+        <span class="o">/</span> <span class="s2">&quot;Job_000093&quot;</span>
+    <span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="n">flowchart_filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;flowchart.flow&quot;</span><span class="p">)</span>
+
+    <span class="n">job1</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">Job</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">flowchart_filename</span><span class="o">=</span><span class="n">flowchart_filename</span><span class="p">,</span>
+        <span class="n">project_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">job2</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">Job</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">flowchart_filename</span><span class="o">=</span><span class="n">flowchart_filename</span><span class="p">,</span>
+        <span class="n">project_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">job1</span><span class="o">.</span><span class="n">flowchart</span> <span class="ow">is</span> <span class="n">job2</span><span class="o">.</span><span class="n">flowchart</span></div>
 
 
 

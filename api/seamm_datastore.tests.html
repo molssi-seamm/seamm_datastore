@@ -14,8 +14,8 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -122,14 +122,55 @@
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="seamm_datastore.tests.test_create.test_flowchart_duplicate_hash_raises">
+<span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_create.</span></span><span class="sig-name descname"><span class="pre">test_flowchart_duplicate_hash_raises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_create.html#test_flowchart_duplicate_hash_raises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_create.test_flowchart_duplicate_hash_raises" title="Link to this definition"></a></dt>
+<dd><p>Directly re-creating the same flowchart via <cite>create</cite> is still an error.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="seamm_datastore.tests.test_create.test_flowchart_from_file">
 <span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_create.</span></span><span class="sig-name descname"><span class="pre">test_flowchart_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_create.html#test_flowchart_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_create.test_flowchart_from_file" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="seamm_datastore.tests.test_create.test_flowchart_get_or_create_concurrent_race">
+<span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_create.</span></span><span class="sig-name descname"><span class="pre">test_flowchart_get_or_create_concurrent_race</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_create.html#test_flowchart_get_or_create_concurrent_race"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_create.test_flowchart_get_or_create_concurrent_race" title="Link to this definition"></a></dt>
+<dd><p>A get-or-create that loses a race to another job’s commit must fall
+back to the winner’s row instead of crashing.</p>
+<p>Reproduces <a class="reference external" href="https://github.com/molssi-seamm/seamm_datastore/issues/37">https://github.com/molssi-seamm/seamm_datastore/issues/37</a> : a
+job array submitting several jobs that share a flowchart which isn’t
+registered yet. Each sees “no flowchart with this hash” and races to
+insert it; before this fix, every insert after the first left a
+duplicate row, and every later lookup by hash crashed with
+MultipleResultsFound.</p>
+<p>The race is reproduced deterministically – a competing row for the same
+hash is committed by a second, raw connection to the same database file,
+timed to land in the window between our own lookup and our own insert –
+rather than depending on real thread scheduling, which is flaky against
+SQLite’s single-writer locking.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="seamm_datastore.tests.test_create.test_flowchart_parse">
 <span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_create.</span></span><span class="sig-name descname"><span class="pre">test_flowchart_parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_create.html#test_flowchart_parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_create.test_flowchart_parse" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="seamm_datastore.tests.test_create.test_flowchart_sha256_strict_unique_constraint">
+<span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_create.</span></span><span class="sig-name descname"><span class="pre">test_flowchart_sha256_strict_unique_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_create.html#test_flowchart_sha256_strict_unique_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_create.test_flowchart_sha256_strict_unique_constraint" title="Link to this definition"></a></dt>
+<dd><p>The DB itself must reject a second flowcharts row for the same hash.</p>
+<p>This is the schema-level half of the fix for
+<a class="reference external" href="https://github.com/molssi-seamm/seamm_datastore/issues/37">https://github.com/molssi-seamm/seamm_datastore/issues/37</a> : previously
+nothing stopped two rows from sharing a <code class="docutils literal notranslate"><span class="pre">sha256_strict</span></code>, which is what
+let the concurrent-submission race described in the issue corrupt the
+table in the first place.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="seamm_datastore.tests.test_create.test_job_create_shared_flowchart_reuses_row">
+<span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_create.</span></span><span class="sig-name descname"><span class="pre">test_job_create_shared_flowchart_reuses_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_create.html#test_job_create_shared_flowchart_reuses_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_create.test_job_create_shared_flowchart_reuses_row" title="Link to this definition"></a></dt>
+<dd><p>Two jobs that use the same flowchart file must share one Flowchart row.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="seamm_datastore.tests.test_create.test_project_create">

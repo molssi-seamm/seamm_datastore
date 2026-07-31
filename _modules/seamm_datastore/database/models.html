@@ -13,8 +13,8 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -88,6 +88,7 @@
     <span class="n">JSON</span><span class="p">,</span>
     <span class="n">Float</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.exc</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntegrityError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.orm</span><span class="w"> </span><span class="kn">import</span> <span class="n">relationship</span><span class="p">,</span> <span class="n">declarative_base</span>
 
 <span class="c1"># Patched flask authorize</span>
@@ -429,7 +430,10 @@
 
     <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">sha256</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">75</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">sha256_strict</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">75</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># Unique (NULLs excepted) so that concurrent submission of jobs sharing</span>
+    <span class="c1"># the same flowchart cannot race past the application-level check in</span>
+    <span class="c1"># `get_or_create_from_file` and insert duplicate rows for the same hash.</span>
+    <span class="n">sha256_strict</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">75</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">flowchart_version</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">doi</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">conceptdoi</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -450,14 +454,22 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">flowchart_info</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">flowchart</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span>
-                <span class="n">sha256_strict</span><span class="o">=</span><span class="n">flowchart_info</span><span class="p">[</span><span class="s2">&quot;sha256_strict&quot;</span><span class="p">]</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+            <span class="c1"># `.first()` (ordered by id) rather than `.one_or_none()`: if a</span>
+            <span class="c1"># datastore already has duplicate rows for this hash (from before</span>
+            <span class="c1"># this race was fixed, or a not-yet-migrated database), degrade to</span>
+            <span class="c1"># the oldest match instead of raising MultipleResultsFound.</span>
+            <span class="n">flowchart</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">sha256_strict</span><span class="o">=</span><span class="n">flowchart_info</span><span class="p">[</span><span class="s2">&quot;sha256_strict&quot;</span><span class="p">])</span>
+                <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">first</span><span class="p">()</span>
+            <span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">flowchart</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span>
-                    <span class="nb">id</span><span class="o">=</span><span class="n">flowchart_info</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+                <span class="n">flowchart</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">Flowchart</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">flowchart_info</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+                    <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">first</span><span class="p">()</span>
+                <span class="p">)</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="n">flowchart</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -514,6 +526,75 @@
             <span class="k">del</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">**</span><span class="n">metadata</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Flowchart.get_or_create_from_file">
+<a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.models.Flowchart.get_or_create_from_file">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_or_create_from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">projects</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the Flowchart matching the file&#39;s hash, or create it.</span>
+
+<span class="sd">        This is the race-tolerant get-or-create used by ``Job.create``. When</span>
+<span class="sd">        several jobs that share the same flowchart are submitted at nearly</span>
+<span class="sd">        the same time (e.g. a job array), each one may see &quot;no flowchart with</span>
+<span class="sd">        this hash yet&quot; before any of the others have committed theirs. Rather</span>
+<span class="sd">        than let that race insert duplicate rows -- which then makes every</span>
+<span class="sd">        later lookup by hash raise ``MultipleResultsFound`` -- the insert</span>
+<span class="sd">        is attempted in a SAVEPOINT (``session.begin_nested``) and a UNIQUE</span>
+<span class="sd">        constraint violation on ``sha256_strict`` (see the column definition)</span>
+<span class="sd">        is caught: we fall back to the row the other, faster job created</span>
+<span class="sd">        instead of failing.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : str or pathlib.Path</span>
+<span class="sd">            The path to the flowchart file.</span>
+<span class="sd">        projects : [Project] = None</span>
+<span class="sd">            Projects to associate with the flowchart, only used if it is</span>
+<span class="sd">            newly created.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Flowchart</span>
+<span class="sd">            The existing or newly created flowchart.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">metadata</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">parse_flowchart_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">sha256_strict</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sha256_strict&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_find</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">sha256_strict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">sha256_strict</span><span class="o">=</span><span class="n">sha256_strict</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">first</span><span class="p">()</span>
+            <span class="p">)</span>
+
+        <span class="n">flowchart</span> <span class="o">=</span> <span class="n">_find</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">flowchart</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">flowchart</span>
+
+        <span class="n">session</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">session</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">begin_nested</span><span class="p">():</span>
+                <span class="c1"># `create_from_file` (via `create`) re-does the same lookup</span>
+                <span class="c1"># and raises ValueError if it now finds a match -- which can</span>
+                <span class="c1"># happen here if another job&#39;s insert committed in the</span>
+                <span class="c1"># window between our `_find()` above and this one. Treated</span>
+                <span class="c1"># the same as an IntegrityError: someone else won the race.</span>
+                <span class="n">flowchart</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">create_from_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">projects</span><span class="p">:</span>
+                    <span class="n">flowchart</span><span class="o">.</span><span class="n">projects</span> <span class="o">=</span> <span class="n">projects</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">flowchart</span><span class="p">)</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">IntegrityError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">flowchart</span> <span class="o">=</span> <span class="n">_find</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">flowchart</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Not a duplicate hash after all -- some other constraint</span>
+                <span class="c1"># failed, so the original error is the useful one.</span>
+                <span class="k">raise</span> <span class="n">exc</span>
+
+        <span class="k">return</span> <span class="n">flowchart</span></div>
 
 
 <div class="viewcode-block" id="Flowchart.parse_flowchart_file">
@@ -739,23 +820,11 @@
                 <span class="p">)</span>
 
         <span class="c1"># Handle the flowchart - we&#39;ll only want to add it if we&#39;re adding the job.</span>
-        <span class="n">flowchart_info</span><span class="p">,</span> <span class="n">fl</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">parse_flowchart_file</span><span class="p">(</span><span class="n">flowchart_filename</span><span class="p">)</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">flowchart</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span>
-                <span class="n">sha256_strict</span><span class="o">=</span><span class="n">flowchart_info</span><span class="p">[</span><span class="s2">&quot;sha256_strict&quot;</span><span class="p">]</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">flowchart</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span>
-                    <span class="nb">id</span><span class="o">=</span><span class="n">flowchart_info</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
-            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="n">flowchart</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="k">if</span> <span class="n">flowchart</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">flowchart</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">create_from_file</span><span class="p">(</span><span class="n">flowchart_filename</span><span class="p">)</span>
-            <span class="n">flowchart</span><span class="o">.</span><span class="n">projects</span> <span class="o">=</span> <span class="n">projects</span>
+        <span class="c1"># `get_or_create_from_file` is race-tolerant: it&#39;s safe when several jobs</span>
+        <span class="c1"># sharing this same flowchart are submitted concurrently (e.g. a job array).</span>
+        <span class="n">flowchart</span> <span class="o">=</span> <span class="n">Flowchart</span><span class="o">.</span><span class="n">get_or_create_from_file</span><span class="p">(</span>
+            <span class="n">flowchart_filename</span><span class="p">,</span> <span class="n">projects</span><span class="o">=</span><span class="n">projects</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">parameters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span>
