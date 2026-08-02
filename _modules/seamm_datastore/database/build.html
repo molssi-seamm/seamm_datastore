@@ -231,15 +231,22 @@
                                     <span class="n">status</span><span class="o">=</span><span class="n">job_data</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">],</span>
                                     <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
                                 <span class="p">)</span>
-                            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                                <span class="nb">print</span><span class="p">(</span>
-                                    <span class="sa">f</span><span class="s2">&quot;Job </span><span class="si">{</span><span class="n">job_data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> not imported because it is &quot;</span>
-                                    <span class="s2">&quot;already in the database.&quot;</span>
-                                <span class="p">)</span>
-                            <span class="k">else</span><span class="p">:</span>
+                                <span class="c1"># `Job.create()` only builds the object --</span>
+                                <span class="c1"># add()/commit() is where a DB-level failure</span>
+                                <span class="c1"># (e.g. an IntegrityError from a still-bad</span>
+                                <span class="c1"># job_data.json) would actually surface, so</span>
+                                <span class="c1"># this must be inside the same try/except:</span>
+                                <span class="c1"># previously it sat in an `else:` clause that</span>
+                                <span class="c1"># the except couldn&#39;t reach, so any commit</span>
+                                <span class="c1"># failure here crashed the whole import scan</span>
+                                <span class="c1"># (and thus dashboard startup) instead of</span>
+                                <span class="c1"># just skipping this one job.</span>
                                 <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
                                 <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
                                 <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+                            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Job </span><span class="si">{</span><span class="n">job_data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> not imported: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                                <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
 
     <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
 

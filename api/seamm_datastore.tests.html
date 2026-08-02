@@ -107,6 +107,26 @@
 <span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_build.</span></span><span class="sig-name descname"><span class="pre">test_build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_build.html#test_build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_build.test_build" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="seamm_datastore.tests.test_build.test_import_datastore_duplicate_project_name_recovers">
+<span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_build.</span></span><span class="sig-name descname"><span class="pre">test_import_datastore_duplicate_project_name_recovers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_build.html#test_import_datastore_duplicate_project_name_recovers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_build.test_import_datastore_duplicate_project_name_recovers" title="Link to this definition"></a></dt>
+<dd><p>A job_data.json listing the same project twice (a real case seen in
+production – e.g. from a job submitted with a malformed project list)
+used to crash the whole import scan with an IntegrityError (“UNIQUE
+constraint failed: job_project.job, job_project.project”), raised from
+session.commit() in import_datastore. That commit sat in an <cite>else:</cite>
+clause the surrounding try/except couldn’t reach, so the failure
+propagated out of import_datastore entirely – aborting the scan and
+leaving every job after the bad one (in directory-listing order)
+unimported too, every time the dashboard started.</p>
+<p>Fixed two ways: Job.create() now dedupes project_names before it’s used
+to populate any relationship (the actual root cause – assigning the
+same related row twice to a SQLAlchemy many-to-many collection is what
+raises the IntegrityError), and import_datastore’s per-job add()/commit()
+is now inside the try/except with a rollback, so even an unrelated
+per-job failure can no longer take down the whole scan.</p>
+</dd></dl>
+
 </section>
 <section id="module-seamm_datastore.tests.test_create">
 <span id="seamm-datastore-tests-test-create-module"></span><h2>seamm_datastore.tests.test_create module<a class="headerlink" href="#module-seamm_datastore.tests.test_create" title="Link to this heading"></a></h2>
