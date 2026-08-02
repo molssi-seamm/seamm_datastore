@@ -665,7 +665,17 @@ class Job(Base, Resource):
         if submitted is None:
             submitted = utc_now()
 
-        # Get the ids for the projects
+        # Get the ids for the projects. Duplicate names in project_names (e.g.
+        # a malformed job_data.json listing the same project twice) must be
+        # deduped here, before `projects` is used to populate any
+        # relationship -- assigning the same related row twice to a
+        # SQLAlchemy many-to-many collection (this job's own `projects`, and
+        # the `projects` passed to `Flowchart.get_or_create_from_file` below)
+        # makes it try to INSERT the same association row twice and raises
+        # IntegrityError ("UNIQUE constraint failed: job_project.job,
+        # job_project.project", or the same for flowchart_project) at flush
+        # time -- i.e. later and away from this obvious cause.
+        project_names = list(dict.fromkeys(project_names))
         projects = [
             Project.query.filter_by(name=x).one_or_none() for x in project_names
         ]
