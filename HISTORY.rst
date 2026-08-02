@@ -1,6 +1,16 @@
 =======
 History
 =======
+2026.8.2 -- Bugfix: crash on a job with a duplicated project name
+    * A job whose data listed the same project twice (for example
+      ``"projects": ["default", "default"]``) made the datastore try to
+      register that job-project link twice, crashing with a database
+      integrity error. Because of where that crash happened, it could also
+      abort an entire startup scan of the job directories, leaving every
+      later job in that scan unimported too, on every restart. Duplicate
+      project names are now silently ignored, and a failure importing one
+      job no longer stops the rest from being imported.
+
 2026.7.31 -- Bugfix: duplicate flowchart rows from concurrent job submission
     * Jobs sharing the same flowchart submitted at nearly the same time -- for
       example a job array -- could race past the check for whether the
