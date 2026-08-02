@@ -157,15 +157,22 @@ def import_datastore(session, location, as_json=True):
                                     status=job_data["status"],
                                     parameters=parameters,
                                 )
-                            except Exception:
-                                print(
-                                    f"Job {job_data['id']} not imported because it is "
-                                    "already in the database."
-                                )
-                            else:
+                                # `Job.create()` only builds the object --
+                                # add()/commit() is where a DB-level failure
+                                # (e.g. an IntegrityError from a still-bad
+                                # job_data.json) would actually surface, so
+                                # this must be inside the same try/except:
+                                # previously it sat in an `else:` clause that
+                                # the except couldn't reach, so any commit
+                                # failure here crashed the whole import scan
+                                # (and thus dashboard startup) instead of
+                                # just skipping this one job.
                                 session.add(job)
                                 session.commit()
                                 jobs.append(job)
+                            except Exception as e:
+                                print(f"Job {job_data['id']} not imported: {e}")
+                                session.rollback()
 
     session.commit()
 
