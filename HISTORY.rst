@@ -1,6 +1,13 @@
 =======
 History
 =======
+2026.9.25 -- Bugfix: alembic is now a declared dependency
+    * The database migration scripts import alembic, which the installer runs when
+      updating the datastore, but it was not listed as a requirement. It is now.
+    * ``make test`` now runs the package's tests directory only. Walking the whole
+      package for doctests imported the alembic environment script, which fails
+      outside alembic, and then ran the tests without a Flask application context.
+
 2026.8.2 -- Bugfix: crash on a job with a duplicated project name
     * A job whose data listed the same project twice (for example
       ``"projects": ["default", "default"]``) made the datastore try to
