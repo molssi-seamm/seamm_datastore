@@ -70,12 +70,12 @@
            <div itemprop="articleBody">
              
   <h1>Source code for seamm_datastore.flask_authorize_patch</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">Patch for flask_authorize.</span>
 
 <span class="sd">Flask authorize and the functions defined here can only be used with an application</span>
 <span class="sd">context.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
 
@@ -102,10 +102,10 @@
     <span class="n">mixins</span><span class="o">.</span><span class="n">current_app</span> <span class="o">=</span> <span class="n">fake_app</span>
     <span class="n">current_app</span> <span class="o">=</span> <span class="n">fake_app</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="c1"># Assume we&#39;re being used with flask_sqlalchemy</span>
+    <span class="c1"># Assume we're being used with flask_sqlalchemy</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">current_app</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;generate_association_table&quot;</span><span class="p">,</span> <span class="s2">&quot;AccessControlPermissionsMixin&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"generate_association_table"</span><span class="p">,</span> <span class="s2">"AccessControlPermissionsMixin"</span><span class="p">]</span>
 
 
 <span class="n">PipedList</span><span class="o">.</span><span class="n">cache_ok</span> <span class="o">=</span> <span class="kc">False</span>
@@ -116,50 +116,50 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">generate_association_table</span><span class="p">(</span>
     <span class="n">entity_name</span><span class="p">,</span> <span class="n">resource_name</span><span class="p">,</span> <span class="n">entity_tablename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resource_tablename</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
-    <span class="c1"># Make them plural by adding &#39;s&#39; :)</span>
+    <span class="c1"># Make them plural by adding 's' :)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">entity_tablename</span><span class="p">:</span>
-        <span class="n">entity_tablename</span> <span class="o">=</span> <span class="n">entity_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;s&quot;</span>
+        <span class="n">entity_tablename</span> <span class="o">=</span> <span class="n">entity_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"s"</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">resource_tablename</span><span class="p">:</span>
-        <span class="n">resource_tablename</span> <span class="o">=</span> <span class="n">resource_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;s&quot;</span>
+        <span class="n">resource_tablename</span> <span class="o">=</span> <span class="n">resource_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"s"</span>
 
     <span class="nd">@declared_attr</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">left_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">entity_tablename</span><span class="si">}</span><span class="s2">.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity_tablename</span><span class="si">}</span><span class="s2">.id"</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="nd">@declared_attr</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">right_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resource_tablename</span><span class="si">}</span><span class="s2">.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">resource_tablename</span><span class="si">}</span><span class="s2">.id"</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="nd">@declared_attr</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">entity_relationship</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">relationship</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">entity_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity_name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
             <span class="n">backref</span><span class="o">=</span><span class="n">backref</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;special_</span><span class="si">{</span><span class="n">resource_tablename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="n">lazy</span><span class="o">=</span><span class="s2">&quot;dynamic&quot;</span><span class="p">,</span>
-                <span class="n">cascade</span><span class="o">=</span><span class="s2">&quot;save-update, merge, &quot;</span> <span class="s2">&quot;delete, delete-orphan&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"special_</span><span class="si">{</span><span class="n">resource_tablename</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="n">lazy</span><span class="o">=</span><span class="s2">"dynamic"</span><span class="p">,</span>
+                <span class="n">cascade</span><span class="o">=</span><span class="s2">"save-update, merge, "</span> <span class="s2">"delete, delete-orphan"</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">)</span>
 
     <span class="nd">@declared_attr</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">resource_relationship</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">relationship</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resource_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">resource_name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
             <span class="n">backref</span><span class="o">=</span><span class="n">backref</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;special_</span><span class="si">{</span><span class="n">entity_tablename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="n">lazy</span><span class="o">=</span><span class="s2">&quot;dynamic&quot;</span><span class="p">,</span>
-                <span class="n">cascade</span><span class="o">=</span><span class="s2">&quot;save-update, merge, &quot;</span> <span class="s2">&quot;delete, delete-orphan&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"special_</span><span class="si">{</span><span class="n">entity_tablename</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="n">lazy</span><span class="o">=</span><span class="s2">"dynamic"</span><span class="p">,</span>
+                <span class="n">cascade</span><span class="o">=</span><span class="s2">"save-update, merge, "</span> <span class="s2">"delete, delete-orphan"</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">)</span>
 
     <span class="k">class</span><span class="w"> </span><span class="nc">PermissionsAssociationMixin</span><span class="p">:</span>
-        <span class="n">__tablename__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">entity_tablename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">resource_tablename</span><span class="si">}</span><span class="s2">_association&quot;</span>
+        <span class="n">__tablename__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity_tablename</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">resource_tablename</span><span class="si">}</span><span class="s2">_association"</span>
 
         <span class="n">entity_id</span> <span class="o">=</span> <span class="n">left_id</span>
         <span class="n">resource_id</span> <span class="o">=</span> <span class="n">right_id</span>
 
-        <span class="nb">locals</span><span class="p">()[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">entity_tablename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity_relationship</span>
-        <span class="nb">locals</span><span class="p">()[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resource_tablename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">resource_relationship</span>
+        <span class="nb">locals</span><span class="p">()[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entity_tablename</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity_relationship</span>
+        <span class="nb">locals</span><span class="p">()[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">resource_tablename</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">resource_relationship</span>
 
         <span class="n">permissions</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">PipedList</span><span class="p">)</span>
 
@@ -180,9 +180,9 @@
         <span class="n">current_user</span> <span class="o">=</span> <span class="n">CURRENT_USER</span><span class="p">()</span>
 
         <span class="c1"># check if the user is an admin</span>
-        <span class="c1"># return True if admin - they&#39;re allowed to do anything!</span>
+        <span class="c1"># return True if admin - they're allowed to do anything!</span>
         <span class="k">if</span> <span class="n">current_user</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;admin&quot;</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">current_user</span><span class="o">.</span><span class="n">roles</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="s2">"admin"</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">current_user</span><span class="o">.</span><span class="n">roles</span><span class="p">]:</span>
                 <span class="k">return</span> <span class="n">true</span><span class="p">()</span>
 
         <span class="n">ret</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">authorized</span><span class="p">(</span><span class="n">check</span><span class="p">)</span>
@@ -190,19 +190,19 @@
         <span class="n">clauses</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># Check user for special permissions</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;special_</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">__tablename__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"special_</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">__tablename__</span><span class="si">}</span><span class="s2">"</span><span class="p">):</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span>
                     <span class="p">[</span>
                         <span class="n">x</span><span class="o">.</span><span class="n">resource_id</span>
-                        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;special_</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">__tablename__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"special_</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">__tablename__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">check</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">permissions</span>
                     <span class="p">]</span>
                 <span class="p">)</span>
             <span class="p">)</span>
 
         <span class="c1"># Check if user is part of a group that has special access</span>
-        <span class="k">if</span> <span class="n">current_user</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;special_groups&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">current_user</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">"special_groups"</span><span class="p">):</span>
             <span class="n">group_list</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">x</span><span class="o">.</span><span class="n">special_groups</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
@@ -227,7 +227,7 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">flask_authorize.plugin</span><span class="w"> </span><span class="kn">import</span> <span class="n">CURRENT_USER</span>
 
     <span class="c1"># look to flask-login for current user</span>
-    <span class="n">user</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"user"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">user</span> <span class="o">=</span> <span class="n">CURRENT_USER</span><span class="p">()</span>
 
@@ -235,14 +235,14 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">):</span>
         <span class="n">user</span> <span class="o">=</span> <span class="n">user</span><span class="p">()</span>
 
-    <span class="c1"># don&#39;t allow anything for anonymous users</span>
+    <span class="c1"># don't allow anything for anonymous users</span>
     <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;AUTHORIZE_ALLOW_ANONYMOUS_ACTIONS&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"AUTHORIZE_ALLOW_ANONYMOUS_ACTIONS"</span><span class="p">]:</span>
             <span class="k">return</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># check if the user is an admin</span>
-        <span class="c1"># return True if admin - they&#39;re allowed to do anything!</span>
-        <span class="k">if</span> <span class="s2">&quot;admin&quot;</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">roles</span><span class="p">]:</span>
+        <span class="c1"># return True if admin - they're allowed to do anything!</span>
+        <span class="k">if</span> <span class="s2">"admin"</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">roles</span><span class="p">]:</span>
             <span class="k">return</span> <span class="kc">True</span>
 
     <span class="c1"># authorize if user has relevant role</span>
@@ -262,8 +262,8 @@
     <span class="c1"># authorize create privileges based on access</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">user_is_restricted</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;create&quot;</span><span class="p">],</span> <span class="n">model</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">user_is_allowed</span><span class="p">(</span>
-                <span class="n">user</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;create&quot;</span><span class="p">],</span> <span class="n">model</span>
+            <span class="k">if</span> <span class="n">user_is_restricted</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="p">[</span><span class="s2">"create"</span><span class="p">],</span> <span class="n">model</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">user_is_allowed</span><span class="p">(</span>
+                <span class="n">user</span><span class="p">,</span> <span class="p">[</span><span class="s2">"create"</span><span class="p">],</span> <span class="n">model</span>
             <span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
@@ -286,39 +286,39 @@
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="c1"># only check permissions for items that have set permissions</span>
-        <span class="n">check</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;AUTHORIZE_IGNORE_PROPERTY&quot;</span><span class="p">]</span>
+        <span class="n">check</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"AUTHORIZE_IGNORE_PROPERTY"</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">check</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">check</span><span class="p">):</span>
             <span class="k">continue</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s2">&quot;permissions&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s2">"permissions"</span><span class="p">):</span>
             <span class="k">continue</span>
 
         <span class="c1"># check other permissions</span>
-        <span class="n">check</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">check</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"other"</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">permitted</span> <span class="o">=</span> <span class="n">has_permission</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">check</span><span class="p">)</span>
 
         <span class="c1"># check user permissions</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s2">&quot;owner&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s2">"owner"</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">owner</span> <span class="o">==</span> <span class="n">user</span><span class="p">:</span>
-                <span class="n">check</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;owner&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="n">check</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"owner"</span><span class="p">,</span> <span class="p">[])</span>
                 <span class="n">permitted</span> <span class="o">|=</span> <span class="n">has_permission</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">check</span><span class="p">)</span>
 
         <span class="c1"># check group permissions</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;groups&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s2">"group"</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s2">"groups"</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">group</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span>
-                    <span class="n">check</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                    <span class="n">check</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"group"</span><span class="p">,</span> <span class="p">[])</span>
                     <span class="n">permitted</span> <span class="o">|=</span> <span class="n">has_permission</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">check</span><span class="p">)</span>
 
         <span class="c1"># check special permissions</span>
         <span class="c1"># should probably figure this out instead of cheating.</span>
         <span class="n">operation</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">operation</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s2">&quot;special_users&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">CURRENT_USER</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s2">"special_users"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">CURRENT_USER</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">assoc</span> <span class="ow">in</span> <span class="n">arg</span><span class="o">.</span><span class="n">special_users</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">CURRENT_USER</span><span class="p">()</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">assoc</span><span class="o">.</span><span class="n">entity_id</span><span class="p">:</span>
                     <span class="n">permitted</span> <span class="o">|=</span> <span class="n">operation</span> <span class="ow">in</span> <span class="n">assoc</span><span class="o">.</span><span class="n">permissions</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s2">&quot;special_groups&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">CURRENT_USER</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s2">"special_groups"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">CURRENT_USER</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">arg</span><span class="o">.</span><span class="n">special_groups</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">group</span><span class="o">.</span><span class="n">entity_id</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">CURRENT_USER</span><span class="p">()</span><span class="o">.</span><span class="n">groups</span><span class="p">]:</span>
                     <span class="n">permitted</span> <span class="o">|=</span> <span class="n">operation</span> <span class="ow">in</span> <span class="n">group</span><span class="o">.</span><span class="n">permissions</span>

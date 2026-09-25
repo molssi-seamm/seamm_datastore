@@ -70,34 +70,34 @@
            <div itemprop="articleBody">
              
   <h1>Source code for seamm_datastore.database.build</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">Automatic import of projects and jobs from directories.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_build_initial</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">default_project</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the initial database&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Build the initial database"""</span>
 
     <span class="kn">from</span><span class="w"> </span><span class="nn">seamm_datastore.database.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Role</span><span class="p">,</span> <span class="n">Group</span><span class="p">,</span> <span class="n">User</span><span class="p">,</span> <span class="n">Project</span>
 
     <span class="c1"># Create roles</span>
-    <span class="n">role_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;group manager&quot;</span><span class="p">,</span> <span class="s2">&quot;admin&quot;</span><span class="p">]</span>
+    <span class="n">role_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"user"</span><span class="p">,</span> <span class="s2">"group manager"</span><span class="p">,</span> <span class="s2">"admin"</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">role_name</span> <span class="ow">in</span> <span class="n">role_names</span><span class="p">:</span>
         <span class="n">role</span> <span class="o">=</span> <span class="n">Role</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">role_name</span><span class="p">)</span>
         <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
         <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
 
     <span class="c1"># Create default admin group</span>
-    <span class="n">admin_group</span> <span class="o">=</span> <span class="n">Group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">)</span>
+    <span class="n">admin_group</span> <span class="o">=</span> <span class="n">Group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"admin"</span><span class="p">)</span>
     <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">admin_group</span><span class="p">)</span>
     <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
 
     <span class="c1"># Create default admin user.s</span>
-    <span class="n">admin_role</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Role</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
-    <span class="n">admin_user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span> <span class="n">roles</span><span class="o">=</span><span class="p">[</span><span class="n">admin_role</span><span class="p">])</span>
+    <span class="n">admin_role</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Role</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"admin"</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+    <span class="n">admin_user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">"admin"</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">"admin"</span><span class="p">,</span> <span class="n">roles</span><span class="o">=</span><span class="p">[</span><span class="n">admin_role</span><span class="p">])</span>
     <span class="n">admin_user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">admin_group</span><span class="p">)</span>
 
     <span class="c1"># Create a user and group with the same information as user running</span>
@@ -109,13 +109,13 @@
         <span class="c1"># This will occur on Windows</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-        <span class="n">username</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;USERNAME&quot;</span><span class="p">]</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"USERNAME"</span><span class="p">]</span>
         <span class="c1"># Just a default group name.</span>
-        <span class="n">group_name</span> <span class="o">=</span> <span class="s2">&quot;staff&quot;</span>
+        <span class="n">group_name</span> <span class="o">=</span> <span class="s2">"staff"</span>
 
     <span class="n">group</span> <span class="o">=</span> <span class="n">Group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">group_name</span><span class="p">)</span>
 
-    <span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="s2">"default"</span>
     <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span> <span class="n">roles</span><span class="o">=</span><span class="p">[</span><span class="n">admin_role</span><span class="p">])</span>
     <span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
 
@@ -137,7 +137,7 @@
 <div class="viewcode-block" id="import_datastore">
 <a class="viewcode-back" href="../../../seamm_datastore.database.html#seamm_datastore.database.build.import_datastore">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">import_datastore</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Import all the projects and jobs at &lt;location&gt;.</span>
+<span class="w">    </span><span class="sd">"""Import all the projects and jobs at &lt;location&gt;.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -150,7 +150,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    (n_projects, n_jobs) : int, integer</span>
 <span class="sd">        The number of projects and jobs added to the database.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="kn">from</span><span class="w"> </span><span class="nn">seamm_datastore.database.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Project</span><span class="p">,</span> <span class="n">Job</span>
 
@@ -171,15 +171,15 @@
                 <span class="n">group</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
                 <span class="n">username</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">owner</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
-                <span class="n">username</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;USERNAME&quot;</span><span class="p">]</span>
+                <span class="n">username</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"USERNAME"</span><span class="p">]</span>
                 <span class="c1"># Just a default group name.</span>
-                <span class="n">group</span> <span class="o">=</span> <span class="s2">&quot;staff&quot;</span>
+                <span class="n">group</span> <span class="o">=</span> <span class="s2">"staff"</span>
 
             <span class="n">project_data</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;owner&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
-                <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span>
-                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">project_name</span><span class="p">,</span>
-                <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">potential_project</span><span class="p">,</span>
+                <span class="s2">"owner"</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+                <span class="s2">"group"</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span>
+                <span class="s2">"name"</span><span class="p">:</span> <span class="n">project_name</span><span class="p">,</span>
+                <span class="s2">"path"</span><span class="p">:</span> <span class="n">potential_project</span><span class="p">,</span>
             <span class="p">}</span>
 
             <span class="k">try</span><span class="p">:</span>
@@ -193,42 +193,42 @@
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="c1"># Project already in DB</span>
                 <span class="nb">print</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Project </span><span class="si">{</span><span class="n">project_name</span><span class="si">}</span><span class="s2"> not imported because it is &quot;</span>
-                    <span class="s2">&quot;already in the database.&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Project </span><span class="si">{</span><span class="n">project_name</span><span class="si">}</span><span class="s2"> not imported because it is "</span>
+                    <span class="s2">"already in the database."</span>
                 <span class="p">)</span>
                 <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
 
-            <span class="n">project_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">project_data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+            <span class="n">project_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">project_data</span><span class="p">[</span><span class="s2">"name"</span><span class="p">])</span>
 
             <span class="k">for</span> <span class="n">potential_job</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">potential_project</span><span class="p">):</span>
                 <span class="n">potential_job</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">potential_project</span><span class="p">,</span> <span class="n">potential_job</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">potential_job</span><span class="p">):</span>
                     <span class="c1"># Check for job_data.json - has to have this to be job</span>
-                    <span class="n">check_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">potential_job</span><span class="p">,</span> <span class="s2">&quot;job_data.json&quot;</span><span class="p">)</span>
+                    <span class="n">check_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">potential_job</span><span class="p">,</span> <span class="s2">"job_data.json"</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">check_path</span><span class="p">):</span>
                         <span class="k">try</span><span class="p">:</span>
                             <span class="n">job_data</span> <span class="o">=</span> <span class="n">Job</span><span class="o">.</span><span class="n">parse_job_data</span><span class="p">(</span><span class="n">check_path</span><span class="p">)</span>
                         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not read the job data </span><span class="si">{</span><span class="n">check_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not read the job data </span><span class="si">{</span><span class="n">check_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="s2">&quot;command line&quot;</span> <span class="ow">in</span> <span class="n">job_data</span><span class="p">:</span>
-                                <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cmdline&quot;</span><span class="p">:</span> <span class="n">job_data</span><span class="p">[</span><span class="s2">&quot;command line&quot;</span><span class="p">]}</span>
+                            <span class="k">if</span> <span class="s2">"command line"</span> <span class="ow">in</span> <span class="n">job_data</span><span class="p">:</span>
+                                <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"cmdline"</span><span class="p">:</span> <span class="n">job_data</span><span class="p">[</span><span class="s2">"command line"</span><span class="p">]}</span>
                             <span class="k">else</span><span class="p">:</span>
-                                <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cmdline&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+                                <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"cmdline"</span><span class="p">:</span> <span class="p">[]}</span>
 
                             <span class="k">try</span><span class="p">:</span>
                                 <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-                                    <span class="n">job_data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
-                                    <span class="n">potential_job</span> <span class="o">+</span> <span class="s2">&quot;/flowchart.flow&quot;</span><span class="p">,</span>
-                                    <span class="n">project_names</span><span class="o">=</span><span class="n">job_data</span><span class="p">[</span><span class="s2">&quot;project_names&quot;</span><span class="p">],</span>
+                                    <span class="n">job_data</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span>
+                                    <span class="n">potential_job</span> <span class="o">+</span> <span class="s2">"/flowchart.flow"</span><span class="p">,</span>
+                                    <span class="n">project_names</span><span class="o">=</span><span class="n">job_data</span><span class="p">[</span><span class="s2">"project_names"</span><span class="p">],</span>
                                     <span class="n">path</span><span class="o">=</span><span class="n">potential_job</span><span class="p">,</span>
-                                    <span class="n">title</span><span class="o">=</span><span class="n">job_data</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">],</span>
-                                    <span class="n">description</span><span class="o">=</span><span class="n">job_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-                                    <span class="n">submitted</span><span class="o">=</span><span class="n">job_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;submitted&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-                                    <span class="n">started</span><span class="o">=</span><span class="n">job_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;started&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-                                    <span class="n">finished</span><span class="o">=</span><span class="n">job_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;finished&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-                                    <span class="n">status</span><span class="o">=</span><span class="n">job_data</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">],</span>
+                                    <span class="n">title</span><span class="o">=</span><span class="n">job_data</span><span class="p">[</span><span class="s2">"title"</span><span class="p">],</span>
+                                    <span class="n">description</span><span class="o">=</span><span class="n">job_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"description"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                                    <span class="n">submitted</span><span class="o">=</span><span class="n">job_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"submitted"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                                    <span class="n">started</span><span class="o">=</span><span class="n">job_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"started"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                                    <span class="n">finished</span><span class="o">=</span><span class="n">job_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"finished"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                                    <span class="n">status</span><span class="o">=</span><span class="n">job_data</span><span class="p">[</span><span class="s2">"status"</span><span class="p">],</span>
                                     <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
                                 <span class="p">)</span>
                                 <span class="c1"># `Job.create()` only builds the object --</span>
@@ -237,7 +237,7 @@
                                 <span class="c1"># job_data.json) would actually surface, so</span>
                                 <span class="c1"># this must be inside the same try/except:</span>
                                 <span class="c1"># previously it sat in an `else:` clause that</span>
-                                <span class="c1"># the except couldn&#39;t reach, so any commit</span>
+                                <span class="c1"># the except couldn't reach, so any commit</span>
                                 <span class="c1"># failure here crashed the whole import scan</span>
                                 <span class="c1"># (and thus dashboard startup) instead of</span>
                                 <span class="c1"># just skipping this one job.</span>
@@ -245,7 +245,7 @@
                                 <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
                                 <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
                             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Job </span><span class="si">{</span><span class="n">job_data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> not imported: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Job </span><span class="si">{</span><span class="n">job_data</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2"> not imported: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                                 <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
 
     <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>

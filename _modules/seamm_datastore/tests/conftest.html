@@ -70,9 +70,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for seamm_datastore.tests.conftest</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">Fixtures for testing</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">seamm_datastore</span>
@@ -85,9 +85,9 @@
 <a class="viewcode-back" href="../../../seamm_datastore.tests.html#seamm_datastore.tests.conftest.session">[docs]</a>
 <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">session</span><span class="p">():</span>
-    <span class="n">some_engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;sqlite:///:memory:&quot;</span><span class="p">)</span>
+    <span class="n">some_engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s2">"sqlite:///:memory:"</span><span class="p">)</span>
 
-    <span class="c1"># create a configured &quot;Session&quot; class</span>
+    <span class="c1"># create a configured "Session" class</span>
     <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">some_engine</span><span class="p">)</span>
 
     <span class="c1"># create a Session</span>
@@ -109,10 +109,10 @@
 
         <span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">username</span> <span class="o">!=</span> <span class="s2">&quot;admin&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">username</span> <span class="o">!=</span> <span class="s2">"admin"</span><span class="p">:</span>
                 <span class="n">user</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">username</span>
                 <span class="k">break</span>
-    <span class="n">db</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db</span></div>
 
 
@@ -121,7 +121,7 @@
 <a class="viewcode-back" href="../../../seamm_datastore.tests.html#seamm_datastore.tests.conftest.admin_connection">[docs]</a>
 <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">admin_connection</span><span class="p">(</span><span class="n">connection</span><span class="p">):</span>
-    <span class="n">connection</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">)</span>
+    <span class="n">connection</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">"admin"</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">"admin"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">connection</span></div>
 
@@ -129,13 +129,13 @@
 
 <div class="viewcode-block" id="filled_db">
 <a class="viewcode-back" href="../../../seamm_datastore.tests.html#seamm_datastore.tests.conftest.filled_db">[docs]</a>
-<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;function&quot;</span><span class="p">)</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">"function"</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">filled_db</span><span class="p">(</span><span class="n">connection</span><span class="p">):</span>
     <span class="c1"># The lazy way to do this for now</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
     <span class="n">loc</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
-    <span class="n">sample_data</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;Projects&quot;</span><span class="p">)</span>
+    <span class="n">sample_data</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="s2">".."</span><span class="p">,</span> <span class="s2">"data"</span><span class="p">,</span> <span class="s2">"Projects"</span><span class="p">)</span>
 
     <span class="n">connection</span><span class="o">.</span><span class="n">import_datastore</span><span class="p">(</span><span class="n">sample_data</span><span class="p">)</span></div>
 

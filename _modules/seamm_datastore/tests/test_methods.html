@@ -70,9 +70,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for seamm_datastore.tests.test_methods</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">API Tests</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
 
@@ -80,66 +80,66 @@
 <div class="viewcode-block" id="test_get_queries">
 <a class="viewcode-back" href="../../../api/seamm_datastore.tests.html#seamm_datastore.tests.test_methods.test_get_queries">[docs]</a>
 <span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span>
-    <span class="s2">&quot;resource, description, title, offset, limit, sort, order, num_records, first_id&quot;</span><span class="p">,</span>
+    <span class="s2">"resource, description, title, offset, limit, sort, order, num_records, first_id"</span><span class="p">,</span>
     <span class="p">[</span>
         <span class="p">(</span>
-            <span class="s2">&quot;job&quot;</span><span class="p">,</span>
+            <span class="s2">"job"</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;asc&quot;</span><span class="p">,</span>
+            <span class="s2">"id"</span><span class="p">,</span>
+            <span class="s2">"asc"</span><span class="p">,</span>
             <span class="mi">2</span><span class="p">,</span>
             <span class="mi">92</span><span class="p">,</span>
         <span class="p">),</span>  <span class="c1"># Test retrieving all jobs default sort</span>
         <span class="p">(</span>
-            <span class="s2">&quot;job&quot;</span><span class="p">,</span>
+            <span class="s2">"job"</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;desc&quot;</span><span class="p">,</span>
+            <span class="s2">"id"</span><span class="p">,</span>
+            <span class="s2">"desc"</span><span class="p">,</span>
             <span class="mi">2</span><span class="p">,</span>
             <span class="mi">93</span><span class="p">,</span>
         <span class="p">),</span>  <span class="c1"># Test retrieving all jobs, descending sort</span>
         <span class="p">(</span>
-            <span class="s2">&quot;job&quot;</span><span class="p">,</span>
+            <span class="s2">"job"</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;last_update&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;desc&quot;</span><span class="p">,</span>
+            <span class="s2">"last_update"</span><span class="p">,</span>
+            <span class="s2">"desc"</span><span class="p">,</span>
             <span class="mi">2</span><span class="p">,</span>
             <span class="mi">93</span><span class="p">,</span>
         <span class="p">),</span>  <span class="c1"># Test retrieving all jobs, descending sort by last update time.</span>
         <span class="p">(</span>
-            <span class="s2">&quot;project&quot;</span><span class="p">,</span>
+            <span class="s2">"project"</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;asc&quot;</span><span class="p">,</span>
+            <span class="s2">"id"</span><span class="p">,</span>
+            <span class="s2">"asc"</span><span class="p">,</span>
             <span class="mi">2</span><span class="p">,</span>
             <span class="mi">1</span><span class="p">,</span>
         <span class="p">),</span>  <span class="c1"># Test retrieving all projects</span>
         <span class="p">(</span>
-            <span class="s2">&quot;flowchart&quot;</span><span class="p">,</span>
+            <span class="s2">"flowchart"</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;asc&quot;</span><span class="p">,</span>
+            <span class="s2">"id"</span><span class="p">,</span>
+            <span class="s2">"asc"</span><span class="p">,</span>
             <span class="mi">1</span><span class="p">,</span>
             <span class="mi">1</span><span class="p">,</span>
         <span class="p">),</span>  <span class="c1"># Test retrieving all flowcharts</span>
-        <span class="p">(</span><span class="s2">&quot;job&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;asc&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">93</span><span class="p">),</span>  <span class="c1"># Get jobs with offset</span>
-        <span class="p">(</span><span class="s2">&quot;job&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;asc&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">92</span><span class="p">),</span>  <span class="c1"># Get jobs with offset</span>
-        <span class="p">(</span><span class="s2">&quot;job&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Test&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;asc&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">92</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"job"</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">,</span> <span class="s2">"asc"</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">93</span><span class="p">),</span>  <span class="c1"># Get jobs with offset</span>
+        <span class="p">(</span><span class="s2">"job"</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">,</span> <span class="s2">"asc"</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">92</span><span class="p">),</span>  <span class="c1"># Get jobs with offset</span>
+        <span class="p">(</span><span class="s2">"job"</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"Test"</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">,</span> <span class="s2">"asc"</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">92</span><span class="p">),</span>
     <span class="p">],</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">test_get_queries</span><span class="p">(</span>
@@ -156,7 +156,7 @@
 <span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">seamm_datastore.database.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Job</span><span class="p">,</span> <span class="n">Project</span><span class="p">,</span> <span class="n">Flowchart</span>
 
-    <span class="n">resource_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;job&quot;</span><span class="p">:</span> <span class="n">Job</span><span class="p">,</span> <span class="s2">&quot;flowchart&quot;</span><span class="p">:</span> <span class="n">Flowchart</span><span class="p">,</span> <span class="s2">&quot;project&quot;</span><span class="p">:</span> <span class="n">Project</span><span class="p">}</span>
+    <span class="n">resource_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"job"</span><span class="p">:</span> <span class="n">Job</span><span class="p">,</span> <span class="s2">"flowchart"</span><span class="p">:</span> <span class="n">Flowchart</span><span class="p">,</span> <span class="s2">"project"</span><span class="p">:</span> <span class="n">Project</span><span class="p">}</span>
 
     <span class="n">resource</span> <span class="o">=</span> <span class="n">resource_map</span><span class="p">[</span><span class="n">resource</span><span class="p">]</span>
 
@@ -172,10 +172,10 @@
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_records</span>
 
     <span class="c1"># Since the test relies on database that is built for testing,</span>
-    <span class="c1"># we don&#39;t know for sure which one is added first. Confirm with</span>
+    <span class="c1"># we don't know for sure which one is added first. Confirm with</span>
     <span class="c1"># times. Not the ideal way :)</span>
-    <span class="k">if</span> <span class="n">sort</span> <span class="o">==</span> <span class="s2">&quot;last_update&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="s2">&quot;desc&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">sort</span> <span class="o">==</span> <span class="s2">"last_update"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="s2">"desc"</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">last_update</span> <span class="o">&gt;=</span> <span class="n">records</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">last_update</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">last_update</span> <span class="o">&lt;=</span> <span class="n">records</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">last_update</span>
@@ -192,7 +192,7 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">seamm_datastore.database.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Job</span>
 
     <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
-        <span class="n">Job</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;This is a new description.&quot;</span><span class="p">)</span></div>
+        <span class="n">Job</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"This is a new description."</span><span class="p">)</span></div>
 
 
 
@@ -201,9 +201,9 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">test_job_update</span><span class="p">(</span><span class="n">filled_db</span><span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">seamm_datastore.database.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Job</span>
 
-    <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">92</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;This is a new description.&quot;</span><span class="p">)</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">92</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"This is a new description."</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="n">job</span><span class="o">.</span><span class="n">description</span> <span class="o">==</span> <span class="s2">&quot;This is a new description.&quot;</span></div>
+    <span class="k">assert</span> <span class="n">job</span><span class="o">.</span><span class="n">description</span> <span class="o">==</span> <span class="s2">"This is a new description."</span></div>
 
 </pre></div>
 

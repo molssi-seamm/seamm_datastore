@@ -427,13 +427,13 @@ and permissionc checks.</p>
 <p>Examples:</p>
 <blockquote>
 <div><p>Query all articles where the current user is read-authorized:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Article</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Article</span><span class="o">.</span><span class="n">authorized</span><span class="p">(</span><span class="s1">&#39;read&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Article</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Article</span><span class="o">.</span><span class="n">authorized</span><span class="p">(</span><span class="s1">'read'</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Query by multiple parameters, including authorization:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Article</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">or_</span><span class="p">(</span>
-    <span class="n">Article</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;open article&#39;</span><span class="p">),</span>
-    <span class="n">Article</span><span class="o">.</span><span class="n">authorized</span><span class="p">(</span><span class="s1">&#39;read&#39;</span><span class="p">)</span>
+    <span class="n">Article</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">'open article'</span><span class="p">),</span>
+    <span class="n">Article</span><span class="o">.</span><span class="n">authorized</span><span class="p">(</span><span class="s1">'read'</span><span class="p">)</span>
 <span class="p">))</span>
 </pre></div>
 </div>
