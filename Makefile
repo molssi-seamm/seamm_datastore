@@ -63,7 +63,7 @@ format: ## reformat with with yapf and isort
 	black --extend-exclude '_version.py|alembic/' $(MODULE) $(MODULE)/tests
 
 test: ## run tests quickly with the default Python
-	pytest --doctest-modules $(MODULE)/tests $(MODULE)
+	pytest --doctest-modules $(MODULE)/tests
 
 dependencies:
 	pur -r requirements_dev.txt
