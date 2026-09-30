@@ -1,0 +1,63 @@
+#!/usr/bin/env run_flowchart
+format: MolSSI flowchart 3.0
+metadata:
+  name: ''
+  description: ''
+requires:
+  dftbplus_step: 2021.6.5
+  from_smiles_step: 2021.8.4.1
+  seamm: 2021.8.3.3
+digest:
+  sha256: 47ac094618076f64d263af38b8473a3ecb734dc1efddc76d050c97d043b2f9b3
+  sha256_strict: 082737ce6e0894d070a361df34c485848bedccf78a12b17992965676317c9ec1
+steps:
+- step: FromSMILESStep
+  parameters:
+    smiles string: CCS
+    structure handling: Overwrite the current configuration
+    subsequent structure handling: Create a new system and configuration
+    system name: from file
+    configuration name: use Canonical SMILES string
+- step: DFTB+
+  parameters:
+    calculation: geometry optimization
+  steps:
+  - step: ChooseParameters
+    parameters:
+      elements: []
+      dataset: 3ob
+      subset: none
+  - step: Optimization
+    parameters:
+      SCC: 'Yes'
+      SCCTolerance: 1.0e-05
+      MaxSCCIterations: 100
+      ThirdOrder: Default for parameters
+      HCorrection: Default for parameters
+      Damping Exponent: 4.0
+      results: {}
+      create tables: 'yes'
+      optimization method: Direct inversion of iterative subspace (gDIIS)
+      MaxForceComponent: [0.0001, hartree/bohr]
+      MaxSteps: 200
+      LatticeOpt: 'Yes'
+      constrain_cell: 'No'
+      fix_a: 'No'
+      fix_b: 'No'
+      fix_c: 'No'
+      pressure: 0.0
+      MaxAtomStep: 0.2
+      MaxLatticeStep: 0.2
+      stop_if_scc_fails: 'Yes'
+      StepSize: [100.0, a_u_time]
+      Alpha: 0.1
+      Generations: 8
+      Memory: 20
+      LineSearch: 'No'
+layout:
+  '0': [150.0, 35.0]
+  '1': [150.0, 105.0]
+  '2': [150.0, 175.0]
+  '2.0': [150.0, 35.0]
+  '2.1': [150.0, 105.0]
+  '2.2': [150.0, 175.0]

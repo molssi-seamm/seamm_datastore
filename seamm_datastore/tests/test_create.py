@@ -40,6 +40,10 @@ def test_project_create_group(connection):
     assert project.group.name == "admin"
 
 
+# The digest the frozen converter gives sample_flowchart_v2.flow in format 3.0
+SHA256_STRICT_V3 = "082737ce6e0894d070a361df34c485848bedccf78a12b17992965676317c9ec1"
+
+
 def test_flowchart_parse(connection):
     this_file = os.path.dirname(os.path.abspath(__file__))
     filepath = os.path.join(this_file, "..", "data", "sample_flowchart_v2.flow")
@@ -65,6 +69,31 @@ def test_flowchart_from_file(connection):
         flowchart.sha256_strict
         == "79d580b78559fe137872bcffe24aa7455e6c66fe260cf63e5edd3b3a1464e9c6"
     )
+
+
+def test_flowchart_parse_v3(connection):
+    """Format 3.0 (YAML): the metadata and digests come from the file."""
+    this_file = os.path.dirname(os.path.abspath(__file__))
+    filepath = os.path.join(this_file, "..", "data", "sample_flowchart_v3.flow")
+
+    metadata, data = connection.Flowchart.parse_flowchart_file(filepath)
+
+    assert metadata["flowchart_version"] == 3.0
+    assert metadata["sha256_strict"] == SHA256_STRICT_V3
+    assert data["format"] == "MolSSI flowchart 3.0"
+    assert len(data["steps"]) > 0
+    # 'yes' and 'no' stay strings
+    assert "yes" in str(data["steps"]) and "True" not in str(data["steps"])
+
+
+def test_flowchart_from_file_v3(connection):
+    this_file = os.path.dirname(os.path.abspath(__file__))
+    filepath = os.path.join(this_file, "..", "data", "sample_flowchart_v3.flow")
+
+    flowchart = connection.Flowchart.create_from_file(filepath)
+
+    assert flowchart.sha256_strict == SHA256_STRICT_V3
+    assert flowchart.flowchart_version == 3.0
 
 
 def test_create_user(connection):
