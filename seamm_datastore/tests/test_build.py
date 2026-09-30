@@ -76,3 +76,67 @@ def test_import_datastore_duplicate_project_name_recovers(connection, tmp_path):
     ids = {j["id"] for j in jobs}
     assert 1 in ids, "job with a duplicated project name should still import"
     assert 2 in ids, "a later job in the same scan must not be skipped"
+
+
+def _job_dirs(projects, jobs):
+    """Job directories with the sample 3.0 flowchart and a job_data.json."""
+    import json
+    import os
+    import shutil
+
+    sample = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "data",
+        "sample_flowchart_v3.flow",
+    )
+    for job_id, directory, listed in jobs:
+        job_dir = projects / directory / f"Job_{job_id:06d}"
+        job_dir.mkdir(parents=True)
+        shutil.copy(sample, job_dir / "flowchart.flow")
+        data = {
+            "job id": job_id,
+            "title": f"Job {job_id}",
+            "state": "finished",
+            "projects": [listed],
+            "working directory": str(job_dir),
+            "command line": [],
+        }
+        (job_dir / "job_data.json").write_text(
+            "!MolSSI job_data 1.0\n" + json.dumps(data)
+        )
+
+
+def test_build_from_jobs(tmp_path):
+    """A datastore from job directories, keeping the accounts and job owners of the
+    one it replaces; a job may list a project with no directory of its own."""
+    import sqlite3
+
+    import seamm_datastore
+
+    projects = tmp_path / "Jobs" / "projects"
+    _job_dirs(projects, [(1, "default", "default"), (2, "water", "Water")])
+    assert len(seamm_datastore.job_directories(projects)) == 2
+
+    first = tmp_path / "Jobs" / "first.db"
+    result = seamm_datastore.build_from_jobs(first, projects)
+    assert result == {"projects": 3, "jobs": 2}
+    db = sqlite3.connect(first)
+    with db:
+        db.execute(
+            "insert into users (id, username, added, status) "
+            "values (99, 'someone', '2026-09-30', 'active')"
+        )
+        db.execute("update jobs set owner_id=99 where id=2")
+    db.close()
+
+    second = tmp_path / "Jobs" / "second.db"
+    seamm_datastore.build_from_jobs(second, projects, keep_from=first)
+    db = sqlite3.connect(second)
+    assert db.execute("select username from users where id=99").fetchone() == (
+        "someone",
+    )
+    assert db.execute("select owner_id from jobs where id=2").fetchone() == (99,)
+    names = {r[0] for r in db.execute("select name from projects")}
+    assert {"default", "water", "Water"} <= names
+    db.close()
