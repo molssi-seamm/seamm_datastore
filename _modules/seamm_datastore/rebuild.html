@@ -1,0 +1,265 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seamm_datastore.rebuild &mdash; seamm_datastore  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            seamm_datastore
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">seamm_datastore</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">seamm_datastore.rebuild</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for seamm_datastore.rebuild</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">"""Build a datastore from the job directories on disk.</span>
+
+<span class="sd">The job directories are the record of what ran: each holds its flowchart and a</span>
+<span class="sd">``job_data.json``. A datastore can therefore be made again from them -- when the</span>
+<span class="sd">database file is missing, or to replace one that no longer matches the disk.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">getpass</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># The tables of accounts, copied whole from the datastore being replaced</span>
+<span class="n">_ACCOUNT_TABLES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"users"</span><span class="p">,</span> <span class="s2">"groups"</span><span class="p">,</span> <span class="s2">"roles"</span><span class="p">,</span> <span class="s2">"user_group"</span><span class="p">,</span> <span class="s2">"user_role"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="job_directories">
+<a class="viewcode-back" href="../../api/seamm_datastore.html#seamm_datastore.rebuild.job_directories">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">job_directories</span><span class="p">(</span><span class="n">projects_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The job directories (those with a job_data.json) under a projects directory.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    projects_path : str or Path</span>
+<span class="sd">        E.g. &lt;root&gt;/Jobs/projects.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    [Path]</span>
+<span class="sd">    """</span>
+    <span class="n">projects_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">projects_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">projects_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">parent</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">projects_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*/*/job_data.json"</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="build_from_jobs">
+<a class="viewcode-back" href="../../api/seamm_datastore.html#seamm_datastore.rebuild.build_from_jobs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_from_jobs</span><span class="p">(</span>
+    <span class="n">db_path</span><span class="p">,</span>
+    <span class="n">projects_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">keep_from</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_project</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Create a datastore from the job directories on disk.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    db_path : str or Path</span>
+<span class="sd">        The datastore to create. It must not exist yet.</span>
+<span class="sd">    projects_path : str or Path, optional</span>
+<span class="sd">        The directory holding the projects and their jobs; by default the</span>
+<span class="sd">        ``projects`` directory beside the datastore.</span>
+<span class="sd">    username : str, optional</span>
+<span class="sd">        The account that owns what is imported (when ``keep_from`` does not say</span>
+<span class="sd">        otherwise). By default the account named like the user running this, if</span>
+<span class="sd">        there is one, else 'admin'.</span>
+<span class="sd">    keep_from : str or Path, optional</span>
+<span class="sd">        A datastore being replaced. Its accounts (users, groups and roles) are kept,</span>
+<span class="sd">        as are the owners, groups, permissions and descriptions of projects that</span>
+<span class="sd">        still exist, and the owner and permissions of each job that is imported</span>
+<span class="sd">        again.</span>
+<span class="sd">    default_project : str</span>
+<span class="sd">        The name of the default project.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The numbers of projects and jobs imported.</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">seamm_datastore</span>
+
+    <span class="n">db_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">db_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">db_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The datastore </span><span class="si">{</span><span class="n">db_path</span><span class="si">}</span><span class="s2"> already exists."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">projects_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">projects_path</span> <span class="o">=</span> <span class="n">db_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"projects"</span>
+    <span class="n">projects_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">projects_path</span><span class="p">)</span>
+    <span class="n">projects_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">datastore</span> <span class="o">=</span> <span class="n">seamm_datastore</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+        <span class="n">database_uri</span><span class="o">=</span><span class="sa">f</span><span class="s2">"sqlite:///</span><span class="si">{</span><span class="n">db_path</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="n">datastore_location</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">db_path</span><span class="o">.</span><span class="n">parent</span><span class="p">),</span>
+        <span class="n">initialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">default_project</span><span class="o">=</span><span class="n">default_project</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Only after connect(): the models pick up its stand-in for a Flask application</span>
+    <span class="c1"># the first time they are imported.</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">seamm_datastore.database.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+
+    <span class="k">if</span> <span class="n">keep_from</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># The accounts of the datastore being replaced, instead of the defaults</span>
+        <span class="n">datastore</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">db_path</span><span class="p">))</span>
+        <span class="k">with</span> <span class="n">db</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"attach database ? as old"</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">keep_from</span><span class="p">),))</span>
+            <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">_ACCOUNT_TABLES</span><span class="p">):</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">"delete from </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">_ACCOUNT_TABLES</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">"insert into </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> select * from old.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"detach database old"</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">datastore</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">username</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">me</span>
+            <span class="k">if</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">me</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="s2">"admin"</span>
+        <span class="p">)</span>
+    <span class="n">datastore</span><span class="o">.</span><span class="n">_user</span> <span class="o">=</span> <span class="n">username</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">jobs</span><span class="p">,</span> <span class="n">projects</span> <span class="o">=</span> <span class="n">datastore</span><span class="o">.</span><span class="n">import_datastore</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">projects_path</span><span class="p">))</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">datastore</span><span class="o">.</span><span class="n">_user</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">datastore</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">keep_from</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">db_path</span><span class="p">))</span>
+        <span class="k">with</span> <span class="n">db</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"attach database ? as old"</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">keep_from</span><span class="p">),))</span>
+            <span class="c1"># Projects that still exist keep their details</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
+<span class="s2">                update projects set</span>
+<span class="s2">                    description = o.description,</span>
+<span class="s2">                    owner_id = o.owner_id,</span>
+<span class="s2">                    group_id = o.group_id,</span>
+<span class="s2">                    owner_permissions = o.owner_permissions,</span>
+<span class="s2">                    group_permissions = o.group_permissions,</span>
+<span class="s2">                    other_permissions = o.other_permissions</span>
+<span class="s2">                from old.projects as o where o.name = projects.name</span>
+<span class="s2">                """</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"users_projects_association"</span><span class="p">,</span> <span class="s2">"groups_projects_association"</span><span class="p">):</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
+<span class="s2">                    insert into </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> (permissions, entity_id, resource_id)</span>
+<span class="s2">                    select a.permissions, a.entity_id, p.id</span>
+<span class="s2">                    from old.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> a</span>
+<span class="s2">                    join old.projects op on op.id = a.resource_id</span>
+<span class="s2">                    join projects p on p.name = op.name</span>
+<span class="s2">                    """</span><span class="p">)</span>
+            <span class="c1"># Jobs keep their owner and permissions</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
+<span class="s2">                update jobs set</span>
+<span class="s2">                    owner_id = o.owner_id,</span>
+<span class="s2">                    group_id = o.group_id,</span>
+<span class="s2">                    owner_permissions = o.owner_permissions,</span>
+<span class="s2">                    group_permissions = o.group_permissions,</span>
+<span class="s2">                    other_permissions = o.other_permissions</span>
+<span class="s2">                from old.jobs as o where o.id = jobs.id</span>
+<span class="s2">                """</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"detach database old"</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"projects"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">projects</span><span class="p">),</span> <span class="s2">"jobs"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">jobs</span><span class="p">)}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jessica A. Nash (The Molecular Sciences Software Institute). Project structure based on the Computational Molecular Science Python Cookiecutter version 1.5.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

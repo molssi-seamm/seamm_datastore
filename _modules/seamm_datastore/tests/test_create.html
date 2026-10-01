@@ -124,6 +124,10 @@
 
 
 
+<span class="c1"># The digest the frozen converter gives sample_flowchart_v2.flow in format 3.0</span>
+<span class="n">SHA256_STRICT_V3</span> <span class="o">=</span> <span class="s2">"082737ce6e0894d070a361df34c485848bedccf78a12b17992965676317c9ec1"</span>
+
+
 <div class="viewcode-block" id="test_flowchart_parse">
 <a class="viewcode-back" href="../../../api/seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_flowchart_parse">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">test_flowchart_parse</span><span class="p">(</span><span class="n">connection</span><span class="p">):</span>
@@ -154,6 +158,37 @@
         <span class="n">flowchart</span><span class="o">.</span><span class="n">sha256_strict</span>
         <span class="o">==</span> <span class="s2">"79d580b78559fe137872bcffe24aa7455e6c66fe260cf63e5edd3b3a1464e9c6"</span>
     <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="test_flowchart_parse_v3">
+<a class="viewcode-back" href="../../../api/seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_flowchart_parse_v3">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_flowchart_parse_v3</span><span class="p">(</span><span class="n">connection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Format 3.0 (YAML): the metadata and digests come from the file."""</span>
+    <span class="n">this_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_file</span><span class="p">,</span> <span class="s2">".."</span><span class="p">,</span> <span class="s2">"data"</span><span class="p">,</span> <span class="s2">"sample_flowchart_v3.flow"</span><span class="p">)</span>
+
+    <span class="n">metadata</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">Flowchart</span><span class="o">.</span><span class="n">parse_flowchart_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">"flowchart_version"</span><span class="p">]</span> <span class="o">==</span> <span class="mf">3.0</span>
+    <span class="k">assert</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">"sha256_strict"</span><span class="p">]</span> <span class="o">==</span> <span class="n">SHA256_STRICT_V3</span>
+    <span class="k">assert</span> <span class="n">data</span><span class="p">[</span><span class="s2">"format"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"MolSSI flowchart 3.0"</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"steps"</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="c1"># 'yes' and 'no' stay strings</span>
+    <span class="k">assert</span> <span class="s2">"yes"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"steps"</span><span class="p">])</span> <span class="ow">and</span> <span class="s2">"True"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"steps"</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="test_flowchart_from_file_v3">
+<a class="viewcode-back" href="../../../api/seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_flowchart_from_file_v3">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_flowchart_from_file_v3</span><span class="p">(</span><span class="n">connection</span><span class="p">):</span>
+    <span class="n">this_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_file</span><span class="p">,</span> <span class="s2">".."</span><span class="p">,</span> <span class="s2">"data"</span><span class="p">,</span> <span class="s2">"sample_flowchart_v3.flow"</span><span class="p">)</span>
+
+    <span class="n">flowchart</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">Flowchart</span><span class="o">.</span><span class="n">create_from_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">flowchart</span><span class="o">.</span><span class="n">sha256_strict</span> <span class="o">==</span> <span class="n">SHA256_STRICT_V3</span>
+    <span class="k">assert</span> <span class="n">flowchart</span><span class="o">.</span><span class="n">flowchart_version</span> <span class="o">==</span> <span class="mf">3.0</span></div>
 
 
 

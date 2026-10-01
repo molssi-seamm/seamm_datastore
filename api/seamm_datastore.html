@@ -269,6 +269,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="seamm_datastore.tests.html#module-seamm_datastore.tests.test_build">seamm_datastore.tests.test_build module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="seamm_datastore.tests.html#seamm_datastore.tests.test_build.test_build"><code class="docutils literal notranslate"><span class="pre">test_build()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="seamm_datastore.tests.html#seamm_datastore.tests.test_build.test_build_from_jobs"><code class="docutils literal notranslate"><span class="pre">test_build_from_jobs()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="seamm_datastore.tests.html#seamm_datastore.tests.test_build.test_import_datastore_duplicate_project_name_recovers"><code class="docutils literal notranslate"><span class="pre">test_import_datastore_duplicate_project_name_recovers()</span></code></a></li>
 </ul>
 </li>
@@ -277,8 +278,10 @@
 <li class="toctree-l3"><a class="reference internal" href="seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_create_user"><code class="docutils literal notranslate"><span class="pre">test_create_user()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_flowchart_duplicate_hash_raises"><code class="docutils literal notranslate"><span class="pre">test_flowchart_duplicate_hash_raises()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_flowchart_from_file"><code class="docutils literal notranslate"><span class="pre">test_flowchart_from_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_flowchart_from_file_v3"><code class="docutils literal notranslate"><span class="pre">test_flowchart_from_file_v3()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_flowchart_get_or_create_concurrent_race"><code class="docutils literal notranslate"><span class="pre">test_flowchart_get_or_create_concurrent_race()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_flowchart_parse"><code class="docutils literal notranslate"><span class="pre">test_flowchart_parse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_flowchart_parse_v3"><code class="docutils literal notranslate"><span class="pre">test_flowchart_parse_v3()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_flowchart_sha256_strict_unique_constraint"><code class="docutils literal notranslate"><span class="pre">test_flowchart_sha256_strict_unique_constraint()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_job_create_shared_flowchart_reuses_row"><code class="docutils literal notranslate"><span class="pre">test_job_create_shared_flowchart_reuses_row()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="seamm_datastore.tests.html#seamm_datastore.tests.test_create.test_project_create"><code class="docutils literal notranslate"><span class="pre">test_project_create()</span></code></a></li>
@@ -446,6 +449,56 @@ and permissionc checks.</p>
 <dt class="sig sig-object py" id="seamm_datastore.flask_authorize_patch.generate_association_table">
 <span class="sig-prename descclassname"><span class="pre">seamm_datastore.flask_authorize_patch.</span></span><span class="sig-name descname"><span class="pre">generate_association_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity_tablename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_tablename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/flask_authorize_patch.html#generate_association_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.flask_authorize_patch.generate_association_table" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+</section>
+<section id="module-seamm_datastore.rebuild">
+<span id="seamm-datastore-rebuild-module"></span><h2>seamm_datastore.rebuild module<a class="headerlink" href="#module-seamm_datastore.rebuild" title="Link to this heading"></a></h2>
+<p>Build a datastore from the job directories on disk.</p>
+<p>The job directories are the record of what ran: each holds its flowchart and a
+<code class="docutils literal notranslate"><span class="pre">job_data.json</span></code>. A datastore can therefore be made again from them – when the
+database file is missing, or to replace one that no longer matches the disk.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="seamm_datastore.rebuild.build_from_jobs">
+<span class="sig-prename descclassname"><span class="pre">seamm_datastore.rebuild.</span></span><span class="sig-name descname"><span class="pre">build_from_jobs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projects_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/rebuild.html#build_from_jobs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.rebuild.build_from_jobs" title="Link to this definition"></a></dt>
+<dd><p>Create a datastore from the job directories on disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db_path</strong> (<em>str or Path</em>) – The datastore to create. It must not exist yet.</p></li>
+<li><p><strong>projects_path</strong> (<em>str or Path, optional</em>) – The directory holding the projects and their jobs; by default the
+<code class="docutils literal notranslate"><span class="pre">projects</span></code> directory beside the datastore.</p></li>
+<li><p><strong>username</strong> (<em>str, optional</em>) – The account that owns what is imported (when <code class="docutils literal notranslate"><span class="pre">keep_from</span></code> does not say
+otherwise). By default the account named like the user running this, if
+there is one, else ‘admin’.</p></li>
+<li><p><strong>keep_from</strong> (<em>str or Path, optional</em>) – A datastore being replaced. Its accounts (users, groups and roles) are kept,
+as are the owners, groups, permissions and descriptions of projects that
+still exist, and the owner and permissions of each job that is imported
+again.</p></li>
+<li><p><strong>default_project</strong> (<em>str</em>) – The name of the default project.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The numbers of projects and jobs imported.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="seamm_datastore.rebuild.job_directories">
+<span class="sig-prename descclassname"><span class="pre">seamm_datastore.rebuild.</span></span><span class="sig-name descname"><span class="pre">job_directories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projects_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/rebuild.html#job_directories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.rebuild.job_directories" title="Link to this definition"></a></dt>
+<dd><p>The job directories (those with a job_data.json) under a projects directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>projects_path</strong> (<em>str or Path</em>) – E.g. &lt;root&gt;/Jobs/projects.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>[Path]</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-seamm_datastore.util">

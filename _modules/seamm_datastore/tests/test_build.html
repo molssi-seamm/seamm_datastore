@@ -154,6 +154,73 @@
     <span class="k">assert</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">,</span> <span class="s2">"job with a duplicated project name should still import"</span>
     <span class="k">assert</span> <span class="mi">2</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">,</span> <span class="s2">"a later job in the same scan must not be skipped"</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_job_dirs</span><span class="p">(</span><span class="n">projects</span><span class="p">,</span> <span class="n">jobs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Job directories with the sample 3.0 flowchart and a job_data.json."""</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+        <span class="s2">".."</span><span class="p">,</span>
+        <span class="s2">"data"</span><span class="p">,</span>
+        <span class="s2">"sample_flowchart_v3.flow"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">listed</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">:</span>
+        <span class="n">job_dir</span> <span class="o">=</span> <span class="n">projects</span> <span class="o">/</span> <span class="n">directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"Job_</span><span class="si">{</span><span class="n">job_id</span><span class="si">:</span><span class="s2">06d</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">job_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">job_dir</span> <span class="o">/</span> <span class="s2">"flowchart.flow"</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"job id"</span><span class="p">:</span> <span class="n">job_id</span><span class="p">,</span>
+            <span class="s2">"title"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Job </span><span class="si">{</span><span class="n">job_id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="s2">"state"</span><span class="p">:</span> <span class="s2">"finished"</span><span class="p">,</span>
+            <span class="s2">"projects"</span><span class="p">:</span> <span class="p">[</span><span class="n">listed</span><span class="p">],</span>
+            <span class="s2">"working directory"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">job_dir</span><span class="p">),</span>
+            <span class="s2">"command line"</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+        <span class="p">(</span><span class="n">job_dir</span> <span class="o">/</span> <span class="s2">"job_data.json"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+            <span class="s2">"!MolSSI job_data 1.0</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="test_build_from_jobs">
+<a class="viewcode-back" href="../../../seamm_datastore.tests.html#seamm_datastore.tests.test_build.test_build_from_jobs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_build_from_jobs</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A datastore from job directories, keeping the accounts and job owners of the</span>
+<span class="sd">    one it replaces; a job may list a project with no directory of its own."""</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
+
+    <span class="kn">import</span><span class="w"> </span><span class="nn">seamm_datastore</span>
+
+    <span class="n">projects</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">"Jobs"</span> <span class="o">/</span> <span class="s2">"projects"</span>
+    <span class="n">_job_dirs</span><span class="p">(</span><span class="n">projects</span><span class="p">,</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"default"</span><span class="p">,</span> <span class="s2">"default"</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">"water"</span><span class="p">,</span> <span class="s2">"Water"</span><span class="p">)])</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">seamm_datastore</span><span class="o">.</span><span class="n">job_directories</span><span class="p">(</span><span class="n">projects</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span>
+
+    <span class="n">first</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">"Jobs"</span> <span class="o">/</span> <span class="s2">"first.db"</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">seamm_datastore</span><span class="o">.</span><span class="n">build_from_jobs</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">projects</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s2">"projects"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"jobs"</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">first</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">db</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">"insert into users (id, username, added, status) "</span>
+            <span class="s2">"values (99, 'someone', '2026-09-30', 'active')"</span>
+        <span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"update jobs set owner_id=99 where id=2"</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">second</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">"Jobs"</span> <span class="o">/</span> <span class="s2">"second.db"</span>
+    <span class="n">seamm_datastore</span><span class="o">.</span><span class="n">build_from_jobs</span><span class="p">(</span><span class="n">second</span><span class="p">,</span> <span class="n">projects</span><span class="p">,</span> <span class="n">keep_from</span><span class="o">=</span><span class="n">first</span><span class="p">)</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">second</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select username from users where id=99"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span>
+        <span class="s2">"someone"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select owner_id from jobs where id=2"</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">99</span><span class="p">,)</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">{</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"select name from projects"</span><span class="p">)}</span>
+    <span class="k">assert</span> <span class="p">{</span><span class="s2">"default"</span><span class="p">,</span> <span class="s2">"water"</span><span class="p">,</span> <span class="s2">"Water"</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="n">names</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
 </pre></div>
 
            </div>

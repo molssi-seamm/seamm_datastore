@@ -217,6 +217,25 @@
                             <span class="k">else</span><span class="p">:</span>
                                 <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"cmdline"</span><span class="p">:</span> <span class="p">[]}</span>
 
+                            <span class="c1"># A job may list a project that has no directory of its</span>
+                            <span class="c1"># own, e.g. 'Water' for a job in 'water' on a file system</span>
+                            <span class="c1"># that ignores case. Create it, at &lt;location&gt;/&lt;name&gt; as</span>
+                            <span class="c1"># the job server would have.</span>
+                            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">job_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"project_names"</span><span class="p">,</span> <span class="p">[]):</span>
+                                <span class="k">if</span> <span class="n">Project</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="k">try</span><span class="p">:</span>
+                                        <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                                            <span class="n">Project</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                                                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                                                <span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">location</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span>
+                                                <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span>
+                                            <span class="p">)</span>
+                                        <span class="p">)</span>
+                                        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+                                        <span class="n">project_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                                        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+
                             <span class="k">try</span><span class="p">:</span>
                                 <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
                                     <span class="n">job_data</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span>

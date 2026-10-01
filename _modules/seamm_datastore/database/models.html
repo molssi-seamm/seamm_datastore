@@ -619,9 +619,14 @@
         <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-            <span class="n">version_info</span> <span class="o">=</span> <span class="s2">" "</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">whole</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">_is_format3</span><span class="p">(</span><span class="n">whole</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_parse_format3</span><span class="p">(</span><span class="n">whole</span><span class="p">)</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">whole</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(</span><span class="n">keepends</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">version_info</span> <span class="o">=</span> <span class="s2">" "</span> <span class="o">+</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
 
         <span class="k">if</span> <span class="s2">" 1."</span> <span class="ow">in</span> <span class="n">version_info</span><span class="p">:</span>
             <span class="n">metadata_pattern</span> <span class="o">=</span> <span class="kc">None</span>
@@ -648,6 +653,47 @@
         <span class="k">return</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">flowchart</span></div>
 </div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_format3</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Whether a flowchart's text is format 3.0 (YAML)."""</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#!"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">""</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"format: MolSSI flowchart 3."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_format3</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The metadata and flowchart data of a format 3.0 flowchart.</span>
+
+<span class="sd">    Returns the metadata, including the digests and the flowchart version, as</span>
+<span class="sd">    parse_flowchart_file does for older formats, and the flowchart's data (a dict).</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+    <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Loader</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Only true/false are booleans, so 'yes' and 'no' stay strings."""</span>
+
+    <span class="n">Loader</span><span class="o">.</span><span class="n">yaml_implicit_resolvers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">key</span><span class="p">:</span> <span class="p">[(</span><span class="n">tag</span><span class="p">,</span> <span class="n">regexp</span><span class="p">)</span> <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">regexp</span> <span class="ow">in</span> <span class="n">value</span> <span class="k">if</span> <span class="n">tag</span> <span class="o">!=</span> <span class="s2">"tag:yaml.org,2002:bool"</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="o">.</span><span class="n">yaml_implicit_resolvers</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="n">Loader</span><span class="o">.</span><span class="n">add_implicit_resolver</span><span class="p">(</span>
+        <span class="s2">"tag:yaml.org,2002:bool"</span><span class="p">,</span>
+        <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^(?:true|True|TRUE|false|False|FALSE)$"</span><span class="p">),</span>
+        <span class="nb">list</span><span class="p">(</span><span class="s2">"tTfF"</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">Loader</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"metadata"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span>
+    <span class="n">digest</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"digest"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">"sha256"</span><span class="p">]</span> <span class="o">=</span> <span class="n">digest</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sha256"</span><span class="p">)</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">"sha256_strict"</span><span class="p">]</span> <span class="o">=</span> <span class="n">digest</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sha256_strict"</span><span class="p">)</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">"flowchart_version"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"format"</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">data</span>
 
 
 <div class="viewcode-block" id="Job">

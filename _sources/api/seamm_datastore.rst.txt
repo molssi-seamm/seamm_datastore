@@ -29,6 +29,14 @@ seamm\_datastore.flask\_authorize\_patch module
    :show-inheritance:
    :undoc-members:
 
+seamm\_datastore.rebuild module
+-------------------------------
+
+.. automodule:: seamm_datastore.rebuild
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 seamm\_datastore.util module
 ----------------------------
 

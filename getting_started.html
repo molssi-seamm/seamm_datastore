@@ -44,7 +44,11 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#flowchart-formats">Flowchart formats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rebuilding-a-datastore-from-the-job-directories">Rebuilding a datastore from the job directories</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
 </ul>
 
@@ -75,6 +79,38 @@
   <section id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
 <p>This page details how to get started with seamm_datastore.</p>
+<section id="flowchart-formats">
+<h2>Flowchart formats<a class="headerlink" href="#flowchart-formats" title="Link to this heading"></a></h2>
+<p>The datastore records the flowchart of every job. It reads both SEAMM flowchart
+formats: the JSON format 2.0, and the YAML format 3.0 that SEAMM writes from its
+2026.10 releases on. A format 3.0 flowchart’s metadata (title, description, creators
+and so on) and its digests come from the file’s <code class="docutils literal notranslate"><span class="pre">metadata</span></code> and <code class="docutils literal notranslate"><span class="pre">digest</span></code> sections.
+Converting an installation’s existing flowcharts to 3.0 is done by SEAMM itself
+(<code class="docutils literal notranslate"><span class="pre">seamm-manager</span> <span class="pre">flowcharts</span> <span class="pre">migrate</span></code>), not by the datastore.</p>
+</section>
+<section id="rebuilding-a-datastore-from-the-job-directories">
+<h2>Rebuilding a datastore from the job directories<a class="headerlink" href="#rebuilding-a-datastore-from-the-job-directories" title="Link to this heading"></a></h2>
+<p>Each job directory holds the job’s flowchart and a <code class="docutils literal notranslate"><span class="pre">job_data.json</span></code>, which is what
+the datastore records, so a datastore can be made again from the directories:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">seamm_datastore</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">seamm_datastore</span><span class="o">.</span><span class="n">build_from_jobs</span><span class="p">(</span>
+    <span class="s2">"Jobs/seamm.db.new"</span><span class="p">,</span>             <span class="c1"># the datastore to create; must not exist</span>
+    <span class="s2">"Jobs/projects"</span><span class="p">,</span>                 <span class="c1"># the projects and their jobs</span>
+    <span class="n">keep_from</span><span class="o">=</span><span class="s2">"Jobs/seamm.db"</span><span class="p">,</span>       <span class="c1"># optional: the datastore being replaced</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"projects"</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="s2">"jobs"</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">keep_from</span></code>, the accounts (users, groups and roles), the details of projects
+that still exist, and the owner and permissions of each job are kept from the old
+datastore; without it, everything is owned by the user running the rebuild (or
+<code class="docutils literal notranslate"><span class="pre">username</span></code>). Projects that a job lists but that do not exist yet are created.
+<code class="docutils literal notranslate"><span class="pre">job_directories(projects_path)</span></code> lists the job directories that would be read.</p>
+<p>Users normally do this with <code class="docutils literal notranslate"><span class="pre">seamm-manager</span> <span class="pre">datastore</span> <span class="pre">rebuild</span></code>, which stops the
+services, keeps the accounts, and keeps the old datastore as a dated backup. The web
+UI also builds a missing datastore from the job directories when it starts.</p>
+</section>
 </section>
 
 

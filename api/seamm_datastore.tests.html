@@ -108,6 +108,13 @@
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="seamm_datastore.tests.test_build.test_build_from_jobs">
+<span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_build.</span></span><span class="sig-name descname"><span class="pre">test_build_from_jobs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_build.html#test_build_from_jobs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_build.test_build_from_jobs" title="Link to this definition"></a></dt>
+<dd><p>A datastore from job directories, keeping the accounts and job owners of the
+one it replaces; a job may list a project with no directory of its own.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="seamm_datastore.tests.test_build.test_import_datastore_duplicate_project_name_recovers">
 <span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_build.</span></span><span class="sig-name descname"><span class="pre">test_import_datastore_duplicate_project_name_recovers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_build.html#test_import_datastore_duplicate_project_name_recovers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_build.test_import_datastore_duplicate_project_name_recovers" title="Link to this definition"></a></dt>
 <dd><p>A job_data.json listing the same project twice (a real case seen in
@@ -153,6 +160,11 @@ per-job failure can no longer take down the whole scan.</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="seamm_datastore.tests.test_create.test_flowchart_from_file_v3">
+<span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_create.</span></span><span class="sig-name descname"><span class="pre">test_flowchart_from_file_v3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_create.html#test_flowchart_from_file_v3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_create.test_flowchart_from_file_v3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="seamm_datastore.tests.test_create.test_flowchart_get_or_create_concurrent_race">
 <span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_create.</span></span><span class="sig-name descname"><span class="pre">test_flowchart_get_or_create_concurrent_race</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_create.html#test_flowchart_get_or_create_concurrent_race"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_create.test_flowchart_get_or_create_concurrent_race" title="Link to this definition"></a></dt>
 <dd><p>A get-or-create that loses a race to another job’s commit must fall
@@ -174,6 +186,12 @@ SQLite’s single-writer locking.</p>
 <dt class="sig sig-object py" id="seamm_datastore.tests.test_create.test_flowchart_parse">
 <span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_create.</span></span><span class="sig-name descname"><span class="pre">test_flowchart_parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_create.html#test_flowchart_parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_create.test_flowchart_parse" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="seamm_datastore.tests.test_create.test_flowchart_parse_v3">
+<span class="sig-prename descclassname"><span class="pre">seamm_datastore.tests.test_create.</span></span><span class="sig-name descname"><span class="pre">test_flowchart_parse_v3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/seamm_datastore/tests/test_create.html#test_flowchart_parse_v3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seamm_datastore.tests.test_create.test_flowchart_parse_v3" title="Link to this definition"></a></dt>
+<dd><p>Format 3.0 (YAML): the metadata and digests come from the file.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="seamm_datastore.tests.test_create.test_flowchart_sha256_strict_unique_constraint">
