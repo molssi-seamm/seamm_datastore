@@ -495,9 +495,14 @@ class Flowchart(Base, Resource):
         import json
 
         with open(path) as f:
-            f.readline()
-            version_info = " " + f.readline().split()[-1]
-            text = f.read()
+            whole = f.read()
+
+        if _is_format3(whole):
+            return _parse_format3(whole)
+
+        lines = whole.splitlines(keepends=True)
+        version_info = " " + lines[1].split()[-1]
+        text = "".join(lines[2:])
 
         if " 1." in version_info:
             metadata_pattern = None
@@ -522,6 +527,47 @@ class Flowchart(Base, Resource):
         flowchart = flowchart_pattern.findall(text)[0]
 
         return metadata, flowchart
+
+
+def _is_format3(text):
+    """Whether a flowchart's text is format 3.0 (YAML)."""
+    for line in text.splitlines()[:5]:
+        if line.startswith("#!") or line.strip() == "":
+            continue
+        return line.strip().startswith("format: MolSSI flowchart 3.")
+    return False
+
+
+def _parse_format3(text):
+    """The metadata and flowchart data of a format 3.0 flowchart.
+
+    Returns the metadata, including the digests and the flowchart version, as
+    parse_flowchart_file does for older formats, and the flowchart's data (a dict).
+    """
+    import re
+
+    import yaml
+
+    class Loader(yaml.SafeLoader):
+        """Only true/false are booleans, so 'yes' and 'no' stay strings."""
+
+    Loader.yaml_implicit_resolvers = {
+        key: [(tag, regexp) for tag, regexp in value if tag != "tag:yaml.org,2002:bool"]
+        for key, value in yaml.SafeLoader.yaml_implicit_resolvers.items()
+    }
+    Loader.add_implicit_resolver(
+        "tag:yaml.org,2002:bool",
+        re.compile(r"^(?:true|True|TRUE|false|False|FALSE)$"),
+        list("tTfF"),
+    )
+
+    data = yaml.load(text, Loader=Loader)
+    metadata = dict(data.get("metadata") or {})
+    digest = data.get("digest") or {}
+    metadata["sha256"] = digest.get("sha256")
+    metadata["sha256_strict"] = digest.get("sha256_strict")
+    metadata["flowchart_version"] = float(data["format"].split()[-1])
+    return metadata, data
 
 
 class Job(Base, Resource):

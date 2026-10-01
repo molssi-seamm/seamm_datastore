@@ -143,6 +143,25 @@ def import_datastore(session, location, as_json=True):
                             else:
                                 parameters = {"cmdline": []}
 
+                            # A job may list a project that has no directory of its
+                            # own, e.g. 'Water' for a job in 'water' on a file system
+                            # that ignores case. Create it, at <location>/<name> as
+                            # the job server would have.
+                            for name in job_data.get("project_names", []):
+                                if Project.query.filter_by(name=name).count() == 0:
+                                    try:
+                                        session.add(
+                                            Project.create(
+                                                name=name,
+                                                path=os.path.join(location, name),
+                                                group=group,
+                                            )
+                                        )
+                                        session.commit()
+                                        project_names.append(name)
+                                    except ValueError:
+                                        session.rollback()
+
                             try:
                                 job = Job.create(
                                     job_data["id"],

@@ -1,6 +1,16 @@
 =======
 History
 =======
+2026.10.1 -- Reads flowchart format 3.0, and rebuilds a datastore from the jobs
+    * The datastore now reads SEAMM's new YAML flowchart format 3.0 as well as format
+      2.0, taking the flowchart's metadata and digests from the file.
+    * New ``build_from_jobs()`` makes a datastore from the job directories (each job's
+      flowchart and ``job_data.json``), optionally keeping the accounts, project
+      details and job owners from the datastore it replaces. ``job_directories()``
+      lists the jobs it would read. Importing a job now creates any project it lists
+      that does not exist yet.
+    * Documented both in Getting Started.
+
 2026.9.25 -- Bugfix: alembic is now a declared dependency
     * The database migration scripts import alembic, which the installer runs when
       updating the datastore, but it was not listed as a requirement. It is now.
